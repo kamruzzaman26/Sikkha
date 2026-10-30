@@ -59,9 +59,9 @@ async function AdminAffiliatesContent({
   const { data: profiles, error: profilesError } =
     userIds.length > 0
       ? await supabase
-          .from("customer_profiles")
-          .select("user_id, display_name")
-          .in("user_id", userIds)
+          .from("profiles")
+          .select("id, display_name")
+          .in("id", userIds)
       : { data: [], error: null };
   if (profilesError) {
     throw new Error("Unable to load affiliate applicant profiles.", {
@@ -69,7 +69,7 @@ async function AdminAffiliatesContent({
     });
   }
   const displayNames = new Map(
-    profiles.map((profile) => [profile.user_id, profile.display_name]),
+    profiles.map((profile) => [profile.id, profile.display_name]),
   );
   const params = await searchParams;
   const status = Array.isArray(params.status) ? params.status[0] : params.status;
