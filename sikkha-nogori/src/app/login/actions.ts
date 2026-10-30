@@ -23,33 +23,10 @@ export async function signInCustomer(formData: FormData) {
   }
 
   const supabase = await createSupabaseServerClient();
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.signInWithPassword({ email, password });
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
 
-  if (error || !user) {
+  if (error) {
     redirect("/login?status=invalid");
-  }
-
-  const { data: profile, error: profileError } = await supabase
-    .from("customer_profiles")
-    .select("account_status")
-    .eq("user_id", user.id)
-    .maybeSingle();
-  if (profileError) {
-    throw new Error("Unable to verify customer account status.", {
-      cause: profileError,
-    });
-  }
-  if (!profile || profile.account_status !== "active") {
-    const { error: signOutError } = await supabase.auth.signOut();
-    if (signOutError) {
-      throw new Error("Unable to sign out an unavailable customer account.", {
-        cause: signOutError,
-      });
-    }
-    redirect("/login?status=suspended");
   }
 
   redirect("/dashboard");
