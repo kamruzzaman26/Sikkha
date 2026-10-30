@@ -463,7 +463,7 @@ async function AdminContent({
         </header>
 
         {role === "admin" && (
-          <div className="mt-5 flex flex-wrap gap-3">
+          <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <Link
               href="/admin/payments"
               className="inline-flex min-h-11 items-center rounded-lg border border-emerald-700 px-4 py-2.5 font-semibold text-emerald-800 transition hover:bg-emerald-50"
@@ -489,6 +489,27 @@ async function AdminContent({
               ব্যবহারকারী পরিচালনা
             </Link>
           </div>
+        )}
+
+        {role === "admin" && (
+          <section aria-label="ক্যাটালগ সারাংশ" className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="rounded-xl border border-slate-200 bg-white p-4">
+              <p className="text-sm text-slate-600">মোট পণ্য</p>
+              <p className="mt-1 text-2xl font-extrabold tabular-nums">{products.length}</p>
+            </div>
+            <div className="rounded-xl border border-slate-200 bg-white p-4">
+              <p className="text-sm text-slate-600">প্রকাশিত পণ্য</p>
+              <p className="mt-1 text-2xl font-extrabold tabular-nums">{products.filter((product) => product.is_published && !product.archived_at).length}</p>
+            </div>
+            <div className="rounded-xl border border-slate-200 bg-white p-4">
+              <p className="text-sm text-slate-600">খসড়া পণ্য</p>
+              <p className="mt-1 text-2xl font-extrabold tabular-nums">{products.filter((product) => !product.is_published && !product.archived_at).length}</p>
+            </div>
+            <div className="rounded-xl border border-slate-200 bg-white p-4">
+              <p className="text-sm text-slate-600">সক্রিয় অ্যাফিলিয়েট লিংক</p>
+              <p className="mt-1 text-2xl font-extrabold tabular-nums">{links.filter((link) => link.is_active).length}</p>
+            </div>
+          </section>
         )}
 
         {statusMessage && (
