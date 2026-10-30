@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 };
 
 const messages = {
-  invalid: "নাম বা ফোন নম্বর যাচাই করুন।",
+  invalid: "নাম যাচাই করুন।",
   saved: "আপনার প্রোফাইল হালনাগাদ হয়েছে।",
 } as const;
 
@@ -23,9 +23,9 @@ async function ProfileContent({
   const params = await searchParams;
   const status = Array.isArray(params.status) ? params.status[0] : params.status;
   const { data: profile, error } = await supabase
-    .from("customer_profiles")
-    .select("display_name, phone")
-    .eq("user_id", user.id)
+    .from("profiles")
+    .select("display_name")
+    .eq("id", user.id)
     .maybeSingle();
 
   if (error) {
@@ -60,20 +60,6 @@ async function ProfileContent({
               name="displayName"
               maxLength={100}
               defaultValue={profile?.display_name ?? ""}
-              className="w-full rounded-lg border border-slate-300 px-3 py-2.5"
-            />
-          </div>
-          <div>
-            <label htmlFor="profile-phone" className="mb-2 block font-semibold">
-              ফোন নম্বর
-            </label>
-            <input
-              id="profile-phone"
-              name="phone"
-              type="tel"
-              autoComplete="tel"
-              maxLength={25}
-              defaultValue={profile?.phone ?? ""}
               className="w-full rounded-lg border border-slate-300 px-3 py-2.5"
             />
           </div>
