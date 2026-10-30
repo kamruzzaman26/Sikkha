@@ -12,24 +12,18 @@ function getValue(formData: FormData, name: string): string {
 export async function updateCustomerProfile(formData: FormData) {
   const { supabase, user } = await requireCustomer();
   const displayName = getValue(formData, "displayName");
-  const phone = getValue(formData, "phone");
 
-  if (
-    displayName.length > 100 ||
-    phone.length > 25 ||
-    (phone !== "" && !/^[+0-9][0-9+ ()-]{6,24}$/.test(phone))
-  ) {
+  if (displayName.length > 100) {
     redirect("/dashboard/profile?status=invalid");
   }
 
   const { error } = await supabase
-    .from("customer_profiles")
+    .from("profiles")
     .update({
       display_name: displayName,
-      phone,
       updated_at: new Date().toISOString(),
     })
-    .eq("user_id", user.id);
+    .eq("id", user.id);
 
   if (error) {
     throw new Error("Unable to update your profile.", { cause: error });
