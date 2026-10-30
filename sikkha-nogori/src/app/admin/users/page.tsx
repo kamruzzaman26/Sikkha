@@ -16,7 +16,7 @@ const messages: Record<string, string> = {
   suspended: "ব্যবহারকারী অ্যাকাউন্ট স্থগিত করা হয়েছে।",
   invalid: "তথ্য যাচাই করুন।",
   forbidden: "এই কাজের জন্য Admin অনুমতি প্রয়োজন।",
-  "not-found": "ব্যবহারকারী পাওয়া যায়নি।",
+  "not-found": "ব্যবহারকারী পাওয়া যায়নি।",\n  unsupported: "বর্তমান ডেটাবেজ schema-তে account_status নেই; তাই suspend/activate সুবিধা বন্ধ রাখা হয়েছে।",
 };
 
 type UserSummary = {
