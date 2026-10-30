@@ -14,9 +14,9 @@ async function DashboardContent() {
   const [{ data: profile, error: profileError }, { count, error: purchaseError }] =
     await Promise.all([
       supabase
-        .from("customer_profiles")
+        .from("profiles")
         .select("display_name")
-        .eq("user_id", user.id)
+        .eq("id", user.id)
         .maybeSingle(),
       supabase
         .from("product_entitlements")
@@ -80,7 +80,7 @@ async function DashboardContent() {
             className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm hover:border-emerald-500"
           >
             <h2 className="text-xl font-bold">প্রোফাইল</h2>
-            <p className="mt-2 text-slate-600">নিজের নাম ও ফোন নম্বর হালনাগাদ করুন।</p>
+            <p className="mt-2 text-slate-600">নিজের নাম হালনাগাদ করুন।</p>
           </Link>
           <Link
             href="/affiliate"
