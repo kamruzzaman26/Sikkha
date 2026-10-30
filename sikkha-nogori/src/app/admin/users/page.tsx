@@ -16,7 +16,7 @@ const messages: Record<string, string> = {
   suspended: "ব্যবহারকারী অ্যাকাউন্ট স্থগিত করা হয়েছে।",
   invalid: "তথ্য যাচাই করুন।",
   forbidden: "এই কাজের জন্য Admin অনুমতি প্রয়োজন।",
-  "not-found": "ব্যবহারকারী পাওয়া যায়নি।",\n  unsupported: "বর্তমান ডেটাবেজ schema-তে account_status নেই; তাই suspend/activate সুবিধা বন্ধ রাখা হয়েছে।",
+  "not-found": "ব্যবহারকারী পাওয়া যায়নি।",
 };
 
 type UserSummary = {
@@ -68,8 +68,9 @@ async function AdminUsersContent({
         </div>
         <h1 className="mt-8 text-3xl font-extrabold">ব্যবহারকারী পরিচালনা</h1>
         <p className="mt-2 leading-7 text-slate-600">
-          সর্বশেষ ৫০০টি অ্যাকাউন্ট। Admin role এখানে পরিবর্তনযোগ্য নয়; affiliate
-          membership আলাদা অনুমোদিত প্রক্রিয়ায় পরিচালিত হয়।
+          সর্বশেষ ৫০০টি অ্যাকাউন্ট। Admin ও অন্যান্য non-customer role এখানে
+          পরিবর্তনযোগ্য নয়; affiliate membership আলাদা অনুমোদিত প্রক্রিয়ায়
+          পরিচালিত হয়।
         </p>
         {message && (
           <p role="status" className="mt-5 rounded-lg bg-emerald-50 px-4 py-3">
@@ -83,7 +84,8 @@ async function AdminUsersContent({
         ) : (
           <ul className="mt-6 grid gap-3">
             {users.map((user) => {
-              const isAdmin = user.access_role === "admin" || user.access_role === "editor";
+              const canChangeStatus =
+                user.access_role === "user" || user.access_role === "customer";
               return (
                 <li
                   key={user.user_id}
@@ -112,7 +114,7 @@ async function AdminUsersContent({
                     <span className="text-sm text-slate-700">
                       অ্যাকাউন্ট: {user.account_status}
                     </span>
-                    {!isAdmin && (
+                    {canChangeStatus && (
                       <form action={setCustomerStatus}>
                         <input type="hidden" name="userId" value={user.user_id} />
                         <input
