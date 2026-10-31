@@ -110,7 +110,7 @@ function BookSection({
     <section id={id} className="scroll-mt-6 py-8 sm:py-10">
       <div className="mb-5 flex flex-wrap items-end justify-between gap-3 sm:mb-6">
         <div>
-          <p className="text-sm font-bold text-emerald-700">বইয়ের সংগ্রহ</p>
+          <p className="text-xs font-bold uppercase tracking-[0.16em] text-emerald-700">Books</p>
           <h2 className="mt-1 text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
             {title}
           </h2>
@@ -122,11 +122,11 @@ function BookSection({
           href={href}
           className="inline-flex min-h-11 items-center gap-2 rounded-xl px-3 py-2 text-sm font-bold text-emerald-800 transition hover:bg-emerald-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700"
         >
-          সব দেখুন <span aria-hidden="true">←</span>
+          View All <span aria-hidden="true">→</span>
         </Link>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 lg:gap-5">
+      <div className="-mx-1 flex snap-x snap-mandatory gap-3 overflow-x-auto px-1 pb-3 [scrollbar-width:thin] sm:gap-4">
         {books.map((book) => (
           <BookCard key={book.slug} book={book} />
         ))}
@@ -433,7 +433,7 @@ export default function HomePage() {
             href="/books"
             className="min-h-11 rounded-xl px-3 py-2 text-sm font-bold text-emerald-800 hover:bg-emerald-50"
           >
-            সকল বই <span aria-hidden="true">←</span>
+            View All <span aria-hidden="true">→</span>
           </Link>
         </div>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-6">
@@ -456,26 +456,26 @@ export default function HomePage() {
 
       <div className="mx-auto max-w-7xl px-4 pb-8 sm:px-6 lg:px-8">
         <BookSection
-          title="বাছাই করা নমুনা বই"
+          title="Trending Books"
           description="উদাহরণ হিসেবে দেখানো বইয়ের তথ্য; বাস্তব মূল্য বা বিক্রয়-র‌্যাঙ্কিং নয়"
           books={getBooksInCollection("popular")}
           href="/books"
         />
         <BookSection
           id="new-books"
-          title="আরও নমুনা বই"
+          title="New Arrivals"
           description="ক্যাটালগের আরও উদাহরণ; প্রকাশের তারিখ যাচাইকৃত নয়"
           books={getBooksInCollection("new")}
           href="/books"
         />
         <BookSection
-          title="ইসলামিক বইয়ের সংগ্রহ"
+          title="ইসলামি বই"
           description="ইসলামিক জ্ঞান ও পাঠের নমুনা বই"
           books={getBooksInCategory("islamic-books")}
           href="/books?category=islamic-books"
         />
         <BookSection
-          title="আরবি শিক্ষার বই"
+          title="আরবি শিক্ষা"
           description="আরবি শেখার প্রাথমিক পাঠ ও অনুশীলনের নমুনা"
           books={getBooksInCategory("arabic-learning")}
           href="/books?category=arabic-learning"
