@@ -436,12 +436,12 @@ export default function HomePage() {
             View All <span aria-hidden="true">→</span>
           </Link>
         </div>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-6">
+        <div className="-mx-1 flex snap-x snap-mandatory gap-3 overflow-x-auto px-1 pb-2 [scrollbar-width:thin] sm:grid sm:grid-cols-3 sm:gap-4 sm:overflow-visible lg:grid-cols-6">
           {bookCategories.map((category) => (
             <Link
               key={category.slug}
               href={category.href}
-              className="group flex min-h-28 items-center gap-3 rounded-2xl border border-emerald-100 bg-white p-3.5 shadow-[0_2px_12px_rgba(15,55,40,0.03)] transition hover:-translate-y-0.5 hover:border-emerald-300 hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700 sm:min-h-32 sm:flex-col sm:items-start sm:justify-between sm:p-4"
+              className="group flex min-h-28 w-44 shrink-0 snap-start items-center gap-3 rounded-2xl border border-emerald-100 bg-white p-3.5 shadow-[0_2px_12px_rgba(15,55,40,0.03)] transition hover:-translate-y-0.5 hover:border-emerald-300 hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700 sm:min-h-32 sm:w-auto sm:flex-col sm:items-start sm:justify-between sm:p-4"
             >
               <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-800 transition group-hover:bg-emerald-100 sm:size-12">
                 <CategoryIcon name={category.icon} />
