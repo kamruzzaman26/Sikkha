@@ -11,10 +11,10 @@ import {
   toCatalogBook,
 } from "@/lib/catalog";
 
-function partnerDisplayName(partner: string | null): string {
-  if (partner === "rokomari") return "Rokomari";
-  if (partner === "10_minute_school") return "10 Minute School";
-  return "পার্টনার";
+function partnerBuyLabel(partner: string | null): string {
+  if (partner === "rokomari") return "রকমারিতে কিনুন";
+  if (partner === "10_minute_school") return "10 Minute School-এ কিনুন";
+  return "পার্টনারের সাইটে কিনুন";
 }
 
 function CartIcon() {
@@ -190,7 +190,7 @@ async function BookDetails({
                       className={buyButtonClass}
                     >
                       <CartIcon />
-                      {partnerDisplayName(affiliateLink.partner)}-এ কিনুন
+                      {partnerBuyLabel(affiliateLink.partner)}
                     </a>
                   ))}
                 </div>
@@ -256,7 +256,7 @@ async function BookDetails({
                 className={`${buyButtonClass} w-full`}
               >
                 <CartIcon />
-                {partnerDisplayName(primaryAffiliateLink.partner)}-এ কিনুন
+                {partnerBuyLabel(primaryAffiliateLink.partner)}
               </a>
             ) : null}
           </div>
