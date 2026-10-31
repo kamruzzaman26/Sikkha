@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 
 type Option = { label: string; value: string };
@@ -59,7 +60,7 @@ export default function MobileCatalogFilters({
                 </section>
               </div>
               <div className="flex gap-3 border-t p-4">
-                <a href="/books" className="flex-1 rounded-lg border border-slate-300 px-4 py-3 text-center text-sm font-semibold">Clear All</a>
+                <Link href="/books" className="flex-1 rounded-lg border border-slate-300 px-4 py-3 text-center text-sm font-semibold">Clear All</Link>
                 <button type="submit" className="flex-1 rounded-lg bg-emerald-800 px-4 py-3 text-sm font-bold text-white">Apply Filters</button>
               </div>
             </form>
