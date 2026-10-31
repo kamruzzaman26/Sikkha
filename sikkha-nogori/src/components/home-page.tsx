@@ -128,7 +128,9 @@ function BookSection({
 
       <div className="-mx-1 flex snap-x snap-mandatory gap-3 overflow-x-auto px-1 pb-3 [scrollbar-width:thin] sm:gap-4">
         {books.map((book) => (
-          <BookCard key={book.slug} book={book} />
+          <div key={book.slug} className="w-[44%] min-w-[9.5rem] max-w-[13rem] shrink-0 snap-start sm:w-[30%] lg:w-[22%]">
+            <BookCard book={book} />
+          </div>
         ))}
       </div>
     </section>
@@ -302,7 +304,7 @@ export default function HomePage() {
             >
               <path d="M4 6h16M4 12h16M4 18h16" />
             </svg>
-            বইয়ের বিভাগ
+            Categories
           </summary>
           <nav
             aria-label="বইয়ের বিভাগ"
@@ -378,13 +380,13 @@ export default function HomePage() {
                 href="/books"
                 className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-extrabold text-[#064b3b] shadow-sm transition hover:bg-emerald-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:text-base"
               >
-                বইয়ের সংগ্রহ দেখুন <span aria-hidden="true">←</span>
+                Browse Books <span aria-hidden="true">→</span>
               </Link>
               <Link
                 href="#new-books"
                 className="inline-flex min-h-12 items-center justify-center rounded-xl border border-white/40 bg-white/5 px-5 py-3 text-sm font-bold text-white transition hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:text-base"
               >
-                নতুন বই আবিষ্কার করুন
+                Explore New Arrivals
               </Link>
             </div>
           </div>
@@ -426,7 +428,7 @@ export default function HomePage() {
               id="categories-title"
               className="mt-1 text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl"
             >
-              বইয়ের বিভাগ
+              Shop By Category
             </h2>
           </div>
           <Link
