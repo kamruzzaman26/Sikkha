@@ -133,15 +133,21 @@ async function BookDetails({
                 aria-labelledby="affiliate-links-heading"
                 className="mt-6 rounded-2xl border border-emerald-100 bg-emerald-50 p-4 sm:p-5"
               >
+                {book.price !== null && (
+                  <p className="text-2xl font-extrabold text-emerald-950">
+                    {formatPrice(book.price)}
+                  </p>
+                )}
                 <h2
                   id="affiliate-links-heading"
-                  className="text-lg font-bold text-emerald-950"
+                  className="mt-1 text-lg font-bold text-emerald-950"
                 >
-                  পণ্যটি পার্টনারের কাছে দেখুন
+                  পণ্যটি পার্টনারের কাছে কিনুন
                 </h2>
                 <p className="mt-1 text-sm leading-6 text-emerald-900">
-                  এই affiliate link থেকে শিক্ষা নগরী কমিশন পেতে পারে। বিক্রেতার
-                  সাইটে পণ্যের বর্তমান মূল্য, মজুত ও শর্ত যাচাই করুন।
+                  এই affiliate link থেকে শিক্ষা নগরী কমিশন পেতে পারে। প্রদর্শিত মূল্য
+                  পরিবর্তন হতে পারে; বিক্রেতার সাইটে বর্তমান মূল্য, মজুত ও শর্ত
+                  যাচাই করুন। (Price may change.)
                 </p>
                 <div className="mt-4 flex flex-wrap gap-3">
                   {availableAffiliateLinks.map((affiliateLink) => {
@@ -160,7 +166,7 @@ async function BookDetails({
                         rel="sponsored nofollow noopener noreferrer"
                         className="inline-flex min-h-11 items-center rounded-lg bg-emerald-700 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-emerald-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700"
                       >
-                        {partnerName}-এ দেখুন
+                        {partnerName}-এ কিনুন
                       </a>
                     );
                   })}

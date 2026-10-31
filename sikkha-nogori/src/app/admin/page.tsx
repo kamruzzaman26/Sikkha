@@ -195,7 +195,7 @@ function ProductForm({
             htmlFor={`${idPrefix}-price`}
             className="mb-2 block text-sm font-semibold text-slate-700"
           >
-            নিজস্ব বিক্রির মূল্য (৳)
+            মূল্য (৳)
           </label>
           <input
             id={`${idPrefix}-price`}
@@ -204,14 +204,13 @@ function ProductForm({
             min="0"
             max="9999999999.99"
             step="0.01"
-            defaultValue={
-              product?.commerce_mode === "direct" ? product.price ?? "" : ""
-            }
+            defaultValue={product?.price ?? ""}
             className={inputClass}
           />
           <p className="mt-1 text-xs leading-5 text-slate-500">
-            affiliate পণ্যের জন্য মূল্য দেবেন না; বিক্রেতার বর্তমান মূল্য তার
-            সাইটে যাচাই করতে হবে।
+            সরাসরি বিক্রির পণ্যে মূল্য আবশ্যক। affiliate পণ্যে ঐচ্ছিক; দিলে
+            সাইটে দেখানো হবে, তাই বিক্রেতার সাইটের বর্তমান মূল্যের সঙ্গে
+            মিলিয়ে হালনাগাদ রাখুন।
           </p>
         </div>
       </div>

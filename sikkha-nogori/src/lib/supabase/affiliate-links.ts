@@ -36,3 +36,33 @@ export async function getActiveAffiliateLinks(
 
   return data;
 }
+
+export async function getActiveAffiliateLinkMap(
+  productSlugs: string[],
+): Promise<Record<string, PublicAffiliateLink>> {
+  if (productSlugs.length === 0) {
+    return {};
+  }
+
+  const supabase = createSupabasePublicServerClient();
+  const { data, error } = await supabase
+    .from("affiliate_links")
+    .select("id, url, partner, products!inner(slug)")
+    .in("products.slug", productSlugs)
+    .eq("is_active", true)
+    .order("created_at", { ascending: true });
+
+  if (error) {
+    console.error("Unable to load affiliate links for the catalog.", error);
+    return {};
+  }
+
+  const linkMap: Record<string, PublicAffiliateLink> = {};
+  for (const row of data) {
+    const product = Array.isArray(row.products) ? row.products[0] : row.products;
+    if (product && !linkMap[product.slug]) {
+      linkMap[product.slug] = { id: row.id, url: row.url, partner: row.partner };
+    }
+  }
+  return linkMap;
+}

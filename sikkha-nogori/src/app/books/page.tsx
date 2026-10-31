@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Suspense } from "react";
 import BookCard from "@/components/book-card";
+import { getActiveAffiliateLinkMap } from "@/lib/supabase/affiliate-links";
 import MobileCatalogFilters from "@/components/mobile-catalog-filters";
 import {
   bookCategories,
@@ -82,6 +83,11 @@ async function BookResults({
             : left.title.localeCompare(right.title, "bn", { sensitivity: "base" });
         })
       : localMatches;
+  const affiliateLinkMap = await getActiveAffiliateLinkMap(
+    matchingBooks
+      .filter((book) => book.commerceMode === "affiliate")
+      .map((book) => book.slug),
+  );
   const total = bookPage?.total ?? matchingBooks.length;
   const pageCount = Math.max(1, Math.ceil(total / 24));
   const categoryNames = databaseCategories ?? [
@@ -298,7 +304,11 @@ async function BookResults({
           <>
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 xl:grid-cols-4">
             {matchingBooks.map((book) => (
-              <BookCard key={book.slug} book={book} />
+              <BookCard
+                key={book.slug}
+                book={book}
+                buyLink={affiliateLinkMap[book.slug] ?? null}
+              />
             ))}
             </div>
             {pageCount > 1 && (

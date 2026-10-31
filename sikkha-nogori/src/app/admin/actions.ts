@@ -303,7 +303,9 @@ export async function saveProduct(formData: FormData) {
   const imageUrl = imageUrlValue ? parseProductImageUrl(imageUrlValue) : null;
   const priceValue = getFormValue(formData, "price");
   const price =
-    commerceMode === "direct" ? parsePrice(priceValue) : null;
+    commerceMode === "affiliate" && priceValue === ""
+      ? null
+      : parsePrice(priceValue);
   const isPublishedValue = getFormValue(formData, "isPublished");
 
   if (
@@ -321,7 +323,7 @@ export async function saveProduct(formData: FormData) {
     !isCommerceMode(commerceMode) ||
     (imageUrlValue !== "" && !imageUrl) ||
     (commerceMode === "direct" && price === undefined) ||
-    (commerceMode === "affiliate" && priceValue !== "") ||
+    (commerceMode === "affiliate" && priceValue !== "" && price === undefined) ||
     !["", "true"].includes(isPublishedValue)
   ) {
     redirect("/admin?status=product-invalid");
