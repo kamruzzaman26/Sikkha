@@ -150,6 +150,55 @@ async function BookResults({
           </p>
         )}
 
+        <div className="mt-8 grid gap-6 lg:grid-cols-[15rem_minmax(0,1fr)] lg:items-start">
+          <aside className="hidden lg:block">
+            <div className="space-y-4">
+              <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                <h2 className="text-sm font-bold text-slate-900">Shop By Categories</h2>
+                <ul className="mt-3 space-y-2.5 text-sm">
+                  <li><Link href="/books" className={category ? "text-slate-600 hover:text-emerald-700" : "font-semibold text-emerald-700"}>All Books</Link></li>
+                  {categoryOptions.map((option) => (
+                    <li key={option.value}>
+                      <Link href={`/books?${new URLSearchParams({ ...(query ? { q: query } : {}), category: option.value }).toString()}`} className={category === option.value ? "font-semibold text-emerald-700" : "text-slate-600 hover:text-emerald-700"}>
+                        <span className="mr-2 inline-block h-3 w-3 rounded-full border border-slate-400 align-middle" aria-hidden="true" />
+                        {option.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+              <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                <h2 className="text-sm font-bold text-slate-900">Sort</h2>
+                <form action="/books" method="get" className="mt-3 space-y-2.5 text-sm text-slate-600">
+                  {query && <input type="hidden" name="q" value={query} />}
+                  {category && <input type="hidden" name="category" value={category} />}
+                  <label className="flex items-center gap-2"><input type="radio" name="sort" value="name-asc" defaultChecked={sort === "name-asc"} /> Name - A to Z</label>
+                  <label className="flex items-center gap-2"><input type="radio" name="sort" value="name-desc" defaultChecked={sort === "name-desc"} /> Name - Z to A</label>
+                  <button type="submit" className="mt-2 rounded-lg bg-emerald-700 px-3 py-2 text-xs font-bold text-white">Apply</button>
+                </form>
+              </section>
+              <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                <h2 className="text-sm font-bold text-slate-900">Shop by Brand</h2>
+                <p className="mt-2 text-xs leading-5 text-slate-500">Brand filters will appear when brand data is available.</p>
+              </section>
+              <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                <h2 className="text-sm font-bold text-slate-900">Availability</h2>
+                <label className="mt-3 flex items-center gap-2 text-sm text-slate-600"><input type="checkbox" disabled /> In Stock</label>
+              </section>
+              <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                <h2 className="text-sm font-bold text-slate-900">Filters</h2>
+                <details className="mt-3 border-t border-slate-100 pt-3">
+                  <summary className="cursor-pointer text-sm font-medium text-slate-700">Language</summary>
+                  <p className="mt-2 text-xs text-slate-500">Language options will be added with catalog attributes.</p>
+                </details>
+                <details className="mt-3 border-t border-slate-100 pt-3">
+                  <summary className="cursor-pointer text-sm font-medium text-slate-700">Publisher</summary>
+                  <p className="mt-2 text-xs text-slate-500">Publisher filters will be available when catalog data is complete.</p>
+                </details>
+              </section>
+            </div>
+          </aside>
+          <section className="min-w-0">
         <form
           action="/books"
           method="get"
@@ -283,6 +332,8 @@ async function BookResults({
             </Link>
           </div>
         )}
+          </section>
+        </div>
     </div>
   );
 }
