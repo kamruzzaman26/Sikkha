@@ -68,6 +68,7 @@ type ProductFormValue = {
   slug?: string;
   description?: string;
   price?: number;
+  list_price?: number | null;
   product_type?: string;
   category?: string | null;
   author?: string | null;
@@ -213,6 +214,27 @@ function ProductForm({
             মিলিয়ে হালনাগাদ রাখুন।
           </p>
         </div>
+        <div>
+          <label
+            htmlFor={`${idPrefix}-list-price`}
+            className="mb-2 block text-sm font-semibold text-slate-700"
+          >
+            মুদ্রিত মূল্য (৳, ঐচ্ছিক)
+          </label>
+          <input
+            id={`${idPrefix}-list-price`}
+            name="listPrice"
+            type="number"
+            min="0"
+            max="9999999999.99"
+            step="0.01"
+            defaultValue={product?.list_price ?? ""}
+            className={inputClass}
+          />
+          <p className="mt-1 text-xs leading-5 text-slate-500">
+            দিলে কাটা দাম ও ছাড়ের হিসাব দেখাবে। মূল্যের চেয়ে কম হতে পারবে না।
+          </p>
+        </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
@@ -313,7 +335,7 @@ async function AdminContent({
     supabase
       .from("products")
       .select(
-        "id, title, slug, description, price, product_type, category, author, publisher, image_url, commerce_mode, is_published, archived_at",
+        "id, title, slug, description, price, list_price, product_type, category, author, publisher, image_url, commerce_mode, is_published, archived_at",
       )
       .order("title"),
     supabase

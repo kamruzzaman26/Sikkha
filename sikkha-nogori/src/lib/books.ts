@@ -7,6 +7,7 @@ export type Book = {
   categorySlug: string;
   price: number | null;
   discountedPrice: number | null;
+  listPrice?: number | null;
   description: string;
   cover: string;
   coverAccent: string;
@@ -226,8 +227,21 @@ export const books: Book[] = [
   },
 ];
 
+export function getSavings(
+  price: number | null,
+  listPrice: number | null | undefined,
+): { amount: number; percent: number } | null {
+  if (price === null || !listPrice || listPrice <= price) {
+    return null;
+  }
+  return {
+    amount: listPrice - price,
+    percent: Math.round(((listPrice - price) / listPrice) * 100),
+  };
+}
+
 export function formatPrice(price: number): string {
-  return `৳${new Intl.NumberFormat("bn-BD").format(price)}`;
+  return `৳${new Intl.NumberFormat("en-US").format(price)}`;
 }
 
 export function getCategorySlug(category: string): string {

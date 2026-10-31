@@ -9,6 +9,7 @@ export type CatalogProduct = {
   slug: string;
   description: string;
   price: number | null;
+  list_price: number | null;
   product_type: string;
   category: string | null;
   author: string | null;
@@ -26,7 +27,7 @@ function isMissingCatalogSchema(error: { code?: string }): boolean {
 
 const bookPageSize = 24;
 const catalogProductSelection =
-  "id, title, slug, description, price, product_type, category, author, publisher, image_url, commerce_mode, archived_at, created_at";
+  "id, title, slug, description, price, list_price, product_type, category, author, publisher, image_url, commerce_mode, archived_at, created_at";
 
 export type PublishedBookPage = {
   products: CatalogProduct[];
@@ -416,6 +417,7 @@ export function toCatalogBook(product: CatalogProduct): Book {
     categorySlug: getCategorySlug(category),
     price: product.price,
     discountedPrice: null,
+    listPrice: product.list_price ?? null,
     description: product.description,
     cover: "",
     coverAccent: "bg-emerald-800",

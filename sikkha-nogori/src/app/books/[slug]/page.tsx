@@ -5,11 +5,39 @@ import Image from "next/image";
 import BookCover from "@/components/book-cover";
 import { WishlistButton } from "@/components/wishlist-button";
 import { getActiveAffiliateLinks } from "@/lib/supabase/affiliate-links";
-import { getBookBySlug, formatPrice } from "@/lib/books";
+import { getBookBySlug, formatPrice, getSavings } from "@/lib/books";
 import {
   getPublishedBookBySlug,
   toCatalogBook,
 } from "@/lib/catalog";
+
+function partnerDisplayName(partner: string | null): string {
+  if (partner === "rokomari") return "Rokomari";
+  if (partner === "10_minute_school") return "10 Minute School";
+  return "পার্টনার";
+}
+
+function CartIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      className="h-5 w-5"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <circle cx="9" cy="20" r="1" />
+      <circle cx="18" cy="20" r="1" />
+      <path d="M2 3h3l2.7 11.4a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.5L21 7H6" />
+    </svg>
+  );
+}
+
+const buyButtonClass =
+  "inline-flex min-h-12 items-center justify-center gap-2 rounded-lg bg-emerald-700 px-6 py-3 text-base font-bold text-white transition hover:bg-emerald-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700";
 
 async function BookDetails({
   params,
@@ -24,12 +52,16 @@ async function BookDetails({
     notFound();
   }
 
+  const savings = getSavings(book.price, book.listPrice);
+
   const affiliateLinks =
     book.commerceMode === "affiliate"
       ? await getActiveAffiliateLinks(book.slug)
       : [];
   const affiliateLinksUnavailable = affiliateLinks === null;
   const availableAffiliateLinks = affiliateLinks ?? [];
+  const primaryAffiliateLink = availableAffiliateLinks[0] ?? null;
+  const isDirectProduct = book.commerceMode === "direct" && Boolean(book.productId);
   return (
     <div className="mx-auto max-w-6xl">
         <nav aria-label="breadcrumb" className="text-sm text-slate-500">
@@ -87,40 +119,58 @@ async function BookDetails({
             <h1 className="mt-4 text-3xl font-extrabold leading-tight sm:text-4xl">
               {book.title}
             </h1>
-            {book.author && (
+            {(book.author || book.publisher) && (
               <p className="mt-3 text-base text-slate-600">
-                লেখক/ব্র্যান্ড:{" "}
-                <span className="font-semibold text-slate-800">
-                  {book.author}
-                </span>
-              </p>
-            )}
-            {book.publisher && (
-              <p className="mt-2 text-sm text-slate-600">
-                প্রকাশক:{" "}
-                <span className="font-semibold text-slate-800">
-                  {book.publisher}
-                </span>
+                {book.author && (
+                  <>
+                    লেখক · Author:{" "}
+                    <span className="font-semibold text-emerald-800">
+                      {book.author}
+                    </span>
+                  </>
+                )}
+                {book.author && book.publisher && (
+                  <span className="mx-2 text-slate-400">|</span>
+                )}
+                {book.publisher && (
+                  <span className="font-semibold text-emerald-800">
+                    {book.publisher}
+                  </span>
+                )}
               </p>
             )}
 
-            {book.commerceMode === "direct" && book.productId ? (
-              <section className="mt-6 rounded-2xl border border-emerald-100 bg-emerald-50 p-4 sm:p-5">
-                {book.price !== null && (
-                  <p className="text-xl font-extrabold text-emerald-950">
-                    {formatPrice(book.price)}
-                  </p>
+            {book.price !== null && (
+              <div className="mt-5 flex flex-wrap items-baseline gap-x-3 gap-y-1 border-y border-dashed border-slate-300 py-4">
+                {savings && book.listPrice ? (
+                  <span className="text-xl font-semibold text-slate-400 line-through">
+                    {formatPrice(book.listPrice)}
+                  </span>
+                ) : null}
+                <span className="text-3xl font-extrabold text-slate-900">
+                  {formatPrice(book.price)}
+                </span>
+                {savings && (
+                  <span className="text-base font-semibold text-emerald-700">
+                    সাশ্রয় · You Save {formatPrice(savings.amount)} (
+                    {savings.percent}%)
+                  </span>
                 )}
-                <p className="mt-1 text-sm leading-6 text-emerald-900">
-                  এটি শিক্ষা নগরীর নিজস্ব বিক্রির পণ্য; অর্ডার ও fulfillment
-                  সাইটের checkout-এ হবে।
-                </p>
+              </div>
+            )}
+
+            {book.commerceMode === "direct" && book.productId ? (
+              <section aria-label="কেনার অপশন" className="mt-5">
                 <Link
                   href={`/checkout?product=${encodeURIComponent(book.productId)}`}
-                  className="mt-4 inline-flex min-h-11 items-center rounded-lg bg-emerald-700 px-4 py-2.5 text-sm font-bold text-white hover:bg-emerald-800"
+                  className={`${buyButtonClass} hidden sm:inline-flex`}
                 >
-                  অর্ডার করতে checkout-এ যান
+                  এখনই কিনুন · Buy Now
                 </Link>
+                <p className="mt-3 text-sm leading-6 text-slate-600">
+                  এটি শিক্ষা নগরীর নিজস্ব বিক্রির পণ্য; অর্ডার ও ডেলিভারি সাইটের
+                  checkout-এ হবে।
+                </p>
               </section>
             ) : book.commerceMode === "affiliate" &&
               affiliateLinksUnavailable ? (
@@ -129,54 +179,32 @@ async function BookDetails({
               </p>
             ) : book.commerceMode === "affiliate" &&
               availableAffiliateLinks.length > 0 ? (
-              <section
-                aria-labelledby="affiliate-links-heading"
-                className="mt-6 rounded-2xl border border-emerald-100 bg-emerald-50 p-4 sm:p-5"
-              >
-                {book.price !== null && (
-                  <p className="text-2xl font-extrabold text-emerald-950">
-                    {formatPrice(book.price)}
-                  </p>
-                )}
-                <h2
-                  id="affiliate-links-heading"
-                  className="mt-1 text-lg font-bold text-emerald-950"
-                >
-                  পণ্যটি পার্টনারের কাছে কিনুন
-                </h2>
-                <p className="mt-1 text-sm leading-6 text-emerald-900">
-                  এই affiliate link থেকে শিক্ষা নগরী কমিশন পেতে পারে। প্রদর্শিত মূল্য
-                  পরিবর্তন হতে পারে; বিক্রেতার সাইটে বর্তমান মূল্য, মজুত ও শর্ত
-                  যাচাই করুন। (Price may change.)
-                </p>
-                <div className="mt-4 flex flex-wrap gap-3">
-                  {availableAffiliateLinks.map((affiliateLink) => {
-                    const partnerName =
-                      affiliateLink.partner === "rokomari"
-                        ? "Rokomari"
-                        : affiliateLink.partner === "10_minute_school"
-                          ? "10 Minute School"
-                          : "পার্টনার";
-
-                    return (
-                      <a
-                        key={affiliateLink.id}
-                        href={affiliateLink.url}
-                        target="_blank"
-                        rel="sponsored nofollow noopener noreferrer"
-                        className="inline-flex min-h-11 items-center rounded-lg bg-emerald-700 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-emerald-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700"
-                      >
-                        {partnerName}-এ কিনুন
-                      </a>
-                    );
-                  })}
+              <section aria-label="কেনার অপশন" className="mt-5">
+                <div className="hidden flex-wrap gap-3 sm:flex">
+                  {availableAffiliateLinks.map((affiliateLink) => (
+                    <a
+                      key={affiliateLink.id}
+                      href={affiliateLink.url}
+                      target="_blank"
+                      rel="sponsored nofollow noopener noreferrer"
+                      className={buyButtonClass}
+                    >
+                      <CartIcon />
+                      {partnerDisplayName(affiliateLink.partner)}-এ কিনুন
+                    </a>
+                  ))}
                 </div>
-                <Link
-                  href="/affiliate-disclosure"
-                  className="mt-3 inline-flex min-h-10 items-center text-sm font-semibold text-emerald-900 underline underline-offset-2"
-                >
-                  অ্যাফিলিয়েট লিংক সম্পর্কে
-                </Link>
+                <p className="mt-3 text-xs leading-5 text-slate-500">
+                  এই বাটন affiliate link; এখান থেকে শিক্ষা নগরী কমিশন পেতে পারে।
+                  মূল্য পরিবর্তন হতে পারে, বিক্রেতার সাইটে যাচাই করুন (Price may
+                  change).{" "}
+                  <Link
+                    href="/affiliate-disclosure"
+                    className="font-semibold text-emerald-800 underline underline-offset-2"
+                  >
+                    বিস্তারিত
+                  </Link>
+                </p>
               </section>
             ) : book.commerceMode === "affiliate" ? (
               <p className="mt-6 rounded-xl bg-slate-100 px-4 py-3 text-sm leading-6 text-slate-700">
@@ -210,6 +238,29 @@ async function BookDetails({
             </Link>
           </div>
         </article>
+
+        {(isDirectProduct || primaryAffiliateLink) && (
+          <div className="fixed inset-x-0 bottom-0 z-30 border-t border-slate-200 bg-white p-3 shadow-[0_-4px_12px_rgba(15,23,42,0.08)] sm:hidden">
+            {isDirectProduct && book.productId ? (
+              <Link
+                href={`/checkout?product=${encodeURIComponent(book.productId)}`}
+                className={`${buyButtonClass} w-full`}
+              >
+                এখনই কিনুন · Buy Now
+              </Link>
+            ) : primaryAffiliateLink ? (
+              <a
+                href={primaryAffiliateLink.url}
+                target="_blank"
+                rel="sponsored nofollow noopener noreferrer"
+                className={`${buyButtonClass} w-full`}
+              >
+                <CartIcon />
+                {partnerDisplayName(primaryAffiliateLink.partner)}-এ কিনুন
+              </a>
+            ) : null}
+          </div>
+        )}
     </div>
   );
 }
@@ -218,7 +269,7 @@ export default function BookDetailsPage({
   params,
 }: PageProps<"/books/[slug]">) {
   return (
-    <main className="min-h-screen bg-[#f7faf8] px-4 py-8 text-slate-900 sm:px-6 sm:py-12 lg:px-8">
+    <main className="min-h-screen bg-[#f7faf8] px-4 py-8 pb-28 text-slate-900 sm:px-6 sm:py-12 sm:pb-12 lg:px-8">
       <Suspense
         fallback={
           <div className="mx-auto max-w-6xl animate-pulse rounded-3xl bg-white p-8">

@@ -306,6 +306,8 @@ export async function saveProduct(formData: FormData) {
     commerceMode === "affiliate" && priceValue === ""
       ? null
       : parsePrice(priceValue);
+  const listPriceValue = getFormValue(formData, "listPrice");
+  const listPrice = listPriceValue === "" ? null : parsePrice(listPriceValue);
   const isPublishedValue = getFormValue(formData, "isPublished");
 
   if (
@@ -324,6 +326,8 @@ export async function saveProduct(formData: FormData) {
     (imageUrlValue !== "" && !imageUrl) ||
     (commerceMode === "direct" && price === undefined) ||
     (commerceMode === "affiliate" && priceValue !== "" && price === undefined) ||
+    listPrice === undefined ||
+    (listPrice !== null && (price == null || listPrice < price)) ||
     !["", "true"].includes(isPublishedValue)
   ) {
     redirect("/admin?status=product-invalid");
@@ -354,6 +358,7 @@ export async function saveProduct(formData: FormData) {
     publisher: publisher || null,
     product_type: productType,
     price,
+    list_price: listPrice,
     is_published: isPublishedValue === "true",
     updated_at: new Date().toISOString(),
   };
