@@ -403,7 +403,7 @@ export function SiteHeader({ identity }: { identity: SiteIdentity }) {
               className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 py-3"
             >
               <DrawerLink icon="home" href="/" onClick={closeDrawer}>
-                হোম
+                Home
               </DrawerLink>
               <details className="group border-b border-slate-100">
                 <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 rounded-lg px-3 text-sm font-bold text-slate-800 outline-none hover:bg-emerald-50 focus-visible:ring-2 focus-visible:ring-emerald-700 [&::-webkit-details-marker]:hidden">
@@ -415,7 +415,7 @@ export function SiteHeader({ identity }: { identity: SiteIdentity }) {
                 </summary>
                 <div className="pb-2 pl-9">
                   <DrawerLink icon="book" href="/books" onClick={closeDrawer}>
-                    সব বই
+                    All Books
                   </DrawerLink>
                   {bookCategories.map((category) => (
                     <DrawerLink
@@ -430,10 +430,10 @@ export function SiteHeader({ identity }: { identity: SiteIdentity }) {
                 </div>
               </details>
               <DrawerLink icon="book" href="/products" onClick={closeDrawer}>
-                অন্যান্য পণ্য
+                Other Products
               </DrawerLink>
               <DrawerLink icon="book" href="/courses" onClick={closeDrawer}>
-                কোর্স
+                Courses
               </DrawerLink>
               {identity?.hasOrders && (
                 <DrawerLink icon="history" href="/account/orders" onClick={closeDrawer}>
@@ -441,16 +441,16 @@ export function SiteHeader({ identity }: { identity: SiteIdentity }) {
                 </DrawerLink>
               )}
               <DrawerLink icon="article" href="/blog" onClick={closeDrawer}>
-                ব্লগ
+                Blog
               </DrawerLink>
               <DrawerLink icon="about" href="/about" onClick={closeDrawer}>
-                আমাদের সম্পর্কে
+                About Us
               </DrawerLink>
               <DrawerLink icon="contact" href="/contact" onClick={closeDrawer}>
-                যোগাযোগ
+                Contact Us
               </DrawerLink>
               <DrawerLink icon="disclosure" href="/affiliate-disclosure" onClick={closeDrawer}>
-                অ্যাফিলিয়েট প্রকাশনা
+                Affiliate Disclosure
               </DrawerLink>
             </nav>
 
@@ -461,10 +461,10 @@ export function SiteHeader({ identity }: { identity: SiteIdentity }) {
                     {identity.displayName}
                   </p>
                   <DrawerLink icon="profile" href="/dashboard/profile" onClick={closeDrawer}>
-                    প্রোফাইল
+                    Profile
                   </DrawerLink>
                   <DrawerLink icon="orders" href="/account/orders" onClick={closeDrawer}>
-                    অর্ডার
+                    Orders
                   </DrawerLink>
                   {identity.isAdmin && (
                     <DrawerLink icon="admin" href="/admin" onClick={closeDrawer}>
@@ -494,7 +494,7 @@ export function SiteHeader({ identity }: { identity: SiteIdentity }) {
                     onClick={closeDrawer}
                     className="inline-flex min-h-11 items-center justify-center rounded-lg bg-emerald-700 px-3 text-sm font-bold text-white hover:bg-emerald-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700"
                   >
-                    রেজিস্টার
+                    Register
                   </Link>
                 </div>
               )}
