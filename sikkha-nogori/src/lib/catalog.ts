@@ -146,8 +146,15 @@ export async function getPublishedBooks({
     request = request.eq("category", category);
   }
 
+  if (sort === "newest") {
+    request = request.order("created_at", { ascending: false });
+  } else if (sort === "price-low" || sort === "price-high") {
+    request = request.order("price", { ascending: sort === "price-low", nullsFirst: false });
+  } else {
+    request = request.order("title", { ascending: sort === "name-asc" });
+  }
+
   const { data, count, error } = await request
-    .order("title", { ascending: sort === "name-asc" })
     .range((page - 1) * safePageSize, page * safePageSize - 1);
 
   if (error) {
