@@ -116,7 +116,7 @@ export async function getPublishedBooks({
   page: number;
   query: string;
   category?: string;
-  sort: "name-asc" | "name-desc";
+  sort: "name-asc" | "name-desc" | "newest" | "price-low" | "price-high";
   pageSize?: number;
 }): Promise<PublishedBookPage | null> {
   const supabase = createSupabasePublicServerClient();
