@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Suspense } from "react";
 import BookCard from "@/components/book-card";
+import MobileCatalogFilters from "@/components/mobile-catalog-filters";
 import {
   bookCategories,
   books,
@@ -39,8 +40,9 @@ async function BookResults({
         legacyCategory.title
       : categoryParam;
   const sortValue = firstValue(params.sort);
-  const sort =
-    sortValue === "name-desc" ? "name-desc" : "name-asc";
+  const sort = ["name-desc", "newest", "price-low", "price-high"].includes(sortValue)
+    ? (sortValue as "name-desc" | "newest" | "price-low" | "price-high")
+    : "name-asc";
   const pageValue = Number.parseInt(firstValue(params.page), 10);
   const page =
     Number.isSafeInteger(pageValue) && pageValue > 0 && pageValue <= 100000
@@ -69,15 +71,16 @@ async function BookResults({
       : availableBooks;
   const matchingBooks =
     bookPage === null
-      ? localMatches.sort((left, right) =>
-          sort === "name-asc"
-            ? left.title.localeCompare(right.title, "bn", {
-                sensitivity: "base",
-              })
-            : right.title.localeCompare(left.title, "bn", {
-                sensitivity: "base",
-              }),
-        )
+      ? localMatches.sort((left, right) => {
+          if (sort === "price-low" || sort === "price-high") {
+            const leftPrice = left.discountedPrice ?? left.price ?? Number.MAX_SAFE_INTEGER;
+            const rightPrice = right.discountedPrice ?? right.price ?? Number.MAX_SAFE_INTEGER;
+            return sort === "price-low" ? leftPrice - rightPrice : rightPrice - leftPrice;
+          }
+          return sort === "name-desc"
+            ? right.title.localeCompare(left.title, "bn", { sensitivity: "base" })
+            : left.title.localeCompare(right.title, "bn", { sensitivity: "base" });
+        })
       : localMatches;
   const total = bookPage?.total ?? matchingBooks.length;
   const pageCount = Math.max(1, Math.ceil(total / 24));
@@ -150,7 +153,8 @@ async function BookResults({
           </p>
         )}
 
-        <div className="mt-8 grid gap-6 lg:grid-cols-[15rem_minmax(0,1fr)] lg:items-start">
+        <div className="mt-6 flex flex-col gap-4 lg:mt-8 lg:grid lg:grid-cols-[15rem_minmax(0,1fr)] lg:items-start">
+          <MobileCatalogFilters categories={categoryOptions} category={category} query={query} sort={sort} />
           <aside className="hidden lg:block">
             <div className="space-y-4">
               <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
@@ -174,6 +178,9 @@ async function BookResults({
                   {category && <input type="hidden" name="category" value={category} />}
                   <label className="flex items-center gap-2"><input type="radio" name="sort" value="name-asc" defaultChecked={sort === "name-asc"} /> Name - A to Z</label>
                   <label className="flex items-center gap-2"><input type="radio" name="sort" value="name-desc" defaultChecked={sort === "name-desc"} /> Name - Z to A</label>
+                  <label className="flex items-center gap-2"><input type="radio" name="sort" value="newest" defaultChecked={sort === "newest"} /> New Released</label>
+                  <label className="flex items-center gap-2"><input type="radio" name="sort" value="price-low" defaultChecked={sort === "price-low"} /> Price - Low to High</label>
+                  <label className="flex items-center gap-2"><input type="radio" name="sort" value="price-high" defaultChecked={sort === "price-high"} /> Price - High to Low</label>
                   <button type="submit" className="mt-2 rounded-lg bg-emerald-700 px-3 py-2 text-xs font-bold text-white">Apply</button>
                 </form>
               </section>
@@ -258,6 +265,9 @@ async function BookResults({
             >
               <option value="name-asc">নাম: ক থেকে হ</option>
               <option value="name-desc">নাম: হ থেকে ক</option>
+              <option value="newest">New Released</option>
+              <option value="price-low">Price: Low to High</option>
+              <option value="price-high">Price: High to Low</option>
             </select>
           </div>
 
@@ -286,7 +296,7 @@ async function BookResults({
 
         {matchingBooks.length > 0 ? (
           <>
-            <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 xl:grid-cols-4">
             {matchingBooks.map((book) => (
               <BookCard key={book.slug} book={book} />
             ))}
