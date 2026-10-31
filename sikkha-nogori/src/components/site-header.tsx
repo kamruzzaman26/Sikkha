@@ -212,7 +212,7 @@ export function SiteHeader({ identity }: { identity: SiteIdentity }) {
               ref={menuButtonRef}
               type="button"
               onClick={openDrawer}
-              aria-label="প্রধান মেনু খুলুন"
+              aria-label="Open menu"
               aria-expanded={drawerOpen}
               aria-controls="site-navigation-drawer"
               className={iconButtonClass}
@@ -221,7 +221,7 @@ export function SiteHeader({ identity }: { identity: SiteIdentity }) {
             </button>
             <Link
               href="/"
-              aria-label="Sikkha Nogori — হোম"
+              aria-label="Sikkha Nogori — Home"
               className="flex min-w-0 items-center gap-2 rounded-xl p-1 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700"
             >
               <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[#006b4f] text-base font-extrabold text-white">
@@ -245,7 +245,7 @@ export function SiteHeader({ identity }: { identity: SiteIdentity }) {
             className="order-3 w-full lg:order-none lg:min-w-0 lg:flex-1"
           >
             <label className="sr-only" htmlFor="site-search">
-              বইয়ের নাম, লেখক বা বিভাগ দিয়ে খুঁজুন
+              Search books, authors, or categories
             </label>
             <div className="flex min-h-11 rounded-xl border border-slate-200 bg-[#f8faf9] p-1 transition focus-within:border-emerald-600 focus-within:ring-2 focus-within:ring-emerald-100">
               <span className="flex items-center pl-2.5 text-slate-500">
@@ -255,16 +255,16 @@ export function SiteHeader({ identity }: { identity: SiteIdentity }) {
                 id="site-search"
                 name="q"
                 type="search"
-                placeholder="বই, লেখক বা বিভাগ খুঁজুন"
+                placeholder="Search books, authors, or categories"
                 className="min-w-0 flex-1 bg-transparent px-2 text-sm text-slate-800 outline-none placeholder:text-slate-500"
               />
               <button
                 type="submit"
-                aria-label="খুঁজুন"
+                aria-label="Search"
                 className="inline-flex min-h-9 items-center gap-2 rounded-lg bg-[#006b4f] px-3 text-sm font-bold text-white transition hover:bg-[#005640] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700"
               >
                 <Icon name="search" />
-                <span className="hidden sm:inline">খুঁজুন</span>
+                <span className="hidden sm:inline">Search</span>
               </button>
             </div>
           </form>
@@ -272,8 +272,8 @@ export function SiteHeader({ identity }: { identity: SiteIdentity }) {
           <div className="flex shrink-0 items-center justify-end gap-0.5 sm:gap-1">
             <Link
               href="/wishlist"
-              aria-label="উইশলিস্ট"
-              title="উইশলিস্ট"
+              aria-label="Wishlist"
+              title="Wishlist"
               className={iconButtonClass}
             >
               <Icon name="heart" />
@@ -282,7 +282,7 @@ export function SiteHeader({ identity }: { identity: SiteIdentity }) {
               <button
                 ref={accountButtonRef}
                 type="button"
-                aria-label={identity ? `অ্যাকাউন্ট: ${identity.displayName}` : "লগইন বা অ্যাকাউন্ট"}
+                aria-label={identity ? `অ্যাকাউন্ট: ${identity.displayName}`  : "Login or account"}
                 aria-expanded={accountOpen}
                 aria-controls="account-menu"
                 onClick={() => setAccountOpen((open) => !open)}
@@ -307,27 +307,27 @@ export function SiteHeader({ identity }: { identity: SiteIdentity }) {
                           </p>
                         )}
                       </div>
-                      <nav aria-label="অ্যাকাউন্ট মেনু" className="mt-2 grid">
+                      <nav aria-label="Account menu" className="mt-2 grid">
                         <AccountLink href="/dashboard/profile" onClick={() => setAccountOpen(false)}>
-                          প্রোফাইল / অ্যাকাউন্ট তথ্য
+                          My Account
                         </AccountLink>
                         <AccountLink href="/account/orders" onClick={() => setAccountOpen(false)}>
-                          অর্ডার ও ট্র্যাকিং
+                          My Orders & Tracking
                         </AccountLink>
                         {identity.hasOrders && (
                           <AccountLink href="/account/orders" onClick={() => setAccountOpen(false)}>
-                            আগের অর্ডার
+                            Order History
                           </AccountLink>
                         )}
                         <AccountLink href="/wishlist" onClick={() => setAccountOpen(false)}>
-                          উইশলিস্ট
+                          Wishlist
                         </AccountLink>
                         <AccountLink href="/affiliate" onClick={() => setAccountOpen(false)}>
-                          অ্যাফিলিয়েট ড্যাশবোর্ড
+                          Affiliate Dashboard
                         </AccountLink>
                         {identity.isAdmin && (
                           <AccountLink href="/admin" onClick={() => setAccountOpen(false)}>
-                            অ্যাডমিন
+                            Admin Dashboard
                           </AccountLink>
                         )}
                       </nav>
@@ -336,20 +336,20 @@ export function SiteHeader({ identity }: { identity: SiteIdentity }) {
                           type="submit"
                           className="min-h-11 w-full rounded-lg px-3 text-left text-sm font-semibold text-rose-700 hover:bg-rose-50 focus-visible:outline-2 focus-visible:outline-rose-700"
                         >
-                          লগআউট
+                          Sign Out
                         </button>
                       </form>
                     </>
                   ) : (
-                    <nav aria-label="লগইন মেনু" className="grid gap-1">
+                    <nav aria-label="Login menu" className="grid gap-1">
                       <p className="px-3 py-2 text-sm font-semibold text-slate-600">
-                        আপনার অ্যাকাউন্ট
+                        Your Account
                       </p>
                       <AccountLink href="/login" onClick={() => setAccountOpen(false)}>
-                        লগইন
+                        Login
                       </AccountLink>
                       <AccountLink href="/register" onClick={() => setAccountOpen(false)}>
-                        নতুন অ্যাকাউন্ট তৈরি
+                        Create Account
                       </AccountLink>
                     </nav>
                   )}
@@ -364,7 +364,7 @@ export function SiteHeader({ identity }: { identity: SiteIdentity }) {
         <div className="fixed inset-0 z-50">
           <button
             type="button"
-            aria-label="মেনু বন্ধ করুন"
+            aria-label="Close menu"
             onClick={closeDrawer}
             className="absolute inset-0 cursor-default bg-slate-950/45"
           />
@@ -391,7 +391,7 @@ export function SiteHeader({ identity }: { identity: SiteIdentity }) {
                 ref={closeButtonRef}
                 type="button"
                 onClick={closeDrawer}
-                aria-label="মেনু বন্ধ করুন"
+                aria-label="Close menu"
                 className={iconButtonClass}
               >
                 <Icon name="close" />
@@ -399,7 +399,7 @@ export function SiteHeader({ identity }: { identity: SiteIdentity }) {
             </div>
 
             <nav
-              aria-label="প্রধান নেভিগেশন"
+              aria-label="Main navigation"
               className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 py-3"
             >
               <DrawerLink icon="home" href="/" onClick={closeDrawer}>
@@ -409,7 +409,7 @@ export function SiteHeader({ identity }: { identity: SiteIdentity }) {
                 <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 rounded-lg px-3 text-sm font-bold text-slate-800 outline-none hover:bg-emerald-50 focus-visible:ring-2 focus-visible:ring-emerald-700 [&::-webkit-details-marker]:hidden">
                   <span className="flex items-center gap-3">
                     <span aria-hidden="true" className="text-lg">▤</span>
-                    বইয়ের বিভাগ
+                    Categories
                   </span>
                   <span aria-hidden="true" className="transition group-open:rotate-180">⌄</span>
                 </summary>
@@ -437,7 +437,7 @@ export function SiteHeader({ identity }: { identity: SiteIdentity }) {
               </DrawerLink>
               {identity?.hasOrders && (
                 <DrawerLink icon="history" href="/account/orders" onClick={closeDrawer}>
-                  আগের অর্ডার
+                  Order History
                 </DrawerLink>
               )}
               <DrawerLink icon="article" href="/blog" onClick={closeDrawer}>
@@ -468,7 +468,7 @@ export function SiteHeader({ identity }: { identity: SiteIdentity }) {
                   </DrawerLink>
                   {identity.isAdmin && (
                     <DrawerLink icon="admin" href="/admin" onClick={closeDrawer}>
-                      অ্যাডমিন
+                      Admin Dashboard
                     </DrawerLink>
                   )}
                   <form action={signOutCustomer} className="mt-1">
@@ -476,7 +476,7 @@ export function SiteHeader({ identity }: { identity: SiteIdentity }) {
                       type="submit"
                       className="min-h-11 w-full rounded-lg px-3 text-left text-sm font-semibold text-rose-700 hover:bg-rose-50 focus-visible:outline-2 focus-visible:outline-rose-700"
                     >
-                      লগআউট
+                      Sign Out
                     </button>
                   </form>
                 </>
@@ -487,7 +487,7 @@ export function SiteHeader({ identity }: { identity: SiteIdentity }) {
                     onClick={closeDrawer}
                     className="inline-flex min-h-11 items-center justify-center rounded-lg border border-emerald-700 px-3 text-sm font-bold text-emerald-800 hover:bg-emerald-50 focus-visible:outline-2 focus-visible:outline-emerald-700"
                   >
-                    লগইন
+                    Login
                   </Link>
                   <Link
                     href="/register"
