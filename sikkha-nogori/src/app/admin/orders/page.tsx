@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { connection } from "next/server";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { logoutAdmin } from "@/app/admin/actions";
@@ -67,6 +68,7 @@ type AdminOrder = {
 async function AdminOrdersContent({
   searchParams,
 }: Pick<PageProps<"/admin/orders">, "searchParams">) {
+  await connection();
   const { supabase, role } = await requireAdmin("admin");
   if (role !== "admin") {
     notFound();

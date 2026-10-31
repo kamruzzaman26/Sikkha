@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { connection } from "next/server";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { logoutAdmin } from "@/app/admin/actions";
@@ -195,6 +196,7 @@ function PaymentMethodForm({
 async function PaymentMethodsContent({
   searchParams,
 }: Pick<PageProps<"/admin/payments">, "searchParams">) {
+  await connection();
   const { supabase, role } = await requireAdmin("admin");
   if (role !== "admin") {
     notFound();

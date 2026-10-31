@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { connection } from "next/server";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { logoutAdmin } from "@/app/admin/actions";
@@ -25,6 +26,7 @@ async function AdminAffiliatesContent({
 }: {
   searchParams: Promise<{ status?: string | string[] }>;
 }) {
+  await connection();
   const { supabase, role } = await requireAdmin("admin");
   if (role !== "admin") {
     notFound();
