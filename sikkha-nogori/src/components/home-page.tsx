@@ -144,15 +144,31 @@ function BookSection({
 export default function HomePage({
   publishedBooks = null,
   buyLinks = {},
+  categories = null,
 }: {
   publishedBooks?: Book[] | null;
   buyLinks?: Record<string, PublicAffiliateLink>;
+  categories?: string[] | null;
 }) {
   const academicAndAdmissionBooks = [
     ...getBooksInCategory("academic"),
     ...getBooksInCategory("admission-prep"),
   ];
   const hasPublishedBooks = publishedBooks !== null && publishedBooks.length > 0;
+  const categoryCards: { key: string; title: string; href: string; icon: CategoryIconName }[] =
+    categories && categories.length > 0
+      ? categories.slice(0, 12).map((name) => ({
+          key: name,
+          title: name,
+          href: `/books?category=${encodeURIComponent(name)}`,
+          icon: "other" as const,
+        }))
+      : bookCategories.map((category) => ({
+          key: category.slug,
+          title: category.title,
+          href: category.href,
+          icon: category.icon,
+        }));
   const newArrivals = (publishedBooks ?? []).slice(0, 12);
   const bestSavings = (publishedBooks ?? [])
     .map((book) => ({ book, savings: getSavings(book.price, book.listPrice) }))
@@ -409,7 +425,7 @@ export default function HomePage({
                 href="#new-books"
                 className="inline-flex min-h-10 flex-1 items-center justify-center rounded-lg border border-white/40 bg-white/5 px-3 py-2 text-sm font-bold text-white transition hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:flex-none sm:px-5"
               >
-                New Arrivals
+                নতুন বই দেখুন
               </Link>
             </div>
           </div>
@@ -462,9 +478,9 @@ export default function HomePage({
           </Link>
         </div>
         <div className="-mx-1 flex snap-x snap-mandatory gap-3 overflow-x-auto px-1 pb-2 [scrollbar-width:thin] sm:grid sm:grid-cols-3 sm:gap-4 sm:overflow-visible lg:grid-cols-6">
-          {bookCategories.map((category) => (
+          {categoryCards.map((category) => (
             <Link
-              key={category.slug}
+              key={category.key}
               href={category.href}
               className="group flex min-h-28 w-44 shrink-0 snap-start items-center gap-3 rounded-2xl border border-emerald-100 bg-white p-3.5 shadow-[0_2px_12px_rgba(15,55,40,0.03)] transition hover:-translate-y-0.5 hover:border-emerald-300 hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700 sm:min-h-32 sm:w-auto sm:flex-col sm:items-start sm:justify-between sm:p-4"
             >
@@ -484,7 +500,7 @@ export default function HomePage({
           <>
             <BookSection
               id="new-books"
-              title="New Arrivals"
+              title="নতুন বই"
               description="সদ্য যোগ হওয়া বই"
               books={newArrivals}
               href="/books?sort=newest"
@@ -508,7 +524,7 @@ export default function HomePage({
             />
             <BookSection
               id="new-books"
-              title="New Arrivals"
+              title="নতুন বই"
               description="ক্যাটালগের আরও উদাহরণ; প্রকাশের তারিখ যাচাইকৃত নয়"
               books={getBooksInCollection("new")}
               href="/books"
