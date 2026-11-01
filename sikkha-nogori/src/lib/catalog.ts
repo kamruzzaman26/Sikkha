@@ -10,6 +10,12 @@ export type CatalogProduct = {
   description: string;
   price: number | null;
   list_price: number | null;
+  edition: string | null;
+  isbn: string | null;
+  page_count: number | null;
+  language: string | null;
+  country: string | null;
+  weight_kg: number | string | null;
   product_type: string;
   category: string | null;
   author: string | null;
@@ -27,7 +33,7 @@ function isMissingCatalogSchema(error: { code?: string }): boolean {
 
 const bookPageSize = 24;
 const catalogProductSelection =
-  "id, title, slug, description, price, list_price, product_type, category, author, publisher, image_url, commerce_mode, archived_at, created_at";
+  "id, title, slug, description, price, list_price, edition, isbn, page_count, language, country, weight_kg, product_type, category, author, publisher, image_url, commerce_mode, archived_at, created_at";
 
 export type PublishedBookPage = {
   products: CatalogProduct[];
@@ -418,6 +424,15 @@ export function toCatalogBook(product: CatalogProduct): Book {
     price: product.price,
     discountedPrice: null,
     listPrice: product.list_price ?? null,
+    edition: product.edition,
+    isbn: product.isbn,
+    pageCount: product.page_count,
+    language: product.language,
+    country: product.country,
+    weightKg:
+      product.weight_kg === null || product.weight_kg === undefined
+        ? null
+        : Number(product.weight_kg),
     description: product.description,
     cover: "",
     coverAccent: "bg-emerald-800",

@@ -8,6 +8,12 @@ export type Book = {
   price: number | null;
   discountedPrice: number | null;
   listPrice?: number | null;
+  edition?: string | null;
+  isbn?: string | null;
+  pageCount?: number | null;
+  language?: string | null;
+  country?: string | null;
+  weightKg?: number | null;
   description: string;
   cover: string;
   coverAccent: string;

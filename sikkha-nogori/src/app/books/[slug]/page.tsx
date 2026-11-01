@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import BookCover from "@/components/book-cover";
+import BookTabs, { type BookSpecRow } from "@/components/book-tabs";
 import { WishlistButton } from "@/components/wishlist-button";
 import { getActiveAffiliateLinks } from "@/lib/supabase/affiliate-links";
 import { getBookBySlug, formatPrice, getSavings } from "@/lib/books";
@@ -53,6 +54,24 @@ async function BookDetails({
   }
 
   const savings = getSavings(book.price, book.listPrice);
+  const specRows: BookSpecRow[] = [
+    { label: "Name", value: book.title },
+    { label: "Category", value: book.category },
+    { label: "Author", value: book.author },
+    { label: "Edition", value: book.edition ?? "" },
+    { label: "ISBN", value: book.isbn ?? "" },
+    {
+      label: "No of Page",
+      value: book.pageCount ? String(book.pageCount) : "",
+    },
+    { label: "Language", value: book.language ?? "" },
+    { label: "Publisher", value: book.publisher },
+    { label: "Country", value: book.country ?? "" },
+    {
+      label: "Weight",
+      value: book.weightKg ? `${book.weightKg} Kg` : "",
+    },
+  ].filter((row) => row.value.trim() !== "");
 
   const affiliateLinks =
     book.commerceMode === "affiliate"
@@ -108,17 +127,12 @@ async function BookDetails({
           </div>
 
           <div className="flex flex-col justify-center">
-            {book.category && (
-              <Link
-                href={`/books?category=${encodeURIComponent(book.category)}`}
-                className="w-fit rounded-full bg-emerald-50 px-3 py-1.5 text-sm font-bold text-emerald-800 hover:bg-emerald-100"
-              >
-                {book.category}
-              </Link>
-            )}
-            <h1 className="mt-4 text-3xl font-extrabold leading-tight sm:text-4xl">
+            <h1 className="text-3xl font-extrabold leading-tight sm:text-4xl">
               {book.title}
             </h1>
+            {book.edition && (
+              <p className="mt-2 text-lg text-slate-600">{book.edition}</p>
+            )}
             {(book.author || book.publisher) && (
               <p className="mt-3 text-base text-slate-600">
                 {book.author && (
@@ -137,6 +151,18 @@ async function BookDetails({
                     {book.publisher}
                   </span>
                 )}
+              </p>
+            )}
+
+            {book.category && (
+              <p className="mt-2 text-base text-slate-600">
+                Category:{" "}
+                <Link
+                  href={`/books?category=${encodeURIComponent(book.category)}`}
+                  className="font-semibold text-emerald-800 hover:underline"
+                >
+                  {book.category}
+                </Link>
               </p>
             )}
 
@@ -219,10 +245,7 @@ async function BookDetails({
             <div className="mt-5 max-w-xs">
               <WishlistButton slug={book.slug} />
             </div>
-            <div className="mt-7 border-t border-slate-100 pt-6">
-              <h2 className="text-lg font-bold">বই সম্পর্কে</h2>
-              <p className="mt-3 leading-7 text-slate-600">{book.description}</p>
-            </div>
+            <BookTabs summary={book.description ?? ""} specs={specRows} />
 
             {!book.productId && (
               <p className="mt-6 rounded-xl bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-900">
