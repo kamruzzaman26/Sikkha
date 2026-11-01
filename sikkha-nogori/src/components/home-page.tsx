@@ -4,8 +4,10 @@ import {
   bookCategories,
   getBooksInCategory,
   getBooksInCollection,
+  getSavings,
   type Book,
 } from "@/lib/books";
+import type { PublicAffiliateLink } from "@/lib/supabase/affiliate-links";
 
 type CategoryIconName =
   | "islamic"
@@ -95,12 +97,14 @@ function BookSection({
   books,
   href,
   id,
+  buyLinks = {},
 }: {
   title: string;
   description: string;
   books: Book[];
   href: string;
   id?: string;
+  buyLinks?: Record<string, PublicAffiliateLink>;
 }) {
   if (books.length === 0) {
     return null;
@@ -129,7 +133,7 @@ function BookSection({
       <div className="-mx-1 flex snap-x snap-mandatory gap-3 overflow-x-auto px-1 pb-3 [scrollbar-width:thin] sm:gap-4">
         {books.map((book) => (
           <div key={book.slug} className="w-[44%] min-w-[9.5rem] max-w-[13rem] shrink-0 snap-start sm:w-[30%] lg:w-[22%]">
-            <BookCard book={book} />
+            <BookCard book={book} buyLink={buyLinks[book.slug] ?? null} />
           </div>
         ))}
       </div>
@@ -137,17 +141,36 @@ function BookSection({
   );
 }
 
-export default function HomePage() {
+export default function HomePage({
+  publishedBooks = null,
+  buyLinks = {},
+}: {
+  publishedBooks?: Book[] | null;
+  buyLinks?: Record<string, PublicAffiliateLink>;
+}) {
   const academicAndAdmissionBooks = [
     ...getBooksInCategory("academic"),
     ...getBooksInCategory("admission-prep"),
   ];
+  const hasPublishedBooks = publishedBooks !== null && publishedBooks.length > 0;
+  const newArrivals = (publishedBooks ?? []).slice(0, 12);
+  const bestSavings = (publishedBooks ?? [])
+    .map((book) => ({ book, savings: getSavings(book.price, book.listPrice) }))
+    .filter(
+      (entry): entry is { book: Book; savings: NonNullable<typeof entry.savings> } =>
+        entry.savings !== null,
+    )
+    .sort((left, right) => right.savings.percent - left.savings.percent)
+    .slice(0, 12)
+    .map((entry) => entry.book);
 
   return (
     <main className="min-h-screen overflow-hidden bg-[#f7faf8] text-slate-900">
-      <div className="bg-[#005640] px-4 py-2 text-center text-xs font-semibold leading-5 text-white sm:text-sm">
-        হোমপেজের বই ও মূল্য নমুনা · অর্ডার করুন শুধু checkout-এ থাকা প্রকাশিত পণ্য
-      </div>
+      {!hasPublishedBooks && (
+        <div className="bg-[#005640] px-4 py-2 text-center text-xs font-semibold leading-5 text-white sm:text-sm">
+          হোমপেজের বই ও মূল্য নমুনা · অর্ডার করুন শুধু checkout-এ থাকা প্রকাশিত পণ্য
+        </div>
+      )}
 
       <header className="hidden">
         <div className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-4 px-4 py-3 sm:px-6 sm:py-4 lg:grid-cols-[auto_minmax(18rem,1fr)_auto] lg:gap-8 lg:px-8">
@@ -353,8 +376,8 @@ export default function HomePage() {
         </details>
       </header>
 
-      <section className="mx-auto max-w-7xl px-4 pt-5 sm:px-6 sm:pt-8 lg:px-8">
-        <div className="relative isolate overflow-hidden rounded-[1.75rem] bg-[#006b4f] px-5 py-9 text-white shadow-sm sm:px-10 sm:py-12 lg:px-14 lg:py-14">
+      <section className="mx-auto max-w-7xl px-4 pt-3 sm:px-6 sm:pt-5 lg:px-8">
+        <div className="relative isolate overflow-hidden rounded-2xl bg-[#006b4f] px-4 py-4 text-white shadow-sm sm:rounded-3xl sm:px-8 sm:py-6 lg:px-12 lg:py-8">
           <div
             aria-hidden="true"
             className="pointer-events-none absolute -right-24 -top-32 size-80 rounded-full border-[2.5rem] border-white/[0.07] sm:right-8 sm:top-[-11rem] sm:size-[28rem]"
@@ -364,39 +387,39 @@ export default function HomePage() {
             className="pointer-events-none absolute -bottom-32 right-[22%] size-72 rounded-full border border-white/10"
           />
           <div className="relative z-10 max-w-2xl lg:max-w-[58%]">
-            <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-sm font-semibold text-emerald-50">
+            <span className="hidden items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-sm font-semibold text-emerald-50 sm:inline-flex">
               <span aria-hidden="true" className="size-2 rounded-full bg-emerald-200" />
               পড়ার আনন্দ, শেখার শক্তি
             </span>
-            <h1 className="mt-5 max-w-[17ch] text-3xl font-extrabold leading-[1.35] tracking-tight sm:text-4xl sm:leading-[1.4] lg:text-5xl">
+            <h1 className="text-xl font-extrabold leading-snug tracking-tight sm:mt-3 sm:text-3xl lg:text-4xl">
               আপনার পছন্দের বইটি খুঁজে নিন এখানেই
             </h1>
-            <p className="mt-4 max-w-xl text-base leading-7 text-emerald-50 sm:text-lg sm:leading-8">
+            <p className="mt-2 hidden max-w-xl text-sm leading-6 text-emerald-50 sm:block sm:text-base">
               ইসলামিক জ্ঞান, আরবি শিক্ষা ও একাডেমিক প্রস্তুতি—সব ধরনের বইয়ের
               নির্ভরযোগ্য সংগ্রহ।
             </p>
-            <div className="mt-7 flex flex-col gap-3 min-[420px]:flex-row">
+            <div className="mt-3 flex flex-row gap-2 sm:mt-4 sm:gap-3">
               <Link
                 href="/books"
-                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-extrabold text-[#064b3b] shadow-sm transition hover:bg-emerald-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:text-base"
+                className="inline-flex min-h-10 flex-1 items-center justify-center gap-2 rounded-lg bg-white px-3 py-2 text-sm font-extrabold text-[#064b3b] shadow-sm transition hover:bg-emerald-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:flex-none sm:px-5"
               >
                 Browse Books <span aria-hidden="true">→</span>
               </Link>
               <Link
                 href="#new-books"
-                className="inline-flex min-h-12 items-center justify-center rounded-xl border border-white/40 bg-white/5 px-5 py-3 text-sm font-bold text-white transition hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:text-base"
+                className="inline-flex min-h-10 flex-1 items-center justify-center rounded-lg border border-white/40 bg-white/5 px-3 py-2 text-sm font-bold text-white transition hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:flex-none sm:px-5"
               >
-                Explore New Arrivals
+                New Arrivals
               </Link>
             </div>
           </div>
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute bottom-0 right-10 hidden h-64 w-64 items-center justify-center rounded-full border border-white/10 lg:flex lg:right-20 lg:h-80 lg:w-80"
+            className="pointer-events-none absolute bottom-0 right-10 hidden h-44 w-44 items-center justify-center rounded-full border border-white/10 lg:flex lg:right-20 lg:h-48 lg:w-48"
           >
             <div className="absolute inset-5 rotate-45 rounded-[2rem] border border-white/10" />
             <svg
-              className="relative size-40 text-emerald-100/90 lg:size-48"
+              className="relative size-24 text-emerald-100/90 lg:size-28"
               viewBox="0 0 160 160"
               fill="none"
             >
@@ -457,37 +480,59 @@ export default function HomePage() {
       </section>
 
       <div className="mx-auto max-w-7xl px-4 pb-8 sm:px-6 lg:px-8">
-        <BookSection
-          title="Trending Books"
-          description="উদাহরণ হিসেবে দেখানো বইয়ের তথ্য; বাস্তব মূল্য বা বিক্রয়-র‌্যাঙ্কিং নয়"
-          books={getBooksInCollection("popular")}
-          href="/books"
-        />
-        <BookSection
-          id="new-books"
-          title="New Arrivals"
-          description="ক্যাটালগের আরও উদাহরণ; প্রকাশের তারিখ যাচাইকৃত নয়"
-          books={getBooksInCollection("new")}
-          href="/books"
-        />
-        <BookSection
-          title="ইসলামি বই"
-          description="ইসলামিক জ্ঞান ও পাঠের নমুনা বই"
-          books={getBooksInCategory("islamic-books")}
-          href="/books?category=islamic-books"
-        />
-        <BookSection
-          title="আরবি শিক্ষা"
-          description="আরবি শেখার প্রাথমিক পাঠ ও অনুশীলনের নমুনা"
-          books={getBooksInCategory("arabic-learning")}
-          href="/books?category=arabic-learning"
-        />
-        <BookSection
-          title="একাডেমিক ও ভর্তি প্রস্তুতি"
-          description="পড়াশোনা ও পরীক্ষার প্রস্তুতির নমুনা বই"
-          books={academicAndAdmissionBooks}
-          href="/books?category=academic"
-        />
+        {hasPublishedBooks ? (
+          <>
+            <BookSection
+              id="new-books"
+              title="New Arrivals"
+              description="সদ্য যোগ হওয়া বই"
+              books={newArrivals}
+              href="/books?sort=newest"
+              buyLinks={buyLinks}
+            />
+            <BookSection
+              title="সাশ্রয়ী দামে"
+              description="মুদ্রিত মূল্যের চেয়ে কমে পাওয়া বই"
+              books={bestSavings}
+              href="/books?sort=price-low"
+              buyLinks={buyLinks}
+            />
+          </>
+        ) : (
+          <>
+            <BookSection
+              title="Trending Books"
+              description="উদাহরণ হিসেবে দেখানো বইয়ের তথ্য; বাস্তব মূল্য বা বিক্রয়-র‌্যাঙ্কিং নয়"
+              books={getBooksInCollection("popular")}
+              href="/books"
+            />
+            <BookSection
+              id="new-books"
+              title="New Arrivals"
+              description="ক্যাটালগের আরও উদাহরণ; প্রকাশের তারিখ যাচাইকৃত নয়"
+              books={getBooksInCollection("new")}
+              href="/books"
+            />
+            <BookSection
+              title="ইসলামি বই"
+              description="ইসলামিক জ্ঞান ও পাঠের নমুনা বই"
+              books={getBooksInCategory("islamic-books")}
+              href="/books?category=islamic-books"
+            />
+            <BookSection
+              title="আরবি শিক্ষা"
+              description="আরবি শেখার প্রাথমিক পাঠ ও অনুশীলনের নমুনা"
+              books={getBooksInCategory("arabic-learning")}
+              href="/books?category=arabic-learning"
+            />
+            <BookSection
+              title="একাডেমিক ও ভর্তি প্রস্তুতি"
+              description="পড়াশোনা ও পরীক্ষার প্রস্তুতির নমুনা বই"
+              books={academicAndAdmissionBooks}
+              href="/books?category=academic"
+            />
+          </>
+        )}
       </div>
 
       <section className="mx-auto max-w-7xl px-4 pb-10 sm:px-6 sm:pb-14 lg:px-8">
