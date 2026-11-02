@@ -11,14 +11,22 @@ export const metadata: Metadata = {
 
 async function DashboardContent() {
   const { supabase, user } = await requireCustomer();
-  const [{ data: profile, error: profileError }, { count, error: purchaseError }] =
-    await Promise.all([
-      supabase
-        .from("customer_profiles")
-        .select("display_name, phone")
-        .eq("user_id", user.id)
-        .maybeSingle(),
-      supabase
+  const [
+    { data: profile, error: profileError },
+    { data: contactProfile, error: contactError },
+    { count, error: purchaseError },
+  ] = await Promise.all([
+    supabase
+      .from("profiles")
+      .select("display_name")
+      .eq("id", user.id)
+      .maybeSingle(),
+    supabase
+      .from("customer_profiles")
+      .select("phone")
+      .eq("user_id", user.id)
+      .maybeSingle(),
+    supabase
         .from("product_entitlements")
         .select("id", { count: "exact", head: true })
         .eq("user_id", user.id)
@@ -28,13 +36,16 @@ async function DashboardContent() {
   if (profileError) {
     throw new Error("Unable to load your profile.", { cause: profileError });
   }
+  if (contactError) {
+    throw new Error("Unable to load your contact information.", { cause: contactError });
+  }
   if (purchaseError) {
     throw new Error("Unable to load your purchased products.", {
       cause: purchaseError,
     });
   }
 
-  const contact = user.email || profile?.phone || user.phone || "";
+  const contact = user.email || contactProfile?.phone || user.phone || "";
 
   return (
     <main className="min-h-screen bg-[#f5f8f6] px-4 py-8 text-slate-900 sm:px-6 sm:py-12">
