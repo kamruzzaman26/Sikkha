@@ -47,8 +47,8 @@ async function RegisterContent({
           </div>
           <div>
             <label htmlFor="register-password" className="mb-2 block text-sm font-bold">পাসওয়ার্ড</label>
-            <input id="register-password" name="password" type="password" autoComplete="new-password" required minLength={12} maxLength={128} className="min-h-12 w-full rounded-xl border border-slate-300 px-4 outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100" />
-            <p className="mt-1.5 text-xs text-slate-500">কমপক্ষে ১২ অক্ষরের পাসওয়ার্ড দিন।</p>
+            <input id="register-password" name="password" type="password" autoComplete="new-password" required minLength={8} maxLength={128} className="min-h-12 w-full rounded-xl border border-slate-300 px-4 outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100" />
+            <p className="mt-1.5 text-xs text-slate-500">কমপক্ষে ৮ অক্ষরের পাসওয়ার্ড দিন।</p>
           </div>
           <SubmitButton pendingLabel="অ্যাকাউন্ট তৈরি হচ্ছে…" className="min-h-12 rounded-xl bg-emerald-700 px-5 font-bold text-white hover:bg-emerald-800">অ্যাকাউন্ট তৈরি করুন</SubmitButton>
         </form>
