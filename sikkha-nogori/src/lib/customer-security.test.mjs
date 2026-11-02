@@ -153,9 +153,9 @@ test("customer signup enforces the agreed 8-character password minimum in server
   );
 
   assert.match(actions, /password\.length < 8/);
-  assert.match(loginPage, /minLength={8}/);
-  assert.match(registerPage, /minLength={8}/);
+  assert.match(loginPage, /minLength=\\{8\\}/);
+  assert.match(registerPage, /minLength=\\{8\\}/);
   assert.doesNotMatch(actions, /password\.length < 12/);
-  assert.doesNotMatch(loginPage, /minLength={12}/);
-  assert.doesNotMatch(registerPage, /minLength={12}/);
+  assert.doesNotMatch(loginPage, /minLength=\\{12\\}/);
+  assert.doesNotMatch(registerPage, /minLength=\\{12\\}/);
 });
