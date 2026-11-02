@@ -33,6 +33,13 @@ $$;
 revoke all on function public.create_customer_profile()
   from public, anon, authenticated;
 
+-- Keep customer contact and account-status data in sync for every new Auth user.
+-- The existing handle_new_user trigger continues to create profiles and roles.
+drop trigger if exists on_auth_customer_profile_created on auth.users;
+create trigger on_auth_customer_profile_created
+after insert on auth.users
+for each row execute function public.create_customer_profile();
+
 create or replace function public.admin_list_users()
 returns table (
   user_id uuid,
