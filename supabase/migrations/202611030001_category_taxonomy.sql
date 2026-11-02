@@ -61,6 +61,7 @@ create policy "Admins manage category import sources"
     )
   );
 
+drop policy if exists "Read categories" on public.categories;
 drop policy if exists "Public reads active category tree"
   on public.categories;
 create policy "Public reads active category tree"
