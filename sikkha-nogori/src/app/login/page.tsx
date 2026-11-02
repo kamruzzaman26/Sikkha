@@ -62,7 +62,6 @@ async function LoginContent({
                   id="signin-identifier"
                   name="identifier"
                   type="text"
-                  inputMode="email"
                   autoComplete="username"
                   placeholder="name@example.com / 01XXXXXXXXX"
                   required
