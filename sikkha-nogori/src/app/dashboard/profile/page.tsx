@@ -44,7 +44,7 @@ async function ProfileContent({
           ← ড্যাশবোর্ড
         </Link>
         <h1 className="mt-8 text-3xl font-extrabold">আমার প্রোফাইল</h1>
-        <p className="mt-2 break-all text-slate-600">{user.email}</p>
+        <p className="mt-2 break-all text-slate-600">{user.email || user.phone}</p>
         {message && (
           <p role="status" className="mt-5 rounded-lg bg-emerald-50 px-4 py-3">
             {message}
