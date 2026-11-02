@@ -6,6 +6,8 @@ const footerLinks = [
   { href: "/blog", label: "ব্লগ" },
   { href: "/books", label: "বইয়ের সংগ্রহ" },
   { href: "/affiliate-disclosure", label: "অ্যাফিলিয়েট প্রকাশনা" },
+  { href: "/privacy", label: "গোপনীয়তা নীতি" },
+  { href: "/terms", label: "ব্যবহারের শর্তাবলি" },
   { href: "/admin/login", label: "অ্যাডমিন লগইন" },
 ];
 

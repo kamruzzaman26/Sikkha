@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
@@ -39,6 +40,38 @@ function CartIcon() {
 
 const buyButtonClass =
   "inline-flex min-h-12 items-center justify-center gap-2 rounded-lg bg-emerald-700 px-6 py-3 text-base font-bold text-white transition hover:bg-emerald-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700";
+
+export async function generateMetadata({
+  params,
+}: Pick<PageProps<"/books/[slug]">, "params">): Promise<Metadata> {
+  const { slug } = await params;
+  const product = await getPublishedBookBySlug(slug);
+  const book = product ? toCatalogBook(product) : getBookBySlug(slug);
+
+  if (!book) {
+    return {
+      title: "বই পাওয়া যায়নি | শিক্ষা নগরী",
+      robots: { index: false, follow: false },
+    };
+  }
+
+  const title = `${book.title} | শিক্ষা নগরী`;
+  const description = (
+    book.description?.trim() ||
+    `${book.title}${book.author ? ` — ${book.author}` : ""}`
+  ).slice(0, 160);
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      type: "book",
+      ...(book.imageUrl ? { images: [book.imageUrl] } : {}),
+    },
+  };
+}
 
 async function BookDetails({
   params,

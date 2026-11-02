@@ -69,6 +69,12 @@ type ProductFormValue = {
   description?: string;
   price?: number;
   list_price?: number | null;
+  edition?: string | null;
+  isbn?: string | null;
+  page_count?: number | null;
+  language?: string | null;
+  country?: string | null;
+  weight_kg?: number | string | null;
   product_type?: string;
   category?: string | null;
   author?: string | null;
@@ -237,6 +243,99 @@ function ProductForm({
         </div>
       </div>
 
+      <div className="grid gap-4 md:grid-cols-3">
+        <div>
+          <label
+            htmlFor={`${idPrefix}-edition`}
+            className="mb-2 block text-sm font-semibold text-slate-700"
+          >
+            সংস্করণ (ঐচ্ছিক)
+          </label>
+          <input
+            id={`${idPrefix}-edition`}
+            name="edition"
+            maxLength={80}
+            defaultValue={product?.edition ?? ""}
+            className={inputClass}
+          />
+        </div>
+        <div>
+          <label
+            htmlFor={`${idPrefix}-isbn`}
+            className="mb-2 block text-sm font-semibold text-slate-700"
+          >
+            ISBN (ঐচ্ছিক)
+          </label>
+          <input
+            id={`${idPrefix}-isbn`}
+            name="isbn"
+            maxLength={30}
+            defaultValue={product?.isbn ?? ""}
+            className={inputClass}
+          />
+        </div>
+        <div>
+          <label
+            htmlFor={`${idPrefix}-pageCount`}
+            className="mb-2 block text-sm font-semibold text-slate-700"
+          >
+            পৃষ্ঠা সংখ্যা (ঐচ্ছিক)
+          </label>
+          <input
+            id={`${idPrefix}-pageCount`}
+            name="pageCount"
+            type="number" min="1" max="20000" step="1"
+            defaultValue={product?.page_count ?? ""}
+            className={inputClass}
+          />
+        </div>
+        <div>
+          <label
+            htmlFor={`${idPrefix}-language`}
+            className="mb-2 block text-sm font-semibold text-slate-700"
+          >
+            ভাষা (ঐচ্ছিক)
+          </label>
+          <input
+            id={`${idPrefix}-language`}
+            name="language"
+            maxLength={60}
+            defaultValue={product?.language ?? ""}
+            className={inputClass}
+          />
+        </div>
+        <div>
+          <label
+            htmlFor={`${idPrefix}-country`}
+            className="mb-2 block text-sm font-semibold text-slate-700"
+          >
+            দেশ (ঐচ্ছিক)
+          </label>
+          <input
+            id={`${idPrefix}-country`}
+            name="country"
+            maxLength={60}
+            defaultValue={product?.country ?? ""}
+            className={inputClass}
+          />
+        </div>
+        <div>
+          <label
+            htmlFor={`${idPrefix}-weightKg`}
+            className="mb-2 block text-sm font-semibold text-slate-700"
+          >
+            ওজন (কেজি, ঐচ্ছিক)
+          </label>
+          <input
+            id={`${idPrefix}-weightKg`}
+            name="weightKg"
+            type="number" min="0" max="1000" step="0.001"
+            defaultValue={product?.weight_kg ?? ""}
+            className={inputClass}
+          />
+        </div>
+      </div>
+
       <div className="grid gap-4 md:grid-cols-2">
         <div>
           <label
@@ -335,7 +434,7 @@ async function AdminContent({
     supabase
       .from("products")
       .select(
-        "id, title, slug, description, price, list_price, product_type, category, author, publisher, image_url, commerce_mode, is_published, archived_at",
+        "id, title, slug, description, price, list_price, edition, isbn, page_count, language, country, weight_kg, product_type, category, author, publisher, image_url, commerce_mode, is_published, archived_at",
       )
       .order("title"),
     supabase

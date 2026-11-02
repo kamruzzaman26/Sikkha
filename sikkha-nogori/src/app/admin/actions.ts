@@ -308,9 +308,25 @@ export async function saveProduct(formData: FormData) {
       : parsePrice(priceValue);
   const listPriceValue = getFormValue(formData, "listPrice");
   const listPrice = listPriceValue === "" ? null : parsePrice(listPriceValue);
+  const edition = getFormValue(formData, "edition");
+  const isbn = getFormValue(formData, "isbn");
+  const language = getFormValue(formData, "language");
+  const country = getFormValue(formData, "country");
+  const pageCountValue = getFormValue(formData, "pageCount");
+  const pageCount = pageCountValue === "" ? null : Number(pageCountValue);
+  const weightValue = getFormValue(formData, "weightKg");
+  const weightKg = weightValue === "" ? null : Number(weightValue);
   const isPublishedValue = getFormValue(formData, "isPublished");
 
   if (
+    edition.length > 80 ||
+    isbn.length > 30 ||
+    language.length > 60 ||
+    country.length > 60 ||
+    (pageCount !== null &&
+      (!Number.isInteger(pageCount) || pageCount < 1 || pageCount > 20000)) ||
+    (weightKg !== null &&
+      (!Number.isFinite(weightKg) || weightKg <= 0 || weightKg > 1000)) ||
     (id && !isUuid(id)) ||
     !title ||
     title.length > 200 ||
@@ -359,6 +375,12 @@ export async function saveProduct(formData: FormData) {
     product_type: productType,
     price,
     list_price: listPrice,
+    edition: edition || null,
+    isbn: isbn || null,
+    page_count: pageCount,
+    language: language || null,
+    country: country || null,
+    weight_kg: weightKg,
     is_published: isPublishedValue === "true",
     updated_at: new Date().toISOString(),
   };

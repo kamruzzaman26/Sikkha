@@ -442,3 +442,24 @@ export function toCatalogBook(product: CatalogProduct): Book {
     commerceMode: product.commerce_mode,
   };
 }
+
+export async function getPublishedBookSlugs(): Promise<
+  { slug: string; updated_at: string | null }[]
+> {
+  const supabase = createSupabasePublicServerClient();
+  const { data, error } = await supabase
+    .from("products")
+    .select("slug, updated_at")
+    .eq("product_type", "book")
+    .eq("is_published", true)
+    .is("archived_at", null)
+    .not("commerce_mode", "is", null)
+    .limit(5000);
+
+  if (error) {
+    console.error("Unable to load book slugs for the sitemap.", error);
+    return [];
+  }
+
+  return data ?? [];
+}
