@@ -133,11 +133,11 @@ async function LoginContent({
                   type="password"
                   autoComplete="new-password"
                   required
-                  minLength={12}
+                  minLength={8}
                   maxLength={128}
                   className="min-h-12 w-full rounded-xl border border-slate-300 px-4 outline-none transition focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100"
                 />
-                <p className="mt-1.5 text-xs text-slate-500">কমপক্ষে ১২ অক্ষরের পাসওয়ার্ড ব্যবহার করুন।</p>
+                <p className="mt-1.5 text-xs text-slate-500">কমপক্ষে ৮ অক্ষরের পাসওয়ার্ড ব্যবহার করুন।</p>
               </div>
               <SubmitButton pendingLabel="অ্যাকাউন্ট তৈরি হচ্ছে…" className="min-h-12 rounded-xl border border-emerald-700 bg-emerald-50 px-5 font-bold text-emerald-900 transition hover:bg-emerald-100">
                 অ্যাকাউন্ট তৈরি করুন
