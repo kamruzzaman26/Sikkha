@@ -137,3 +137,25 @@ test("customer admin RPC returns real phone and status fields and can update sus
   assert.match(migration, /new\.phone/);
   assert.match(migration, /role = 'admin'/);
 });
+
+test("customer signup enforces the agreed 8-character password minimum in server and forms", async () => {
+  const actions = await readFile(
+    new URL("../app/login/actions.ts", import.meta.url),
+    "utf8",
+  );
+  const loginPage = await readFile(
+    new URL("../app/login/page.tsx", import.meta.url),
+    "utf8",
+  );
+  const registerPage = await readFile(
+    new URL("../app/register/page.tsx", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(actions, /password\.length < 8/);
+  assert.match(loginPage, /minLength={8}/);
+  assert.match(registerPage, /minLength={8}/);
+  assert.doesNotMatch(actions, /password\.length < 12/);
+  assert.doesNotMatch(loginPage, /minLength={12}/);
+  assert.doesNotMatch(registerPage, /minLength={12}/);
+});
