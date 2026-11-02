@@ -13,7 +13,7 @@ async function VerifyEmailContent({ searchParams }: { searchParams: Promise<{ em
   const params = await searchParams;
   const emailValue = Array.isArray(params.email) ? params.email[0] : params.email;
   const statusValue = Array.isArray(params.status) ? params.status[0] : params.status;
-  const email = emailValue && /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(emailValue) ? emailValue : "";
+  const email = emailValue && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue) && emailValue.length <= 254 ? emailValue : "";
   const messages: Record<string, string> = {
     invalid: "কোডটি ভুল অথবা মেয়াদ শেষ হয়েছে। ইমেইল ও কোড মিলিয়ে আবার চেষ্টা করুন।",
     resent: "নতুন যাচাইকরণ কোড পাঠানো হয়েছে। ইনবক্স ও Spam ফোল্ডার দেখুন।",
