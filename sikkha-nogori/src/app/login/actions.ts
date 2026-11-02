@@ -76,7 +76,7 @@ async function createCustomerAccount(formData: FormData, returnPath: string) {
     !displayName ||
     displayName.length > 100 ||
     !contact ||
-    password.length < 12 ||
+    password.length < 8 ||
     password.length > 128
   ) {
     redirect(`${returnPath}?status=invalid`);
