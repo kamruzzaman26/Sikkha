@@ -9,7 +9,7 @@ security definer
 set search_path = ''
 as $$
 begin
-  insert into public.customer_profiles (
+  insert into public.customer_profiles as existing_profile (
     user_id,
     display_name,
     phone
@@ -21,8 +21,8 @@ begin
   )
   on conflict (user_id) do update
     set phone = case
-      when public.customer_profiles.phone = '' then excluded.phone
-      else public.customer_profiles.phone
+      when existing_profile.phone = '' then excluded.phone
+      else existing_profile.phone
     end,
     updated_at = now();
 
@@ -57,7 +57,7 @@ begin
   select
     u.id,
     coalesce(u.email::text, ''),
-    coalesce(nullif(cp.display_name, ''), p.display_name, ''),
+    coalesce(nullif(p.display_name, ''), cp.display_name, ''),
     coalesce(nullif(cp.phone, ''), u.phone, ''),
     coalesce(cp.account_status, 'active'),
     coalesce(r.role::text, 'customer')
