@@ -127,7 +127,7 @@ test("customer authentication supports either email or verified phone identifier
 
 test("customer admin RPC returns real phone and status fields and can update suspension", async () => {
   const migration = await readFile(
-    new URL("../../../supabase/migrations/202611020001_customer_auth_and_admin_account_fix.sql", import.meta.url),
+    new URL("../../../supabase/migrations/20261102150000_customer_auth_and_admin_account_fix.sql", import.meta.url),
     "utf8",
   );
 
