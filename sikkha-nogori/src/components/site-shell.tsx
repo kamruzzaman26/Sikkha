@@ -6,6 +6,7 @@ import { connection } from "next/server";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { isNoActiveSessionError } from "@/lib/supabase/auth-errors";
 
 type SiteIdentity = {
   displayName: string;
@@ -21,7 +22,7 @@ async function getSiteIdentity(): Promise<SiteIdentity> {
     error: userError,
   } = await supabase.auth.getUser();
 
-  if (userError && userError.name !== "AuthSessionMissingError") {
+  if (userError && !isNoActiveSessionError(userError)) {
     throw new Error("Unable to verify the signed-in user for navigation.", {
       cause: userError,
     });

@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { isNoActiveSessionError } from "@/lib/supabase/auth-errors";
 
 const noStoreHeaders = { "Cache-Control": "private, no-store" };
 
@@ -25,7 +26,7 @@ export async function GET(
     error: userError,
   } = await supabase.auth.getUser();
 
-  if (userError && userError.name !== "AuthSessionMissingError") {
+  if (userError && !isNoActiveSessionError(userError)) {
     throw new Error("Unable to verify product access.", { cause: userError });
   }
   if (!user) {

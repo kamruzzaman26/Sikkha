@@ -2,6 +2,7 @@ import "server-only";
 
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { isNoActiveSessionError } from "@/lib/supabase/auth-errors";
 
 export type AdminRole = "admin";
 
@@ -28,7 +29,7 @@ export async function requireAdmin(requiredRole: AdminRole = "admin") {
     error: userError,
   } = await supabase.auth.getUser();
 
-  if (userError && userError.name !== "AuthSessionMissingError") {
+  if (userError && !isNoActiveSessionError(userError)) {
     throw new Error("Unable to verify the signed-in user.", {
       cause: userError,
     });

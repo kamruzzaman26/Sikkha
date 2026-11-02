@@ -2,6 +2,7 @@ import "server-only";
 
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { isNoActiveSessionError } from "@/lib/supabase/auth-errors";
 
 export async function requireCustomer() {
   const supabase = await createSupabaseServerClient();
@@ -10,7 +11,7 @@ export async function requireCustomer() {
     error,
   } = await supabase.auth.getUser();
 
-  if (error && error.name !== "AuthSessionMissingError") {
+  if (error && !isNoActiveSessionError(error)) {
     throw new Error("Unable to verify the signed-in customer.", { cause: error });
   }
   if (!user) {

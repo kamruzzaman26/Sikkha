@@ -6,6 +6,7 @@ import { placeOrder } from "./actions";
 import { formatBDT } from "@/lib/money";
 import { getCheckoutOptions } from "@/lib/supabase/checkout";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { isNoActiveSessionError } from "@/lib/supabase/auth-errors";
 
 export const metadata: Metadata = {
   title: "অর্ডার | শিক্ষা নগরী",
@@ -39,7 +40,7 @@ async function CheckoutContent({
     error: userError,
   } = await supabase.auth.getUser();
 
-  if (userError && userError.name !== "AuthSessionMissingError") {
+  if (userError && !isNoActiveSessionError(userError)) {
     throw new Error("Unable to verify the signed-in customer.", {
       cause: userError,
     });
