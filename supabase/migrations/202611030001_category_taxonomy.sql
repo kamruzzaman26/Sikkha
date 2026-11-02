@@ -33,7 +33,7 @@ create table if not exists public.category_import_sources (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
   constraint category_import_source_url_check
-    check (source_url ~ '^https://www\\.rokomari\.com/')
+    check (source_url ~ '^https://www\.rokomari\.com/')
 );
 
 create index if not exists category_import_sources_review_idx
