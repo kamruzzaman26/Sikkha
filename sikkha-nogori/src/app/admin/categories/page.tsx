@@ -91,7 +91,9 @@ function TreeNode({
 
 export default async function AdminCategoriesPage({
   searchParams,
-}: PageProps<"/admin/categories">) {
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   await connection();
   const { supabase } = await requirePermission(
     "manage_categories",

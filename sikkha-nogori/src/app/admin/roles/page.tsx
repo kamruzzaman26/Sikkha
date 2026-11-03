@@ -152,7 +152,9 @@ async function RolesContent({
 
 export default function AdminRolesPage({
   searchParams,
-}: PageProps<"/admin/roles">) {
+}: {
+  searchParams: Promise<{ status?: string | string[] }>;
+}) {
   return (
     <Suspense
       fallback={
