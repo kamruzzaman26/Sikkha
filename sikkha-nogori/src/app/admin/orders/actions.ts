@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { requireAdmin } from "@/lib/supabase/admin";
+import { logActivity, requirePermission } from "@/lib/supabase/admin";
 
 const orderStatuses = [
   "confirmed",
@@ -47,7 +47,7 @@ function handleRpcError(
 }
 
 export async function updateOrderStatus(formData: FormData) {
-  const { supabase } = await requireAdmin("admin");
+  const { supabase } = await requirePermission("manage_orders", "/admin/orders?status=forbidden");
   const orderId = getFormValue(formData, "orderId");
   const nextStatus = getFormValue(formData, "nextStatus");
 
@@ -66,11 +66,14 @@ export async function updateOrderStatus(formData: FormData) {
     handleRpcError(error);
   }
 
+  await logActivity(supabase, "order_status_changed", "order", orderId, {
+    next_status: nextStatus,
+  });
   finishAction("order-updated");
 }
 
 export async function reviewOrderPayment(formData: FormData) {
-  const { supabase } = await requireAdmin("admin");
+  const { supabase } = await requirePermission("manage_orders", "/admin/orders?status=forbidden");
   const orderId = getFormValue(formData, "orderId");
   const decision = getFormValue(formData, "decision");
   const rejectionReason = getFormValue(formData, "rejectionReason");
@@ -93,13 +96,16 @@ export async function reviewOrderPayment(formData: FormData) {
     handleRpcError(error);
   }
 
+  await logActivity(supabase, "payment_reviewed", "order", orderId, {
+    decision,
+  });
   finishAction(
     decision === "verified" ? "payment-verified" : "payment-rejected",
   );
 }
 
 export async function recordOrderRefund(formData: FormData) {
-  const { supabase } = await requireAdmin("admin");
+  const { supabase } = await requirePermission("manage_orders", "/admin/orders?status=forbidden");
   const orderId = getFormValue(formData, "orderId");
   const reason = getFormValue(formData, "reason");
 
@@ -115,5 +121,6 @@ export async function recordOrderRefund(formData: FormData) {
     handleRpcError(error);
   }
 
+  await logActivity(supabase, "order_refund_recorded", "order", orderId);
   finishAction("refund-recorded");
 }

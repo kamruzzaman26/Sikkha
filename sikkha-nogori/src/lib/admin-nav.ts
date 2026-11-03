@@ -40,8 +40,8 @@ export const adminNav: AdminNavGroup[] = [
     title: "System Administration",
     items: [
       { label: "Affiliates", href: "/admin/affiliates" },
-      { label: "Roles & Permissions" },
-      { label: "Activity Logs" },
+      { label: "Roles & Permissions", href: "/admin/roles" },
+      { label: "Activity Logs", href: "/admin/logs" },
       { label: "Website Settings" },
       { label: "Reports" },
     ],

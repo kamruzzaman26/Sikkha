@@ -5,7 +5,9 @@ import { redirect } from "next/navigation";
 import { parseAffiliateUrl } from "@/lib/affiliate-url.mjs";
 import { parseProductImageUrl } from "@/lib/product-image-url.mjs";
 import {
+  logActivity,
   requireAdmin,
+  requirePermission,
   verifyCurrentUserIsAdmin,
 } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -289,7 +291,7 @@ export async function setAffiliateLinkStatus(formData: FormData) {
 }
 
 export async function saveProduct(formData: FormData) {
-  const { supabase } = await requireAdmin("admin");
+  const { supabase } = await requirePermission("manage_products");
   const id = getFormValue(formData, "id");
   const title = getFormValue(formData, "title");
   const slug = getFormValue(formData, "slug");
@@ -423,6 +425,7 @@ export async function saveProduct(formData: FormData) {
       redirect("/admin?status=product-not-found");
     }
 
+    await logActivity(supabase, "product_updated", "product", id, { slug, title });
     finishAction("product-updated");
   }
 
@@ -438,11 +441,12 @@ export async function saveProduct(formData: FormData) {
     );
   }
 
+  await logActivity(supabase, "product_created", "product", slug, { title });
   finishAction("product-created");
 }
 
 export async function setProductArchiveStatus(formData: FormData) {
-  const { supabase } = await requireAdmin("admin");
+  const { supabase } = await requirePermission("manage_products");
   const id = getFormValue(formData, "id");
   const archiveValue = getFormValue(formData, "archive");
 
@@ -471,6 +475,12 @@ export async function setProductArchiveStatus(formData: FormData) {
     redirect("/admin?status=product-not-found");
   }
 
+  await logActivity(
+    supabase,
+    archived ? "product_archived" : "product_restored",
+    "product",
+    id,
+  );
   finishAction(archived ? "product-archived" : "product-restored");
 }
 

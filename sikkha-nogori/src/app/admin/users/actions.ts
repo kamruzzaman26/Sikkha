@@ -2,10 +2,10 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { requireAdmin } from "@/lib/supabase/admin";
+import { logActivity, requirePermission } from "@/lib/supabase/admin";
 
 export async function setCustomerStatus(formData: FormData) {
-  const { supabase } = await requireAdmin("admin");
+  const { supabase } = await requirePermission("manage_customers", "/admin/users?status=forbidden");
   const userIdValue = formData.get("userId");
   const statusValue = formData.get("status");
   const userId = typeof userIdValue === "string" ? userIdValue.trim() : "";
@@ -37,6 +37,9 @@ export async function setCustomerStatus(formData: FormData) {
     throw new Error("Unable to update customer access.", { cause: error });
   }
 
+  await logActivity(supabase, "customer_status_changed", "user", userId, {
+    status,
+  });
   revalidatePath("/admin/users");
   redirect(`/admin/users?status=${status}`);
 }
