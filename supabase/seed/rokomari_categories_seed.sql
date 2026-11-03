@@ -1,4 +1,4 @@
--- Rokomari category seed (PROPOSED, not applied).
+-- Rokomari category seed (applied 2026-11-03).
 -- Source: user-supplied research text; names NOT verified against the live Rokomari site.
 -- Only the 17 parents listed below have subcategories; other parents' children are unknown.
 -- Slugs are neutral placeholders (books-NN / books-NN-MM / products-NN), editable later.
@@ -52,7 +52,6 @@ insert into public.categories (name, slug, category_group, sort_order, source) v
   ('ইউনিভার্সিটি', 'books-45', 'books', 45, 'rokomari'),
   ('নাটকের বই', 'books-46', 'books', 46, 'rokomari'),
   ('পরিবার ও প্যারেন্টিং', 'books-47', 'books', 47, 'rokomari'),
-  ('অতিরিক্ত ছাড়ের বই', 'books-48', 'books', 48, 'rokomari'),
   ('আরবি ও উর্দূ ভাষার বই', 'books-49', 'books', 49, 'rokomari'),
   ('অলিম্পিয়াড', 'books-50', 'books', 50, 'rokomari'),
   ('Electronics', 'products-01', 'products', 1, 'rokomari'),
