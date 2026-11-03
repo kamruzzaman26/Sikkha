@@ -16,7 +16,7 @@ export const adminNav: AdminNavGroup[] = [
     items: [
       { label: "Dashboard", href: "/admin/dashboard" },
       { label: "Products / পণ্য", href: "/admin" },
-      { label: "ক্যাটাগরি ব্যবস্থাপনা" },
+      { label: "ক্যাটাগরি ব্যবস্থাপনা", href: "/admin/categories" },
       { label: "Orders / অর্ডার", href: "/admin/orders" },
       { label: "Customers / গ্রাহক", href: "/admin/users" },
       { label: "Payments / পেমেন্ট", href: "/admin/payments" },
