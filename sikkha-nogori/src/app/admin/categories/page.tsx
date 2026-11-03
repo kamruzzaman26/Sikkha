@@ -50,14 +50,14 @@ function first(value: string | string[] | undefined): string | undefined {
 
 function TreeNode({
   node,
-  children,
+  childMap,
   depth,
 }: {
   node: CategoryRow;
-  children: Map<string, CategoryRow[]>;
+  childMap: Map<string, CategoryRow[]>;
   depth: number;
 }) {
-  const kids = children.get(node.id) ?? [];
+  const kids = childMap.get(node.id) ?? [];
   return (
     <li>
       <div
@@ -81,7 +81,7 @@ function TreeNode({
       {kids.length > 0 && (
         <ul>
           {kids.map((kid) => (
-            <TreeNode key={kid.id} node={kid} children={children} depth={depth + 1} />
+            <TreeNode key={kid.id} node={kid} childMap={children} depth={depth + 1} />
           ))}
         </ul>
       )}
@@ -168,8 +168,8 @@ export default async function AdminCategoriesPage({
           ক্যাটাগরি ব্যবস্থাপনা
         </h1>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
-          মোট {rows.length}টি ক্যাটাগরি, {roots.length}টি মূল। নিচের "একসাথে
-          যোগ করুন" অংশে তালিকা লিখে অনেকগুলো একবারে যোগ করা যায়।
+          মোট {rows.length}টি ক্যাটাগরি, {roots.length}টি মূল। নিচের &quot;একসাথে
+          যোগ করুন&quot; অংশে তালিকা লিখে অনেকগুলো একবারে যোগ করা যায়।
         </p>
       </header>
 
@@ -340,7 +340,7 @@ export default async function AdminCategoriesPage({
               ) : (
                 <ul className="divide-y divide-slate-100 px-4 py-2">
                   {groupRoots.map((root) => (
-                    <TreeNode key={root.id} node={root} children={children} depth={0} />
+                    <TreeNode key={root.id} node={root} childMap={children} depth={0} />
                   ))}
                 </ul>
               )}
