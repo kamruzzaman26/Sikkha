@@ -81,7 +81,7 @@ function TreeNode({
       {kids.length > 0 && (
         <ul>
           {kids.map((kid) => (
-            <TreeNode key={kid.id} node={kid} childMap={children} depth={depth + 1} />
+            <TreeNode key={kid.id} node={kid} childMap={childMap} depth={depth + 1} />
           ))}
         </ul>
       )}
