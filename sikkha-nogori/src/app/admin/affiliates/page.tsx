@@ -126,7 +126,7 @@ async function AdminAffiliatesContent({
                   </p>
                   <p className="mt-1 text-sm text-slate-600">
                     Application:{" "}
-                    {new Date(application.created_at).toLocaleString("bn-BD")}
+                    {new Date(application.created_at).toLocaleString("en-GB")}
                   </p>
                   {application.status === "pending" && (
                     <div className="mt-3 flex flex-wrap gap-2">
