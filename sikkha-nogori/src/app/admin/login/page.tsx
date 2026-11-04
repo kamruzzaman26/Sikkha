@@ -26,16 +26,16 @@ async function AdminLoginContent({
       : undefined;
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-slate-100 px-5 py-10 text-slate-900">
-      <section className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+    <main lang="en" className="flex min-h-screen items-center justify-center bg-[#edf4f1] px-5 py-10 text-slate-900">
+      <section className="w-full max-w-md rounded-[28px] border border-white bg-white p-7 shadow-[0_24px_70px_-35px_rgba(7,60,50,0.35)] sm:p-9">
         <Link href="/" className="font-semibold text-emerald-700">
           ← Back to Sikkha Nogori
         </Link>
 
-        <p className="mt-8 text-sm font-bold text-emerald-700">
+        <p className="mt-8 text-[11px] font-extrabold uppercase tracking-[0.2em] text-emerald-700">
           ADMIN PORTAL
         </p>
-        <h1 className="mt-2 text-3xl font-bold">Administrator Sign In</h1>
+        <h1 className="mt-2 text-3xl font-black tracking-tight text-slate-950">Administrator Sign In</h1>
         <p className="mt-3 leading-7 text-slate-600">
           Sign in with an authorized administrator account.
         </p>
@@ -87,7 +87,7 @@ async function AdminLoginContent({
 
           <button
             type="submit"
-            className="mt-2 min-h-11 rounded-lg bg-emerald-700 px-4 py-2.5 font-semibold text-white transition hover:bg-emerald-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700"
+            className="mt-2 min-h-12 rounded-xl bg-[#0a5748] px-4 py-3 font-bold text-white shadow-lg shadow-emerald-900/10 transition hover:bg-[#073c32] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700"
           >
             Sign in
           </button>
