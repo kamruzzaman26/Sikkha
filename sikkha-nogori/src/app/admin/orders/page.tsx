@@ -33,7 +33,7 @@ const paymentStatusLabels = {
   verified: "Payment verified",
   rejected: "Payment reference rejected",
   failed: "Payment failed",
-  cancelled: "পেমেন্ট Cancelled",
+  cancelled: "Payment Cancelled",
   refunded: "Refunded",
 } as const;
 
@@ -168,7 +168,7 @@ async function AdminOrdersContent({
           </h1>
           <p className="mt-3 leading-7 text-slate-600">
             Showing the latest 100 orders. Orders are not marked Paid without manual payment verification
-            না; COD-তে Delivered ও নগদ গ্রহণের পর যাচাই করুন।
+            Do not mark Paid until COD delivery is completed and cash is collected.
           </p>
         </header>
 
@@ -345,7 +345,7 @@ async function AdminOrdersContent({
                       </h3>
                       {canVerifyCodPayment && (
                         <p className="mt-1 text-sm leading-6 text-amber-950">
-                          Customerের কাছ থেকে নগদ গ্রহণ Confirmed না হলে যাচাই করবেন না।
+                          Do not verify until cash collection from the customer is confirmed.
                         </p>
                       )}
                       <div className="mt-3 flex flex-wrap gap-3">
