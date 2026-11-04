@@ -33,3 +33,10 @@ textarea {
   background: #cce9df;
   color: #064b3b;
 }
+
+
+/* Keep public navigation out of the admin workspace without client-side routing hooks. */
+body:has([data-admin-route]) > .site-header-slot,
+body:has([data-admin-route]) > .site-footer-slot {
+  display: none;
+}
