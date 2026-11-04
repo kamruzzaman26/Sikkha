@@ -24,6 +24,7 @@ export const adminNav: AdminNavGroup[] = [
       { label: "Customers", icon: "customers", href: "/admin/users" },
       { label: "Payments", icon: "payments", href: "/admin/payments" },
       { label: "Inventory", icon: "inventory", href: "/admin/inventory" },
+      { label: "Accounts & Finance", icon: "wallet", href: "/admin/accounts-finance" },
       { label: "Library Partnership", icon: "affiliates", href: "/admin/partners/applications", children: [
         { label: "Partner Applications", href: "/admin/partners/applications" },
         { label: "Partner Books & Stock", href: "/admin/partners/books" },
