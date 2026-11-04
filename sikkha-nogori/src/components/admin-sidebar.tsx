@@ -4,7 +4,7 @@ import { adminNav } from "@/lib/admin-nav";
 
 function NavList() {
   return (
-    <nav aria-label="অ্যাডমিন নেভিগেশন" className="space-y-5">
+    <nav aria-label="Admin navigation" className="space-y-5">
       {adminNav.map((group) => (
         <div key={group.title}>
           <p className="px-3 text-xs font-bold uppercase tracking-wide text-slate-500">{group.title}</p>
@@ -17,7 +17,7 @@ function NavList() {
                   <span aria-disabled="true" className="flex min-h-10 items-center gap-3 rounded-lg px-3 text-sm text-slate-400">
                     <AdminIcon name={item.icon} className="size-5 shrink-0" />
                     <span className="flex-1">{item.label}</span>
-                    <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[11px] font-semibold text-slate-500">শীঘ্রই</span>
+                    <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[11px] font-semibold text-slate-500">Soon</span>
                   </span>
                 )}
               </li>
@@ -38,7 +38,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
       <details className="group border-b border-slate-200 bg-white lg:hidden">
         <summary className="flex min-h-12 cursor-pointer list-none items-center gap-3 px-5 text-sm font-bold text-slate-800">
           <AdminIcon name="menu" className="size-5 text-slate-600" />
-          <span className="flex-1">অ্যাডমিন মেনু</span>
+          <span className="flex-1">Admin menu</span>
           <AdminIcon name="chevron" className="size-5 text-slate-500 transition-transform group-open:rotate-180" />
         </summary>
         <div className="border-t border-slate-100 px-2 py-4"><NavList /></div>
