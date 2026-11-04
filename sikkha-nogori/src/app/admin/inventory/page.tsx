@@ -3,6 +3,7 @@ import Link from "next/link";
 import { connection } from "next/server";
 import { requirePermission } from "@/lib/supabase/admin";
 import { saveInventory } from "./actions";
+import { AdminSubmitButton } from "@/components/admin-submit-button";
 
 export const metadata: Metadata = {
   title: "Inventory Control | Sikkha Nogori Admin",
@@ -104,7 +105,7 @@ export default async function InventoryPage({ searchParams }: { searchParams: Pr
                       <div><label className={label} htmlFor={`sku-${product.id}`}>SKU</label><input id={`sku-${product.id}`} name="sku" maxLength={80} defaultValue={stock?.sku ?? ""} placeholder="Optional" className={input} /></div>
                       <div><label className={label} htmlFor={`qty-${product.id}`}>Quantity</label><input id={`qty-${product.id}`} name="quantity" type="number" min="0" max="100000000" step="1" required defaultValue={stock?.stock_quantity ?? 0} className={input} /></div>
                       <div><label className={label} htmlFor={`threshold-${product.id}`}>Low-stock alert</label><input id={`threshold-${product.id}`} name="threshold" type="number" min="0" max="100000000" step="1" required defaultValue={stock?.low_stock_threshold ?? 5} className={input} /></div>
-                      <button type="submit" className="col-span-2 min-h-11 rounded-xl bg-[#0b5b48] px-4 text-sm font-extrabold text-white transition hover:bg-[#084b3c] sm:col-span-1">Save stock</button>
+                      <AdminSubmitButton pendingLabel="Saving stock…" className="col-span-2 min-h-11 rounded-xl bg-[#0b5b48] px-4 text-sm font-extrabold text-white transition hover:bg-[#084b3c] disabled:cursor-wait disabled:opacity-70 sm:col-span-1">Save stock</AdminSubmitButton>
                     </form>
                   </article>
                 );
