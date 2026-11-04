@@ -4,6 +4,7 @@ import Link from "next/link";
 import { connection } from "next/server";
 import { Suspense } from "react";
 import { AdminBookImport } from "@/components/admin-book-import";
+import { AdminIcon } from "@/components/admin-icons";
 import {
   logoutAdmin,
   addProductType,
@@ -199,7 +200,7 @@ function ProductForm({
             className={inputClass}
           >
             <option value="" disabled>
-              Sales Type নির্বাচন করুন
+              Select Sales Type
             </option>
             <option value="affiliate">Third-party affiliate product</option>
             <option value="direct">Sikkha Nogori direct-sale product</option>
@@ -683,51 +684,42 @@ async function AdminContent({
           </form>
         </div>
 
-        <header className="mt-6">
+        <header className="mt-7 rounded-[28px] bg-gradient-to-br from-[#0b5949] via-[#0a493e] to-[#082f29] px-6 py-7 text-white shadow-[0_18px_45px_-28px_rgba(5,48,39,0.75)] sm:px-8 sm:py-9">
           <p className="text-sm font-bold text-emerald-700">
             SIKKHA NOGORI · ADMINISTRATION
           </p>
-          <h1 className="mt-2 text-3xl font-extrabold sm:text-4xl">
+          <h1 className="mt-3 text-3xl font-black tracking-tight text-white sm:text-4xl">
             Affiliate & Catalog Management
           </h1>
-          <p className="mt-3 max-w-3xl leading-7 text-slate-600">
-            Product Type, বিক্রির মাধ্যম, Category ও প্রচ্ছদ পরিচালনা করুন। বাইরের
-            বিক্রেতার Products checkout-এ অর্ডারযোগ্য হবে না।
+          <p className="mt-3 max-w-3xl text-sm leading-7 text-emerald-50/80 sm:text-base">
+            Manage product types, sales channels, categories, and cover images. Third-party
+            seller products are not available for direct checkout.
           </p>
         </header>
 
         {role === "admin" && (
-          <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <Link
-              href="/admin/payments"
-              className="inline-flex min-h-11 items-center rounded-lg border border-emerald-700 px-4 py-2.5 font-semibold text-emerald-800 transition hover:bg-emerald-50"
-            >
-              Payment Methods
-            </Link>
-            <Link
-              href="/admin/orders"
-              className="inline-flex min-h-11 items-center rounded-lg border border-emerald-700 px-4 py-2.5 font-semibold text-emerald-800 transition hover:bg-emerald-50"
-            >
-              Manage Orders
-            </Link>
-            <Link
-              href="/admin/affiliates"
-              className="inline-flex min-h-11 items-center rounded-lg border border-emerald-700 px-4 py-2.5 font-semibold text-emerald-800 transition hover:bg-emerald-50"
-            >
-              Affiliate Accounts
-            </Link>
-            <Link
-              href="/admin/users"
-              className="inline-flex min-h-11 items-center rounded-lg border border-emerald-700 px-4 py-2.5 font-semibold text-emerald-800 transition hover:bg-emerald-50"
-            >
-              Manage Users
-            </Link>
-          </div>
+          <section aria-label="Quick actions" className="mt-7 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            {[
+              { href: "/admin/payments", label: "Payment Methods", icon: "payments" as const, note: "Configure payment options" },
+              { href: "/admin/orders", label: "Manage Orders", icon: "orders" as const, note: "Review and process orders" },
+              { href: "/admin/affiliates", label: "Affiliate Accounts", icon: "affiliates" as const, note: "Manage partner accounts" },
+              { href: "/admin/users", label: "Manage Users", icon: "customers" as const, note: "View customer accounts" },
+            ].map((action) => (
+              <Link key={action.href} href={action.href} className="group flex min-h-[92px] items-center gap-4 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-[0_8px_24px_-20px_rgba(15,55,42,0.45)] transition hover:-translate-y-0.5 hover:border-emerald-300 hover:shadow-lg">
+                <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-800 transition group-hover:bg-[#0a5748] group-hover:text-white"><AdminIcon name={action.icon} /></span>
+                <span className="min-w-0">
+                  <span className="block text-sm font-extrabold text-slate-900">{action.label}</span>
+                  <span className="mt-1 block text-xs text-slate-500">{action.note}</span>
+                </span>
+                <span className="ml-auto text-lg text-slate-300 transition group-hover:translate-x-1 group-hover:text-emerald-700">→</span>
+              </Link>
+            ))}
+          </section>
         )}
 
         {role === "admin" && (
           <section aria-label="Catalog overview" className="mt-7 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            <div className="rounded-xl border border-slate-200 bg-white p-4">
+            <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_8px_24px_-20px_rgba(15,55,42,0.45)]">
               <p className="text-sm text-slate-600">Total Products</p>
               <p className="mt-1 text-2xl font-extrabold tabular-nums">{products.length}</p>
             </div>
@@ -765,7 +757,7 @@ async function AdminContent({
           <h2 className="text-xl font-bold">Product Catalog</h2>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
             Published and categorized products appear in the public catalog. Affiliate
-            Products বর্তমান মূল্য প্রকাশ করা হয় না; সরাসরি বিক্রির Products জন্য
+            Affiliate product prices are not shown as verified current prices. For direct-sale products,
             enter a verified selling price.
           </p>
 
@@ -884,7 +876,7 @@ async function AdminContent({
 
           <div className="mt-6 grid gap-5 lg:grid-cols-2">
             {productGroups.map(({ slug, title, entries }) => (
-              <section key={slug} aria-label={`${title} ক্যাটালগ`}>
+              <section key={slug} aria-label={`${title} catalog`}>
                 <h3 className="font-bold">
                   {title} · {entries.length}
                 </h3>
@@ -920,17 +912,17 @@ async function AdminContent({
                                     ? "affiliate"
                                     : "Direct sale"
                                 }`
-                              : " · Sales Type নির্বাচন প্রয়োজন"}
+                              : " · Sales type required"}
                           </span>
                         </div>
                         <article
-                          aria-label={`${product.title} Products কার্ড প্রিভিউ`}
+                          aria-label={`${product.title} product preview`}
                           className="mt-3 flex max-w-sm gap-3 rounded-xl border border-slate-200 bg-white p-3"
                         >
                           {product.image_url ? (
                             <Image
                               src={product.image_url}
-                              alt={`${product.title} Products প্রচ্ছদ`}
+                              alt={`${product.title} cover image`}
                               width={72}
                               height={96}
                               unoptimized
@@ -1021,9 +1013,9 @@ async function AdminContent({
 
         {role === "admin" && (
           <section className="mt-7 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_8px_30px_-18px_rgba(15,55,42,0.22)] sm:p-7">
-            <h2 className="text-xl font-bold">Product Type বাড়ান</h2>
+            <h2 className="text-xl font-bold">Add Product Type</h2>
             <p className="mt-2 text-sm leading-6 text-slate-600">
-              নতুন Type যোগ করলে তা product forms নির্বাচন করা যাবে। ব্যবহৃত Type
+              New types become available in product forms. Types already in use
               cannot be deleted.
             </p>
             <form
@@ -1075,7 +1067,7 @@ async function AdminContent({
           <h2 className="text-xl font-bold">Create Affiliate Link</h2>
           {affiliateProducts.length === 0 ? (
             <p className="mt-4 rounded-xl bg-amber-50 px-4 py-3 leading-6 text-amber-900">
-              প্রথমে কোনো Products in Affiliate Sales Type দিয়ে সংরক্ষণ করতে হবে।
+              First, save a product with the Affiliate sales mode.
             </p>
           ) : (
             <form action={saveAffiliateLink} className="mt-5 grid gap-4">
@@ -1095,7 +1087,7 @@ async function AdminContent({
                     className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5"
                   >
                     <option value="" disabled>
-                      একটি Select a product
+                      Select a product
                     </option>
                     {affiliateProducts.map((product) => (
                       <option key={product.id} value={product.id}>
