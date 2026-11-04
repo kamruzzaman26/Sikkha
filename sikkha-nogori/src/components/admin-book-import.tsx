@@ -186,7 +186,8 @@ export function AdminBookImport() {
         <code className="rounded bg-slate-100 px-1">image_url</code>. Maximum 500 rows / 512 KiB.
         Preview validates every row before import. Only valid new products are saved as unpublished drafts.
         Product names and URLs are preserved exactly. Fix invalid rows, select the updated CSV, and run Preview again.
-      </p>     <p className="mt-2 text-sm leading-6 text-amber-900">
+      </p>
+      <p className="mt-2 text-sm leading-6 text-amber-900">
         Imported affiliate products will not be available for direct checkout.
         No products will be written if the required database migration is missing.
       </p>
