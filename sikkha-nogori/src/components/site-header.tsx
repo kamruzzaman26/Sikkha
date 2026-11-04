@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { signOutCustomer } from "@/app/login/actions";
-import { bookCategories } from "@/lib/books";
 
 type SiteIdentity = {
   displayName: string;
@@ -11,6 +10,9 @@ type SiteIdentity = {
   hasOrders: boolean;
   isAdmin: boolean;
 } | null;
+
+export type MenuCategory = { name: string; children: MenuCategory[] };
+export type CategoryMenu = { books: MenuCategory[]; products: MenuCategory[] };
 
 type IconName = "menu" | "search" | "heart" | "user" | "close";
 type NavigationIconName =
@@ -112,7 +114,13 @@ function NavigationIcon({ name }: { name: NavigationIconName }) {
 const iconButtonClass =
   "inline-flex size-11 shrink-0 items-center justify-center rounded-xl text-slate-700 transition hover:bg-emerald-50 hover:text-emerald-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700";
 
-export function SiteHeader({ identity }: { identity: SiteIdentity }) {
+export function SiteHeader({
+  identity,
+  categoryMenu = { books: [], products: [] },
+}: {
+  identity: SiteIdentity;
+  categoryMenu?: CategoryMenu;
+}) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const drawerRef = useRef<HTMLElement>(null);
@@ -417,21 +425,38 @@ export function SiteHeader({ identity }: { identity: SiteIdentity }) {
                   <DrawerLink icon="book" href="/books" onClick={closeDrawer}>
                     All Books
                   </DrawerLink>
-                  {bookCategories.map((category) => (
-                    <DrawerLink
-                    icon="book"
-                    key={category.slug}
-                    href={category.href}
-                      onClick={closeDrawer}
-                    >
-                      {category.title}
-                    </DrawerLink>
-                  ))}
+                  <CategoryTree
+                    items={categoryMenu.books}
+                    basePath="/books"
+                    onNavigate={closeDrawer}
+                  />
                 </div>
               </details>
-              <DrawerLink icon="book" href="/products" onClick={closeDrawer}>
-                Other Products
-              </DrawerLink>
+              {categoryMenu.products.length > 0 ? (
+                <details className="group border-b border-slate-100">
+                  <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 rounded-lg px-3 text-sm font-bold text-slate-800 outline-none hover:bg-emerald-50 focus-visible:ring-2 focus-visible:ring-emerald-700 [&::-webkit-details-marker]:hidden">
+                    <span className="flex items-center gap-3">
+                      <span aria-hidden="true" className="text-lg">▤</span>
+                      Other Products
+                    </span>
+                    <span aria-hidden="true" className="transition group-open:rotate-180">⌄</span>
+                  </summary>
+                  <div className="pb-2 pl-9">
+                    <DrawerLink icon="book" href="/products" onClick={closeDrawer}>
+                      All Products
+                    </DrawerLink>
+                    <CategoryTree
+                      items={categoryMenu.products}
+                      basePath="/products"
+                      onNavigate={closeDrawer}
+                    />
+                  </div>
+                </details>
+              ) : (
+                <DrawerLink icon="book" href="/products" onClick={closeDrawer}>
+                  Other Products
+                </DrawerLink>
+              )}
               <DrawerLink icon="book" href="/courses" onClick={closeDrawer}>
                 Courses
               </DrawerLink>
@@ -546,5 +571,48 @@ function DrawerLink({
       <NavigationIcon name={icon} />
       {children}
     </Link>
+  );
+}
+
+function CategoryTree({
+  items,
+  basePath,
+  onNavigate,
+}: {
+  items: MenuCategory[];
+  basePath: string;
+  onNavigate: () => void;
+}) {
+  return (
+    <>
+      {items.map((item) => {
+        const href = `${basePath}?category=${encodeURIComponent(item.name)}`;
+        if (item.children.length === 0) {
+          return (
+            <DrawerLink key={item.name} icon="book" href={href} onClick={onNavigate}>
+              {item.name}
+            </DrawerLink>
+          );
+        }
+        return (
+          <details key={item.name} className="group/sub border-b border-slate-100">
+            <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 rounded-lg px-3 text-sm font-semibold text-slate-700 outline-none hover:bg-emerald-50 focus-visible:ring-2 focus-visible:ring-emerald-700 [&::-webkit-details-marker]:hidden">
+              {item.name}
+              <span aria-hidden="true" className="transition group-open/sub:rotate-180">⌄</span>
+            </summary>
+            <div className="pl-4">
+              <DrawerLink icon="book" href={href} onClick={onNavigate}>
+                সব {item.name}
+              </DrawerLink>
+              <CategoryTree
+                items={item.children}
+                basePath={basePath}
+                onNavigate={onNavigate}
+              />
+            </div>
+          </details>
+        );
+      })}
+    </>
   );
 }

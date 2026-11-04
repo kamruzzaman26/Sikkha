@@ -46,3 +46,22 @@ test("rootCategoryCounts counts each product once per top-level category", () =>
 test("rootCategoryCounts hides empty categories", () => {
   assert.deepEqual(rootCategoryCounts(rows, []), []);
 });
+
+import { buildCategoryMenu } from "./category-tree.mjs";
+
+test("buildCategoryMenu nests children, sorts, and filters by group", () => {
+  const menu = buildCategoryMenu(
+    [
+      { id: "b", parent_id: null, name: "B", sort_order: 2, category_group: "books" },
+      { id: "a", parent_id: null, name: "A", sort_order: 1, category_group: "books" },
+      { id: "a2", parent_id: "a", name: "A2", sort_order: 2, category_group: "books" },
+      { id: "a1", parent_id: "a", name: "A1", sort_order: 1, category_group: "books" },
+      { id: "p", parent_id: null, name: "P", sort_order: 1, category_group: "products" },
+    ],
+    "books",
+  );
+  assert.deepEqual(menu, [
+    { name: "A", children: [{ name: "A1", children: [] }, { name: "A2", children: [] }] },
+    { name: "B", children: [] },
+  ]);
+});

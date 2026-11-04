@@ -5,7 +5,11 @@ import { Suspense } from "react";
 import { connection } from "next/server";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import {
+  createSupabasePublicServerClient,
+  createSupabaseServerClient,
+} from "@/lib/supabase/server";
+import { buildCategoryMenu } from "@/lib/category-tree.mjs";
 import { isNoActiveSessionError } from "@/lib/supabase/auth-errors";
 
 type SiteIdentity = {
@@ -45,10 +49,33 @@ async function getSiteIdentity(): Promise<SiteIdentity> {
   };
 }
 
+async function getCategoryMenu() {
+  try {
+    const supabase = createSupabasePublicServerClient();
+    const { data, error } = await supabase
+      .from("categories")
+      .select("id, parent_id, name, sort_order, category_group")
+      .eq("is_active", true)
+      .limit(2000);
+    if (error || !data) {
+      return { books: [], products: [] };
+    }
+    return {
+      books: buildCategoryMenu(data, "books"),
+      products: buildCategoryMenu(data, "products"),
+    };
+  } catch {
+    return { books: [], products: [] };
+  }
+}
+
 async function AuthenticatedSiteHeader() {
   await connection();
-  const identity = await getSiteIdentity();
-  return <SiteHeader identity={identity} />;
+  const [identity, categoryMenu] = await Promise.all([
+    getSiteIdentity(),
+    getCategoryMenu(),
+  ]);
+  return <SiteHeader identity={identity} categoryMenu={categoryMenu} />;
 }
 
 export function SiteShell({ children }: { children: ReactNode }) {

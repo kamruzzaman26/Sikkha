@@ -74,3 +74,31 @@ export function rootCategoryCounts(rows, links) {
     )
     .map(({ name, count }) => ({ name, count }));
 }
+
+/**
+ * Nested menu tree for one category group, sorted by sort_order then name.
+ * rows: { id, parent_id, name, sort_order, category_group }
+ */
+export function buildCategoryMenu(rows, group) {
+  const inGroup = rows.filter((row) => row.category_group === group);
+  const byParent = new Map();
+  for (const row of inGroup) {
+    const key = row.parent_id ?? "";
+    byParent.set(key, [...(byParent.get(key) ?? []), row]);
+  }
+  const compare = (a, b) =>
+    (a.sort_order ?? 0) - (b.sort_order ?? 0) ||
+    a.name.localeCompare(b.name, "bn");
+
+  const build = (parentKey, seen) =>
+    (byParent.get(parentKey) ?? [])
+      .slice()
+      .sort(compare)
+      .filter((row) => !seen.has(row.id))
+      .map((row) => ({
+        name: row.name,
+        children: build(row.id, new Set([...seen, row.id])),
+      }));
+
+  return build("", new Set());
+}
