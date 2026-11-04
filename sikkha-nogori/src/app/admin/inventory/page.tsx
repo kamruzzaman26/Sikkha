@@ -20,12 +20,14 @@ export default async function InventoryPage({ searchParams }: { searchParams: Pr
   const { supabase } = await requirePermission("manage_products", "/admin/dashboard");
   const params = await searchParams;
   const status = Array.isArray(params.status) ? params.status[0] : params.status;
-  const [{ data: products, error: productError }, { data: stocks, error: stockError }] = await Promise.all([
-    supabase.from("products").select("id,title,slug,product_type,is_published,archived_at").is("archived_at", null).order("title").limit(1000),
+  const [{ data: products, error: productError }, { data: stocks, error: stockError }, { data: movements, error: movementError }] = await Promise.all([
+    supabase.from("products").select("id,title,slug,product_type,is_published,archived_at,price,cost_price,pricing_mode,markup_percent").is("archived_at", null).order("title").limit(1000),
     supabase.from("product_inventory").select("product_id,sku,stock_quantity,low_stock_threshold").limit(2000),
+    supabase.from("inventory_movements").select("id,product_id,movement_type,quantity_change,quantity_before,quantity_after,note,created_at,products(title)").order("created_at", { ascending: false }).limit(50),
   ]);
   if (productError) throw new Error("Unable to load products.", { cause: productError });
   if (stockError) throw new Error("Unable to load inventory.", { cause: stockError });
+  if (movementError) throw new Error("Unable to load inventory history.", { cause: movementError });
   const inventory = new Map((stocks ?? []).map((stock) => [stock.product_id, stock as Stock]));
   const rows = (products ?? []) as Product[];
   const tracked = rows.filter((product) => inventory.has(product.id));
@@ -108,6 +110,22 @@ export default async function InventoryPage({ searchParams }: { searchParams: Pr
             </div>
           )}
           <div className="border-t border-slate-100 bg-slate-50 px-5 py-4 text-xs leading-5 text-slate-500 sm:px-6">Inventory is an administrative stock register. It does not automatically change product pricing, order status or payment records.</div>
+        </section>
+
+        <section className="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white">
+          <div className="border-b border-slate-100 px-5 py-5 sm:px-6">
+            <p className="text-[10px] font-extrabold uppercase tracking-[.18em] text-emerald-700">Audit trail</p>
+            <h2 className="mt-1 text-xl font-extrabold">Recent stock movements</h2>
+            <p className="mt-1 text-xs text-slate-500">Latest 50 opening, adjustment and order deductions.</p>
+          </div>
+          {(movements ?? []).length === 0 ? <p className="px-6 py-8 text-sm text-slate-500">No stock movement has been recorded yet.</p> : (
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[720px] text-left text-sm">
+                <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500"><tr><th className="px-5 py-3">Product</th><th className="px-5 py-3">Movement</th><th className="px-5 py-3">Change</th><th className="px-5 py-3">Before → After</th><th className="px-5 py-3">Note</th><th className="px-5 py-3">Date</th></tr></thead>
+                <tbody className="divide-y divide-slate-100">{(movements ?? []).map((movement: any) => <tr key={movement.id}><td className="px-5 py-3 font-semibold">{movement.products?.title ?? "Product"}</td><td className="px-5 py-3 capitalize">{movement.movement_type.replace("_", " ")}</td><td className={`px-5 py-3 font-bold tabular-nums ${movement.quantity_change < 0 ? "text-rose-700" : "text-emerald-700"}`}>{movement.quantity_change > 0 ? "+" : ""}{movement.quantity_change}</td><td className="px-5 py-3 tabular-nums">{movement.quantity_before} → {movement.quantity_after}</td><td className="max-w-56 truncate px-5 py-3 text-slate-500">{movement.note ?? "—"}</td><td className="whitespace-nowrap px-5 py-3 text-slate-500">{new Date(movement.created_at).toLocaleString("en-GB")}</td></tr>)}</tbody>
+              </table>
+            </div>
+          )}
         </section>
       </div>
     </main>
