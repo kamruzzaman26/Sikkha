@@ -20,7 +20,7 @@ const actionLabels: Record<string, string> = {
   staff_role_changed: "Staff role changed",
 };
 
-const dateFormat = new Intl.DateTimeFormat("bn-BD", {
+const dateFormat = new Intl.DateTimeFormat("en-GB", {
   timeZone: "Asia/Dhaka",
   dateStyle: "medium",
   timeStyle: "short",
