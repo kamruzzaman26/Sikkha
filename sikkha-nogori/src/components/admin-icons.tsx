@@ -7,7 +7,7 @@ export type AdminIconName =
   | "pages" | "blog" | "marketing" | "seo" | "media" | "affiliates"
   | "roles" | "logs" | "settings" | "reports" | "save" | "edit"
   | "delete" | "upload" | "search" | "filter" | "add" | "view"
-  | "external" | "menu" | "chevron";
+  | "external" | "menu" | "chevron" | "wallet" | "handshake" | "receipt" | "chart" | "spreadsheet";
 
 const paths: Record<AdminIconName, ReactNode> = {
   dashboard: <><rect x="3.5" y="3.5" width="7" height="8" rx="1.5" /><rect x="13.5" y="3.5" width="7" height="5" rx="1.5" /><rect x="13.5" y="11.5" width="7" height="9" rx="1.5" /><rect x="3.5" y="14.5" width="7" height="6" rx="1.5" /></>,
@@ -41,6 +41,11 @@ const paths: Record<AdminIconName, ReactNode> = {
   external: <><path d="M14 4.5h5.5V10M19.5 4.5 11 13" /><path d="M18 14v5H5V6h5" /></>,
   menu: <path d="M4 6.5h16M4 12h16M4 17.5h16" />,
   chevron: <path d="m7 10 5 5 5-5" />,
+  wallet: <><rect x="3" y="5" width="18" height="15" rx="2.5" /><path d="M3 9h18M16 14h2" /><path d="M7 5V3.5h10V5" /></>,
+  handshake: <><path d="m3 9 4-4 4 2 2-1 4 1 4 4-3 3-3-2-3 3-3-2-2 1-4-5Z" /><path d="m7 5 2 2m6-1 2 2M9 15l2 2m2-4 2 2" /></>,
+  receipt: <><path d="M5 3.5 7 5l2-1.5L11 5l2-1.5L15 5l2-1.5 2 1.5v17l-2-1.5-2 1.5-2-1.5L11 22l-2-1.5L7 22l-2-1.5v-17Z" /><path d="M9 10h6M9 14h6M9 18h3" /></>,
+  chart: <><path d="M4 20V4M4 20h17" /><path d="m7 15 4-4 3 2 5-6" /><path d="M16 7h3v3" /></>,
+  spreadsheet: <><rect x="3.5" y="3.5" width="17" height="17" rx="2" /><path d="M3.5 9h17M3.5 14.5h17M9 3.5v17M14.5 3.5v17" /></>,
 };
 
 export function AdminIcon({ name, className = "size-5" }: { name: AdminIconName; className?: string }) {
