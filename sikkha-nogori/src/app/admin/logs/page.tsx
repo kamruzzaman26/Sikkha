@@ -53,7 +53,7 @@ async function LogsContent() {
   }
 
   return (
-    <main className="min-h-screen bg-[#f7faf8] px-5 py-8 text-slate-900 sm:px-8">
+    <main lang="en" className="min-h-screen bg-[#f3f7f5] px-5 py-8 text-slate-900 sm:px-8">
       <div className="mx-auto max-w-6xl">
         <h1 className="text-3xl font-extrabold">Activity Logs</h1>
         <p className="mt-2 text-sm leading-6 text-slate-600">
@@ -111,7 +111,7 @@ export default function AdminLogsPage() {
   return (
     <Suspense
       fallback={
-        <main className="min-h-screen bg-[#f7faf8] px-5 py-8">
+        <main lang="en" className="min-h-screen bg-[#f3f7f5] px-5 py-8">
           <div className="mx-auto h-64 max-w-6xl animate-pulse rounded-2xl bg-white" />
         </main>
       }
