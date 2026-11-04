@@ -4,20 +4,20 @@ import { Suspense } from "react";
 import { requirePermission } from "@/lib/supabase/admin";
 
 export const metadata: Metadata = {
-  title: "Activity Logs | শিক্ষা নগরী প্রশাসন",
+  title: "Activity Logs | Sikkha Nogori Admin",
   robots: { index: false, follow: false },
 };
 
 const actionLabels: Record<string, string> = {
-  product_created: "পণ্য তৈরি",
-  product_updated: "পণ্য পরিবর্তন",
-  product_archived: "পণ্য আর্কাইভ",
-  product_restored: "পণ্য পুনরুদ্ধার",
-  order_status_changed: "অর্ডারের স্ট্যাটাস পরিবর্তন",
-  payment_reviewed: "পেমেন্ট যাচাই",
-  order_refund_recorded: "রিফান্ড রেকর্ড",
-  customer_status_changed: "গ্রাহকের অ্যাকাউন্ট স্ট্যাটাস পরিবর্তন",
-  staff_role_changed: "স্টাফ role পরিবর্তন",
+  product_created: "Product created",
+  product_updated: "Product updated",
+  product_archived: "Product archived",
+  product_restored: "Product restored",
+  order_status_changed: "Order status changed",
+  payment_reviewed: "Payment reviewed",
+  order_refund_recorded: "Refund recorded",
+  customer_status_changed: "Customer account status changed",
+  staff_role_changed: "Staff role changed",
 };
 
 const dateFormat = new Intl.DateTimeFormat("bn-BD", {
@@ -57,23 +57,23 @@ async function LogsContent() {
       <div className="mx-auto max-w-6xl">
         <h1 className="text-3xl font-extrabold">Activity Logs</h1>
         <p className="mt-2 text-sm leading-6 text-slate-600">
-          সর্বশেষ ২০০টি প্রশাসনিক কাজ। লগ শুধু যোগ হয়; বদলানো বা মোছা যায় না।
-          এই লগ চালুর আগের কাজ এখানে নেই।
+          Latest 200 administrative events. Logs are append-only and cannot be edited or deleted.
+          Actions performed before activity logging was enabled are not included.
         </p>
         {(logs ?? []).length === 0 ? (
           <p className="mt-6 rounded-xl border border-slate-200 bg-white px-4 py-8 text-center text-sm text-slate-600">
-            এখনো কোনো কাজ লগ হয়নি।
+            No activity has been logged yet.
           </p>
         ) : (
           <div className="mt-6 overflow-x-auto rounded-xl border border-slate-200 bg-white">
             <table className="w-full min-w-[40rem] text-left text-sm">
               <thead className="bg-slate-50 text-slate-600">
                 <tr>
-                  <th className="px-4 py-3 font-semibold">সময়</th>
-                  <th className="px-4 py-3 font-semibold">কে</th>
-                  <th className="px-4 py-3 font-semibold">কাজ</th>
-                  <th className="px-4 py-3 font-semibold">লক্ষ্য</th>
-                  <th className="px-4 py-3 font-semibold">বিবরণ</th>
+                  <th className="px-4 py-3 font-semibold">Timestamp</th>
+                  <th className="px-4 py-3 font-semibold">Actor</th>
+                  <th className="px-4 py-3 font-semibold">Action</th>
+                  <th className="px-4 py-3 font-semibold">Target</th>
+                  <th className="px-4 py-3 font-semibold">Details</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
