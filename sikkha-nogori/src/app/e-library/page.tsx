@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getPublishedBooks, getPublishedCourses } from "@/lib/catalog";
 import { CatalogProductCard } from "@/components/catalog-product-card";
+import { formatPrice } from "@/lib/books";
 export const metadata: Metadata = {title:"E-Library | শিক্ষা নগরী",description:"শিক্ষা নগরীর প্রকাশিত বই ও অনলাইন কোর্সের ডিজিটাল ক্যাটালগ।"};
 export default async function ELibraryPage(){
  const [bookPage,courses]=await Promise.all([getPublishedBooks({page:1,query:"",sort:"newest",pageSize:24}),getPublishedCourses()]);
