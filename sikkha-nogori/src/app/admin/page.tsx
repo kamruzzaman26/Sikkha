@@ -5,6 +5,7 @@ import { connection } from "next/server";
 import { Suspense } from "react";
 import { AdminBookImport } from "@/components/admin-book-import";
 import { ProductImageUpload } from "@/components/admin-product-image-upload";
+import { AdminAutoDraftForm } from "@/components/admin-auto-draft-form";
 import { AdminIcon } from "@/components/admin-icons";
 import {
   logoutAdmin,
@@ -111,7 +112,7 @@ function ProductForm({
     "w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5";
 
   return (
-    <form action={saveProduct} className="grid gap-4">
+    <AdminAutoDraftForm draftKey={product?.id ?? idPrefix} action={saveProduct} className="grid gap-4">
       {product?.id && <input type="hidden" name="id" value={product.id} />}
       <div className="grid gap-4 md:grid-cols-2">
         <div>
@@ -473,7 +474,7 @@ function ProductForm({
       >
         {product ? "Update Product" : "Add Product"}
       </button>
-    </form>
+    </AdminAutoDraftForm>
   );
 }
 
