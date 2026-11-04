@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { getActiveAffiliateLinks } from "@/lib/supabase/affiliate-links";
 import { WishlistButton } from "@/components/wishlist-button";
+import { AddToCartButton } from "@/components/add-to-cart-button";
 import {
   getPublishedProductBySlug,
   getPublishedProductTypes,
@@ -131,6 +132,7 @@ async function ProductDetails({ params }: ProductPageProps) {
               >
                 অর্ডারের জন্য এগিয়ে যান
               </Link>
+              <AddToCartButton productId={product.id} />
             </section>
           )
         ) : affiliateLinks === null ? (
