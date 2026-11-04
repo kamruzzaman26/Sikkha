@@ -22,7 +22,7 @@ export const adminNav: AdminNavGroup[] = [
       { label: "Orders", icon: "orders", href: "/admin/orders" },
       { label: "Customers", icon: "customers", href: "/admin/users" },
       { label: "Payments", icon: "payments", href: "/admin/payments" },
-      { label: "Inventory", icon: "inventory" },
+      { label: "Inventory", icon: "inventory", href: "/admin/inventory" },
     ],
   },
   {
