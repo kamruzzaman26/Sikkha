@@ -143,7 +143,7 @@ async function AdminOrdersContent({
   const typedOrders = orders as AdminOrder[];
 
   return (
-    <main className="min-h-screen bg-[#f7faf8] px-5 py-10 text-slate-900 sm:px-8 sm:py-14">
+    <main lang="en" className="min-h-screen bg-[#f3f7f5] px-5 py-10 text-slate-900 sm:px-8 sm:py-14">
       <div className="mx-auto max-w-5xl">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <Link href="/admin" className="font-semibold text-emerald-700">
@@ -449,7 +449,7 @@ export default function AdminOrdersPage({
   return (
     <Suspense
       fallback={
-        <main className="min-h-screen bg-[#f7faf8] px-5 py-10 sm:px-8 sm:py-14">
+        <main lang="en" className="min-h-screen bg-[#f3f7f5] px-5 py-10 sm:px-8 sm:py-14">
           <div className="mx-auto max-w-5xl animate-pulse rounded-2xl bg-white p-8">
             <div className="h-8 w-64 rounded bg-slate-100" />
             <div className="mt-8 h-56 rounded-xl bg-slate-100" />
