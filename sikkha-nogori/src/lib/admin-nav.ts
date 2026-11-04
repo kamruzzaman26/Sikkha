@@ -4,6 +4,7 @@ export type AdminNavItem = {
   label: string;
   icon: AdminIconName;
   href?: string;
+  children?: { label: string; href: string }[];
 };
 
 export type AdminNavGroup = {
@@ -23,6 +24,13 @@ export const adminNav: AdminNavGroup[] = [
       { label: "Customers", icon: "customers", href: "/admin/users" },
       { label: "Payments", icon: "payments", href: "/admin/payments" },
       { label: "Inventory", icon: "inventory", href: "/admin/inventory" },
+      { label: "Library Partnership", icon: "affiliates", href: "/admin/partners/applications", children: [
+        { label: "Partner Applications", href: "/admin/partners/applications" },
+        { label: "Partner Books & Stock", href: "/admin/partners/books" },
+        { label: "Order Assignment", href: "/admin/partners/assignments" },
+        { label: "Packing & Delivery", href: "/admin/partners/delivery" },
+        { label: "Commission & Settlement", href: "/admin/partners/commissions" },
+      ] },
     ],
   },
   {
