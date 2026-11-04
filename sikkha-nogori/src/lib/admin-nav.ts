@@ -1,6 +1,9 @@
+import type { AdminIconName } from "@/components/admin-icons";
+
 export type AdminNavItem = {
   label: string;
-  href?: string; // no href = not implemented yet (shown as "শীঘ্রই")
+  icon: AdminIconName;
+  href?: string;
 };
 
 export type AdminNavGroup = {
@@ -8,42 +11,41 @@ export type AdminNavGroup = {
   items: AdminNavItem[];
 };
 
-// Source of truth for the admin sidebar. Items without `href` are planned
-// features and are rendered disabled; nothing here links to a fake page.
+// Items without href are intentionally disabled until their pages exist.
 export const adminNav: AdminNavGroup[] = [
   {
     title: "Daily Operations",
     items: [
-      { label: "Dashboard", href: "/admin/dashboard" },
-      { label: "Products / পণ্য", href: "/admin" },
-      { label: "ক্যাটাগরি ব্যবস্থাপনা", href: "/admin/categories" },
-      { label: "Orders / অর্ডার", href: "/admin/orders" },
-      { label: "Customers / গ্রাহক", href: "/admin/users" },
-      { label: "Payments / পেমেন্ট", href: "/admin/payments" },
-      { label: "Inventory / স্টক" },
+      { label: "Dashboard", icon: "dashboard", href: "/admin/dashboard" },
+      { label: "Products / পণ্য", icon: "products", href: "/admin" },
+      { label: "ক্যাটাগরি ব্যবস্থাপনা", icon: "categories", href: "/admin/categories" },
+      { label: "Orders / অর্ডার", icon: "orders", href: "/admin/orders" },
+      { label: "Customers / গ্রাহক", icon: "customers", href: "/admin/users" },
+      { label: "Payments / পেমেন্ট", icon: "payments", href: "/admin/payments" },
+      { label: "Inventory / স্টক", icon: "inventory" },
     ],
   },
   {
     title: "Website Control",
     items: [
-      { label: "Homepage Builder" },
-      { label: "Banners" },
-      { label: "Navigation" },
-      { label: "Pages" },
-      { label: "Blog" },
-      { label: "Marketing" },
-      { label: "SEO" },
-      { label: "Media Library" },
+      { label: "Homepage Builder", icon: "homepage" },
+      { label: "Banners", icon: "banners" },
+      { label: "Navigation", icon: "navigation" },
+      { label: "Pages", icon: "pages" },
+      { label: "Blog", icon: "blog" },
+      { label: "Marketing", icon: "marketing" },
+      { label: "SEO", icon: "seo" },
+      { label: "Media Library", icon: "media" },
     ],
   },
   {
     title: "System Administration",
     items: [
-      { label: "Affiliates", href: "/admin/affiliates" },
-      { label: "Roles & Permissions", href: "/admin/roles" },
-      { label: "Activity Logs", href: "/admin/logs" },
-      { label: "Website Settings" },
-      { label: "Reports" },
+      { label: "Affiliates", icon: "affiliates", href: "/admin/affiliates" },
+      { label: "Roles & Permissions", icon: "roles", href: "/admin/roles" },
+      { label: "Activity Logs", icon: "logs", href: "/admin/logs" },
+      { label: "Website Settings", icon: "settings" },
+      { label: "Reports", icon: "reports" },
     ],
   },
 ];
