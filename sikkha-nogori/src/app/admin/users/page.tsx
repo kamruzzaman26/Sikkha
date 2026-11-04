@@ -8,16 +8,16 @@ import { requireAdmin } from "@/lib/supabase/admin";
 import { setCustomerStatus } from "./actions";
 
 export const metadata: Metadata = {
-  title: "ব্যবহারকারী পরিচালনা | শিক্ষা নগরী",
+  title: "User Management | Sikkha Nogori",
   robots: { index: false, follow: false },
 };
 
 const messages: Record<string, string> = {
-  active: "ব্যবহারকারী অ্যাকাউন্ট সক্রিয় করা হয়েছে।",
-  suspended: "ব্যবহারকারী অ্যাকাউন্ট স্থগিত করা হয়েছে।",
-  invalid: "তথ্য যাচাই করুন।",
-  forbidden: "এই কাজের জন্য Admin অনুমতি প্রয়োজন।",
-  "not-found": "ব্যবহারকারী পাওয়া যায়নি।",
+  active: "User account activated.",
+  suspended: "User account suspended.",
+  invalid: "Please verify the information.",
+  forbidden: "Administrator permission is required for this action.",
+  "not-found": "User not found.",
 };
 
 type UserSummary = {
@@ -57,22 +57,22 @@ async function AdminUsersContent({
       <div className="mx-auto max-w-5xl">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <Link href="/admin" className="font-semibold text-emerald-700">
-            ← প্রশাসনিক প্যানেল
+            ← Admin workspace
           </Link>
           <form action={logoutAdmin}>
             <button
               type="submit"
               className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-white"
             >
-              লগআউট
+              Sign out
             </button>
           </form>
         </div>
-        <h1 className="mt-8 text-3xl font-extrabold">ব্যবহারকারী পরিচালনা</h1>
+        <h1 className="mt-8 text-3xl font-extrabold">User Management</h1>
         <p className="mt-2 leading-7 text-slate-600">
-          সর্বশেষ ৫০০টি অ্যাকাউন্ট। Admin ও অন্যান্য non-customer role এখানে
-          পরিবর্তনযোগ্য নয়; affiliate membership আলাদা অনুমোদিত প্রক্রিয়ায়
-          পরিচালিত হয়।
+          Latest 500 accounts. Admin and other non-customer roles cannot be modified here.
+          Affiliate membership is managed through a separate approval workflow
+          .
         </p>
         {message && (
           <p role="status" className="mt-5 rounded-lg bg-emerald-50 px-4 py-3">
@@ -81,7 +81,7 @@ async function AdminUsersContent({
         )}
         {users.length === 0 ? (
           <p className="mt-6 rounded-xl bg-white p-5 text-slate-600">
-            কোনো ব্যবহারকারী পাওয়া যায়নি।
+            কোনো User not found.
           </p>
         ) : (
           <ul className="mt-6 grid gap-3">
@@ -96,7 +96,7 @@ async function AdminUsersContent({
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div className="min-w-0">
                       <h2 className="font-bold">
-                        {user.display_name || "নাম দেওয়া হয়নি"}
+                        {user.display_name || "Name not provided"}
                       </h2>
                       <p className="mt-1 break-all text-sm text-slate-600">
                         {user.email}
@@ -114,7 +114,7 @@ async function AdminUsersContent({
                   </div>
                   <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4">
                     <span className="text-sm text-slate-700">
-                      অ্যাকাউন্ট: {user.account_status}
+                      Account: {user.account_status}
                     </span>
                     {canChangeStatus && (
                       <form action={setCustomerStatus}>
@@ -133,8 +133,8 @@ async function AdminUsersContent({
                           className="min-h-10 rounded-lg border border-slate-300 px-4 py-2 font-semibold hover:bg-slate-50"
                         >
                           {user.account_status === "active"
-                            ? "অ্যাকাউন্ট স্থগিত করুন"
-                            : "অ্যাকাউন্ট সক্রিয় করুন"}
+                            ? "Suspend Account"
+                            : "Activate Account"}
                         </button>
                       </form>
                     )}
