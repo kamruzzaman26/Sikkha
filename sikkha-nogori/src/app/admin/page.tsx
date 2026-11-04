@@ -668,7 +668,7 @@ async function AdminContent({
   );
 
   return (
-    <main className="min-h-screen bg-[#f3f7f5] px-4 py-6 text-slate-900 sm:px-7 sm:py-8 xl:px-10">
+    <main lang="en" className="min-h-screen bg-[#f3f7f5] px-4 py-6 text-slate-900 sm:px-7 sm:py-8 xl:px-10">
       <div className="mx-auto max-w-[1500px]">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <Link href="/" className="font-semibold text-emerald-700">
@@ -756,8 +756,7 @@ async function AdminContent({
         >
           <h2 className="text-xl font-bold">Product Catalog</h2>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-            Published and categorized products appear in the public catalog. Affiliate
-            Affiliate product prices are not shown as verified current prices. For direct-sale products,
+            Published and categorized products appear in the public catalog. Affiliate product prices are not treated as verified current prices. For direct-sale products,
             enter a verified selling price.
           </p>
 
