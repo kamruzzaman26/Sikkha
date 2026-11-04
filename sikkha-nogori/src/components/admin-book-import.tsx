@@ -16,15 +16,15 @@ import type {
 function statusLabel(status: BookImportRowResult["status"]): string {
   switch (status) {
     case "ready":
-      return "আমদানির জন্য প্রস্তুত";
+      return "Ready to import";
     case "invalid":
-      return "সংশোধন প্রয়োজন";
+      return "Needs correction";
     case "duplicate":
-      return "ডুপ্লিকেট";
+      return "Duplicate";
     case "imported":
-      return "সংরক্ষিত (খসড়া)";
+      return "Saved as draft";
     case "failed":
-      return "ব্যর্থ";
+      return "Failed";
   }
 }
 
@@ -35,10 +35,10 @@ function ImportRows({ rows }: { rows: BookImportRowResult[] }) {
         <thead className="bg-slate-50 text-slate-700">
           <tr>
             <th scope="col" className="px-3 py-3">CSV row</th>
-            <th scope="col" className="px-3 py-3">বইয়ের নাম</th>
+            <th scope="col" className="px-3 py-3">Book title</th>
             <th scope="col" className="px-3 py-3">Affiliate URL</th>
             <th scope="col" className="px-3 py-3">Image URL</th>
-            <th scope="col" className="px-3 py-3">অবস্থা ও কারণ</th>
+            <th scope="col" className="px-3 py-3">Status & details</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-100">
@@ -85,10 +85,10 @@ function Summary({ rows }: { rows: BookImportRowResult[] }) {
 
   return (
     <p className="mt-4 rounded-xl bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-700">
-      {counts.imported > 0 && `সফল: ${counts.imported}টি · `}
-      {`ব্যর্থ: ${counts.failed}টি · ডুপ্লিকেট: ${counts.duplicate}টি · `}
-      {counts.invalid > 0 && `সংশোধন প্রয়োজন: ${counts.invalid}টি · `}
-      {counts.ready > 0 && `এখনো প্রস্তুত: ${counts.ready}টি`}
+      {counts.imported > 0 && `Imported: ${counts.imported} · `}
+      {`Failed: ${counts.failed}টি · Duplicate: ${counts.duplicate}টি · `}
+      {counts.invalid > 0 && `Needs correction: ${counts.invalid}টি · `}
+      {counts.ready > 0 && `Ready: ${counts.ready}`}
     </p>
   );
 }
@@ -105,11 +105,11 @@ export function AdminBookImport() {
   async function handlePreview() {
     const file = fileInputRef.current?.files?.[0];
     if (!file) {
-      setError("প্রথমে CSV ফাইল নির্বাচন করুন।");
+      setError("Please select a CSV file first.");
       return;
     }
     if (file.size === 0 || file.size > MAX_BOOK_IMPORT_BYTES) {
-      setError("CSV ফাইল খালি হতে পারবে না এবং সর্বোচ্চ 512 KiB হতে পারবে।");
+      setError("The CSV file must not be empty or exceed 512 KiB.");
       return;
     }
 
@@ -126,7 +126,7 @@ export function AdminBookImport() {
         setError(result.error);
       }
     } catch {
-      setError("CSV preview প্রস্তুত করা যায়নি। ফাইলটি পরীক্ষা করে আবার চেষ্টা করুন।");
+      setError("Could not prepare the CSV preview. Check the file and try again.");
     } finally {
       setBusy(false);
     }
@@ -134,14 +134,14 @@ export function AdminBookImport() {
 
   async function handleConfirm() {
     if (!csvText || !rows.some((row) => row.status === "ready")) {
-      setError("আমদানির জন্য কোনো যাচাইকৃত নতুন row নেই।");
+      setError("There are no validated new rows ready to import.");
       return;
     }
 
     const readyCount = rows.filter((row) => row.status === "ready").length;
     if (
       !window.confirm(
-        `${readyCount}টি যাচাইকৃত, নতুন পণ্য database-এ অপ্রকাশিত খসড়া হিসেবে সংরক্ষণ করবেন?`,
+        `Save ${readyCount} validated new products to the database as unpublished drafts?`,
       )
     ) {
       return;
@@ -157,7 +157,7 @@ export function AdminBookImport() {
         setError(result.error);
       }
     } catch {
-      setError("Import শেষ করা যায়নি। কোনো row-এর অবস্থা অনিশ্চিত হলে আবার preview চালান।");
+      setError("Import could not be completed. If any row status is uncertain, run the preview again.");
     } finally {
       setBusy(false);
     }
@@ -177,20 +177,20 @@ export function AdminBookImport() {
       className="mt-8 rounded-2xl border border-emerald-100 bg-white p-5 shadow-sm sm:p-7"
     >
       <h2 id="book-import-heading" className="text-xl font-bold">
-        বইয়ের CSV Bulk Import
+        Bulk Import Products (CSV)
       </h2>
       <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
         Header অবশ্যই{" "}
         <code className="rounded bg-slate-100 px-1">book_name</code>,{" "}
         <code className="rounded bg-slate-100 px-1">affiliate_url</code>,{" "}
-        <code className="rounded bg-slate-100 px-1">image_url</code> হবে।
-        সর্বোচ্চ 500 row/512 KiB। Preview-তে যাচাইয়ের পর Confirm করলে শুধু
-        valid ও নতুন পণ্য অপ্রকাশিত খসড়া হিসেবে যোগ হবে; CSV-র নাম ও URL হুবহু
-        রাখা হবে। ভুল সারি ঠিক করে CSV পুনরায় নির্বাচন করে Preview চালান।
+        <code className="rounded bg-slate-100 px-1">image_url</code> are required.
+        Maximum 500 rows / 512 KiB. After preview validation, confirm to import only
+        valid new products as unpublished drafts. Product names and URLs are preserved exactly.
+        রাখা are required. ভুল সারি ঠিক করে CSV পুনরায় নির্বাচন করে Preview চালান।
       </p>
       <p className="mt-2 text-sm leading-6 text-amber-900">
-        Import হওয়া affiliate বই অর্ডার/checkout-এ বিক্রির জন্য যাবে না।
-        Migration না থাকলে কোনো পণ্য লেখা হবে না।
+        Imported affiliate products will not be available for direct checkout.
+        No products will be written if the required database migration is missing.
       </p>
 
       <div className="mt-5 grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
@@ -199,7 +199,7 @@ export function AdminBookImport() {
             htmlFor="book-import-csv"
             className="mb-2 block text-sm font-semibold text-slate-700"
           >
-            CSV ফাইল
+            CSV file
           </label>
           <input
             ref={fileInputRef}
@@ -217,12 +217,12 @@ export function AdminBookImport() {
           onClick={handlePreview}
           className="min-h-11 rounded-lg bg-emerald-700 px-5 py-2.5 text-sm font-bold text-white hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {busy ? "যাচাই হচ্ছে…" : "Preview ও যাচাই"}
+          {busy ? "Validating…" : "Preview & Validate"}
         </button>
       </div>
 
       {fileName && (
-        <p className="mt-3 text-sm text-slate-600">নির্বাচিত: {fileName}</p>
+        <p className="mt-3 text-sm text-slate-600">Selected: {fileName}</p>
       )}
       {error && (
         <p role="alert" className="mt-4 rounded-xl bg-rose-50 px-4 py-3 text-sm text-rose-800">
@@ -238,13 +238,13 @@ export function AdminBookImport() {
           onClick={handleConfirm}
           className="mt-5 min-h-11 rounded-lg bg-emerald-800 px-5 py-2.5 text-sm font-bold text-white hover:bg-emerald-900 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {busy ? "সংরক্ষণ হচ্ছে…" : "যাচাইকৃত row import নিশ্চিত করুন"}
+          {busy ? "Importing…" : "Confirm Import of Valid Rows"}
         </button>
       )}
       {report && (
         <p role="status" className="mt-4 text-sm leading-6 text-slate-600">
-          Import রিপোর্ট দেখুন। ব্যর্থ বা সংশোধনযোগ্য row ঠিক করে CSV আবার
-          নির্বাচন করুন এবং নতুন Preview চালান।
+          Import রিপোর্ট দেখুন। Failed বা সংশোধনযোগ্য row ঠিক করে CSV আবার
+          and run a new preview.
         </p>
       )}
     </section>
