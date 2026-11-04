@@ -6,6 +6,7 @@ import { Suspense } from "react";
 import { AdminBookImport } from "@/components/admin-book-import";
 import { ProductImageUpload } from "@/components/admin-product-image-upload";
 import { AdminAutoDraftForm } from "@/components/admin-auto-draft-form";
+import { AdminSubmitButton } from "@/components/admin-submit-button";
 import { AdminIcon } from "@/components/admin-icons";
 import {
   logoutAdmin,
@@ -468,12 +469,7 @@ function ProductForm({
         Publish in public catalog
       </label>
 
-      <button
-        type="submit"
-        className="w-fit rounded-lg bg-emerald-700 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-emerald-800"
-      >
-        {product ? "Update Product" : "Add Product"}
-      </button>
+      <AdminSubmitButton pendingLabel="Saving product…" className="w-fit rounded-lg bg-emerald-700 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-emerald-800">{product ? "Update Product" : "Add Product"}</AdminSubmitButton>
     </AdminAutoDraftForm>
   );
 }
