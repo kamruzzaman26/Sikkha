@@ -24,6 +24,15 @@ export async function saveInventory(formData: FormData) {
   if (productError) throw new Error("Unable to verify product.", { cause: productError });
   if (!product) redirect(`${BASE}?status=not-found`);
 
+  const { data: previousStock, error: previousError } = await supabase
+    .from("product_inventory")
+    .select("stock_quantity")
+    .eq("product_id", productId)
+    .maybeSingle();
+  if (previousError) throw new Error("Unable to read current stock.", { cause: previousError });
+
+  const previousQuantity = previousStock?.stock_quantity ?? 0;
+  const change = quantity - previousQuantity;
   const { error } = await supabase.from("product_inventory").upsert({
     product_id: productId,
     sku: sku || null,
@@ -36,7 +45,21 @@ export async function saveInventory(formData: FormData) {
     throw new Error("Unable to save inventory.", { cause: error });
   }
 
-  await logActivity(supabase, "inventory_updated", "product", productId, { title: product.title, quantity, sku });
+  if (change !== 0) {
+    const { data: { user } } = await supabase.auth.getUser();
+    const { error: movementError } = await supabase.from("inventory_movements").insert({
+      product_id: productId,
+      movement_type: previousStock ? "adjustment" : "opening",
+      quantity_change: change,
+      quantity_before: previousQuantity,
+      quantity_after: quantity,
+      note: previousStock ? "Admin stock adjustment" : "Opening stock",
+      created_by: user?.id ?? null,
+    });
+    if (movementError) throw new Error("Stock saved, but movement history could not be recorded.", { cause: movementError });
+  }
+
+  await logActivity(supabase, "inventory_updated", "product", productId, { title: product.title, previousQuantity, quantity, sku });
   revalidatePath(BASE);
   revalidatePath("/admin");
   revalidatePath("/products");
