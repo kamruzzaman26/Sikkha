@@ -85,14 +85,22 @@ type ProductFormValue = {
   archived_at?: string | null;
 };
 
+type CategoryOption = { id: string; label: string; group: string };
+
 function ProductForm({
   product,
   idPrefix,
   productTypes,
+  categoryOptions = [],
+  selectedCategoryIds = [],
+  primaryCategoryId = "",
 }: {
   product?: ProductFormValue;
   idPrefix: string;
   productTypes: Array<{ slug: string; label: string }>;
+  categoryOptions?: CategoryOption[];
+  selectedCategoryIds?: string[];
+  primaryCategoryId?: string;
 }) {
   const inputClass =
     "w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5";
@@ -387,6 +395,56 @@ function ProductForm({
         />
       </div>
 
+      {categoryOptions.length > 0 && (
+        <fieldset className="rounded-xl border border-slate-200 p-4">
+          <input type="hidden" name="categoriesSubmitted" value="1" />
+          <legend className="px-1 text-sm font-semibold text-slate-700">
+            ক্যাটাগরি (একাধিক বাছতে পারেন)
+          </legend>
+          <details className="mt-1" open={selectedCategoryIds.length === 0}>
+            <summary className="cursor-pointer text-sm font-semibold text-emerald-800">
+              {selectedCategoryIds.length}টি নির্বাচিত — তালিকা খুলুন
+            </summary>
+            <div className="mt-3 max-h-72 space-y-1 overflow-y-auto rounded-lg border border-slate-100 p-2">
+              {categoryOptions.map((option) => (
+                <label
+                  key={option.id}
+                  className="flex min-h-9 items-start gap-2 text-sm leading-6"
+                >
+                  <input
+                    type="checkbox"
+                    name="categoryIds"
+                    value={option.id}
+                    defaultChecked={selectedCategoryIds.includes(option.id)}
+                    className="mt-1.5 size-4"
+                  />
+                  <span>{option.label}</span>
+                </label>
+              ))}
+            </div>
+          </details>
+          <label
+            htmlFor={`${idPrefix}-primary-category`}
+            className="mb-1 mt-3 block text-sm font-semibold text-slate-700"
+          >
+            প্রধান ক্যাটাগরি
+          </label>
+          <select
+            id={`${idPrefix}-primary-category`}
+            name="primaryCategoryId"
+            defaultValue={primaryCategoryId}
+            className={inputClass}
+          >
+            <option value="">— নির্বাচিতদের প্রথমটি —</option>
+            {categoryOptions.map((option) => (
+              <option key={option.id} value={option.id}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </fieldset>
+      )}
+
       <div>
         <label
           htmlFor={`${idPrefix}-description`}
@@ -430,7 +488,13 @@ async function AdminContent({
 }: Pick<PageProps<"/admin">, "searchParams">) {
   await connection();
   const { supabase, role } = await requireAdmin("admin");
-  const [productsResult, linksResult, productTypesResult] = await Promise.all([
+  const [
+    productsResult,
+    linksResult,
+    productTypesResult,
+    categoriesResult,
+    productCategoriesResult,
+  ] = await Promise.all([
     supabase
       .from("products")
       .select(
@@ -447,6 +511,16 @@ async function AdminContent({
       .from("product_types")
       .select("slug, label, is_active")
       .order("label"),
+    supabase
+      .from("categories")
+      .select("id, name, parent_id, category_group, sort_order, is_active")
+      .order("category_group")
+      .order("sort_order")
+      .limit(2000),
+    supabase
+      .from("product_categories")
+      .select("product_id, category_id, is_primary")
+      .limit(10000),
   ]);
 
   if (productsResult.error) {
@@ -463,6 +537,46 @@ async function AdminContent({
     throw new Error("Unable to load product types.", {
       cause: productTypesResult.error,
     });
+  }
+
+  if (categoriesResult.error || productCategoriesResult.error) {
+    console.error(
+      "Unable to load categories for the product form.",
+      categoriesResult.error ?? productCategoriesResult.error,
+    );
+  }
+  const categoryRows = categoriesResult.data ?? [];
+  const categoryById = new Map(categoryRows.map((row) => [row.id, row]));
+  const groupLabelsForForm: Record<string, string> = {
+    books: "বই",
+    products: "পণ্য",
+    electronics: "Electronics",
+  };
+  const categoryOptions: CategoryOption[] = categoryRows
+    .filter((row) => row.is_active)
+    .map((row) => {
+      const names = [row.name];
+      let cursor = row.parent_id ? categoryById.get(row.parent_id) : undefined;
+      while (cursor) {
+        names.unshift(cursor.name);
+        cursor = cursor.parent_id ? categoryById.get(cursor.parent_id) : undefined;
+      }
+      return {
+        id: row.id,
+        group: row.category_group,
+        label: `${groupLabelsForForm[row.category_group] ?? row.category_group} › ${names.join(" › ")}`,
+      };
+    });
+  const selectedByProduct = new Map<string, string[]>();
+  const primaryByProduct = new Map<string, string>();
+  for (const link of productCategoriesResult.data ?? []) {
+    selectedByProduct.set(link.product_id, [
+      ...(selectedByProduct.get(link.product_id) ?? []),
+      link.category_id,
+    ]);
+    if (link.is_primary) {
+      primaryByProduct.set(link.product_id, link.category_id);
+    }
   }
 
   const params = await searchParams;
@@ -664,6 +778,7 @@ async function AdminContent({
                 <ProductForm
                   idPrefix="new-product"
                   productTypes={productTypes}
+                  categoryOptions={categoryOptions}
                 />
               </div>
             </details>
@@ -859,6 +974,13 @@ async function AdminContent({
                                   product={product}
                                   idPrefix={`product-${product.id}`}
                                   productTypes={productTypes}
+                                  categoryOptions={categoryOptions}
+                                  selectedCategoryIds={
+                                    selectedByProduct.get(product.id) ?? []
+                                  }
+                                  primaryCategoryId={
+                                    primaryByProduct.get(product.id) ?? ""
+                                  }
                                 />
                               </div>
                             </details>

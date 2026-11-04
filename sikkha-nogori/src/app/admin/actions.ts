@@ -49,6 +49,7 @@ function parsePrice(value: string): number | undefined {
 
 function finishAction(status: string): never {
   revalidatePath("/admin");
+  revalidatePath("/");
   revalidatePath("/books");
   revalidatePath("/books/[slug]", "page");
   revalidatePath("/courses");
@@ -290,6 +291,68 @@ export async function setAffiliateLinkStatus(formData: FormData) {
   finishAction(isActiveValue === "true" ? "activated" : "deactivated");
 }
 
+async function syncProductCategories(
+  supabase: Awaited<ReturnType<typeof requirePermission>>["supabase"],
+  productId: string,
+  categoryIds: string[],
+  primaryId: string,
+) {
+  const primary = categoryIds.includes(primaryId) ? primaryId : categoryIds[0];
+
+  const { data: existing, error: existingError } = await supabase
+    .from("product_categories")
+    .select("category_id")
+    .eq("product_id", productId);
+  if (existingError) {
+    throw new Error("Unable to read the product's categories.", {
+      cause: existingError,
+    });
+  }
+
+  const removed = (existing ?? [])
+    .map((row) => row.category_id as string)
+    .filter((id) => !categoryIds.includes(id));
+  if (removed.length > 0) {
+    const { error } = await supabase
+      .from("product_categories")
+      .delete()
+      .eq("product_id", productId)
+      .in("category_id", removed);
+    if (error) {
+      throw new Error("Unable to remove product categories.", { cause: error });
+    }
+  }
+
+  if (categoryIds.length === 0) {
+    return;
+  }
+
+  // Clear the old primary first so the one-primary-per-product index holds.
+  const { error: clearError } = await supabase
+    .from("product_categories")
+    .update({ is_primary: false })
+    .eq("product_id", productId);
+  if (clearError) {
+    throw new Error("Unable to update the primary category.", {
+      cause: clearError,
+    });
+  }
+
+  const { error: upsertError } = await supabase.from("product_categories").upsert(
+    categoryIds.map((categoryId) => ({
+      product_id: productId,
+      category_id: categoryId,
+      is_primary: categoryId === primary,
+    })),
+    { onConflict: "product_id,category_id" },
+  );
+  if (upsertError) {
+    throw new Error("Unable to save product categories.", {
+      cause: upsertError,
+    });
+  }
+}
+
 export async function saveProduct(formData: FormData) {
   const { supabase } = await requirePermission("manage_products");
   const id = getFormValue(formData, "id");
@@ -319,8 +382,21 @@ export async function saveProduct(formData: FormData) {
   const weightValue = getFormValue(formData, "weightKg");
   const weightKg = weightValue === "" ? null : Number(weightValue);
   const isPublishedValue = getFormValue(formData, "isPublished");
+  const categoriesSubmitted = getFormValue(formData, "categoriesSubmitted") === "1";
+  const categoryIds = [
+    ...new Set(
+      formData
+        .getAll("categoryIds")
+        .filter((value): value is string => typeof value === "string")
+        .map((value) => value.trim()),
+    ),
+  ];
+  const primaryCategoryId = getFormValue(formData, "primaryCategoryId");
 
   if (
+    categoryIds.length > 30 ||
+    categoryIds.some((categoryId) => !isUuid(categoryId)) ||
+    (primaryCategoryId !== "" && !isUuid(primaryCategoryId)) ||
     edition.length > 80 ||
     isbn.length > 30 ||
     language.length > 60 ||
@@ -425,11 +501,18 @@ export async function saveProduct(formData: FormData) {
       redirect("/admin?status=product-not-found");
     }
 
+    if (categoriesSubmitted) {
+      await syncProductCategories(supabase, id, categoryIds, primaryCategoryId);
+    }
     await logActivity(supabase, "product_updated", "product", id, { slug, title });
     finishAction("product-updated");
   }
 
-  const { error } = await supabase.from("products").insert(values);
+  const { data: created, error } = await supabase
+    .from("products")
+    .insert(values)
+    .select("id")
+    .single();
 
   if (error) {
     if (error.code === "23505") {
@@ -441,6 +524,9 @@ export async function saveProduct(formData: FormData) {
     );
   }
 
+  if (categoriesSubmitted && created) {
+    await syncProductCategories(supabase, created.id, categoryIds, primaryCategoryId);
+  }
   await logActivity(supabase, "product_created", "product", slug, { title });
   finishAction("product-created");
 }
