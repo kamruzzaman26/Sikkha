@@ -15,7 +15,22 @@ function NavList() {
           <ul className="mt-3 space-y-1">
             {group.items.map((item) => (
               <li key={item.label}>
-                {item.href ? (
+                {item.children ? (
+                  <details className="group/partner">
+                    <summary className="flex min-h-11 cursor-pointer list-none items-center gap-3 rounded-xl px-3 text-sm font-semibold text-emerald-50 transition hover:bg-white/10">
+                      <AdminIcon name={item.icon} className="size-[18px] shrink-0" />
+                      <span className="flex-1">{item.label}</span>
+                      <AdminIcon name="chevron" className="size-4 transition group-open/partner:rotate-180" />
+                    </summary>
+                    <ul className="ml-5 mt-1 space-y-1 border-l border-white/15 pl-3">
+                      {item.children.map((child) => (
+                        <li key={child.href}>
+                          <AdminNavLink href={child.href} label={child.label} icon="chevron" />
+                        </li>
+                      ))}
+                    </ul>
+                  </details>
+                ) : item.href ? (
                   <AdminNavLink href={item.href} label={item.label} icon={item.icon} />
                 ) : (
                   <span aria-disabled="true" className="flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm text-emerald-100/45">
