@@ -5,7 +5,7 @@ import { requirePermission } from "@/lib/supabase/admin";
 import { setStaffRole } from "./actions";
 
 export const metadata: Metadata = {
-  title: "Roles & Permissions | শিক্ষা নগরী প্রশাসন",
+  title: "Roles & Permissions | Sikkha Nogori Admin",
   robots: { index: false, follow: false },
 };
 
@@ -16,11 +16,11 @@ const roleLabels: Record<string, string> = {
 };
 
 const messages: Record<string, string> = {
-  updated: "Role হালনাগাদ হয়েছে।",
-  invalid: "তথ্য যাচাই করুন।",
-  forbidden: "শুধু Super Admin role পরিবর্তন করতে পারেন।",
+  updated: "Role updated successfully.",
+  invalid: "Please verify the information.",
+  forbidden: "Only a Super Admin can change roles.",
   rejected:
-    "পরিবর্তন গ্রহণ করা হয়নি। শেষ Super Admin সরানো যায় না, আর শুধু Super Admin এটি করতে পারেন।",
+    "Change rejected. The last Super Admin cannot be removed, and only a Super Admin can make this change.",
 };
 
 async function RolesContent({
@@ -75,9 +75,9 @@ async function RolesContent({
       <div className="mx-auto max-w-5xl">
         <h1 className="text-3xl font-extrabold">Roles & Permissions</h1>
         <p className="mt-2 text-sm leading-6 text-slate-600">
-          বর্তমান অ্যাডমিনদের role। নতুন স্টাফ অ্যাকাউন্ট যোগ করা (বিশেষ করে
-          Editor) পরবর্তী ধাপে আসবে — এখন শুধু বিদ্যমান অ্যাডমিনের role বদলানো
-          যায়।
+          Current administrator roles. Adding new staff accounts (especially Editors)
+          will be added in a later phase. For now, only existing administrator roles can be changed
+          .
         </p>
         {message && (
           <p
@@ -101,9 +101,9 @@ async function RolesContent({
                 </p>
                 <p className="text-sm text-slate-600">{admin.email}</p>
                 <p className="mt-1 text-sm text-slate-600">
-                  বর্তমান role:{" "}
+                  Current role:{" "}
                   <strong>
-                    {current ? roleLabels[current] : "নির্ধারিত নেই (Admin হিসেবে গণ্য)"}
+                    {current ? roleLabels[current] : "Not assigned (treated as Admin)"}
                   </strong>
                 </p>
                 <form action={setStaffRole} className="mt-3 flex flex-wrap gap-2">
@@ -124,7 +124,7 @@ async function RolesContent({
                     type="submit"
                     className="min-h-11 rounded-lg bg-emerald-700 px-4 font-bold text-white hover:bg-emerald-800"
                   >
-                    সংরক্ষণ
+                    Save Changes
                   </button>
                 </form>
               </li>
@@ -132,7 +132,7 @@ async function RolesContent({
           })}
         </ul>
 
-        <h2 className="mt-10 text-lg font-bold">Role অনুযায়ী Permission</h2>
+        <h2 className="mt-10 text-lg font-bold">Permissions by Role</h2>
         <div className="mt-3 grid gap-3 md:grid-cols-3">
           {Object.entries(roleLabels).map(([role, label]) => (
             <div key={role} className="rounded-xl border border-slate-200 bg-white p-4">
