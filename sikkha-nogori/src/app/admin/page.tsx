@@ -69,6 +69,9 @@ type ProductFormValue = {
   slug?: string;
   description?: string;
   price?: number;
+  cost_price?: number | null;
+  pricing_mode?: "manual" | "automatic";
+  markup_percent?: number;
   list_price?: number | null;
   edition?: string | null;
   isbn?: string | null;
@@ -229,6 +232,11 @@ function ProductForm({
             and update it regularly.
           </p>
         </div>
+      <div className="grid gap-4 md:grid-cols-3">
+        <div><label htmlFor={`${idPrefix}-cost-price`} className="mb-2 block text-sm font-semibold text-slate-700">Purchase / Cost Price (৳)</label><input id={`${idPrefix}-cost-price`} name="costPrice" type="number" min="0" max="9999999999.99" step="0.01" defaultValue={product?.cost_price ?? ""} className={inputClass} /></div>
+        <div><label htmlFor={`${idPrefix}-pricing-mode`} className="mb-2 block text-sm font-semibold text-slate-700">Pricing Mode</label><select id={`${idPrefix}-pricing-mode`} name="pricingMode" defaultValue={product?.pricing_mode ?? "manual"} className={inputClass}><option value="manual">Manual price</option><option value="automatic">Automatic from cost</option></select></div>
+        <div><label htmlFor={`${idPrefix}-markup`} className="mb-2 block text-sm font-semibold text-slate-700">Profit Markup (%)</label><input id={`${idPrefix}-markup`} name="markupPercent" type="number" min="0" max="10000" step="0.01" defaultValue={product?.markup_percent ?? 0} className={inputClass} /><p className="mt-1 text-xs text-slate-500">Automatic price = cost × (1 + markup ÷ 100).</p></div>
+      </div>
         <div>
           <label
             htmlFor={`${idPrefix}-list-price`}
@@ -499,7 +507,7 @@ async function AdminContent({
     supabase
       .from("products")
       .select(
-        "id, title, slug, description, price, list_price, edition, isbn, page_count, language, country, weight_kg, product_type, category, author, publisher, image_url, commerce_mode, is_published, archived_at",
+        "id, title, slug, description, price, cost_price, pricing_mode, markup_percent, list_price, edition, isbn, page_count, language, country, weight_kg, product_type, category, author, publisher, image_url, commerce_mode, is_published, archived_at",
       )
       .order("title"),
     supabase
