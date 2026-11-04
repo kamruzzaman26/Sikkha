@@ -46,7 +46,9 @@ async function AdminUsersContent({
       cause: error,
     });
   }
-  const users = (data ?? []) as UserSummary[];
+  const allUsers = (data ?? []) as UserSummary[];
+  const users = allUsers.filter((user) => ["user", "customer"].includes(user.access_role));
+  const staffUsers = allUsers.filter((user) => !["user", "customer"].includes(user.access_role));
   const params = await searchParams;
   const status = Array.isArray(params.status) ? params.status[0] : params.status;
   const message =
@@ -68,7 +70,7 @@ async function AdminUsersContent({
             </button>
           </form>
         </div>
-        <h1 className="mt-8 text-3xl font-extrabold">User Management</h1>
+        <h1 className="mt-8 text-3xl font-extrabold">Customer Management</h1>
         <p className="mt-2 leading-7 text-slate-600">
           Latest 500 accounts. Admin and other non-customer roles cannot be modified here.
           Affiliate membership is managed through a separate approval workflow
@@ -79,6 +81,18 @@ async function AdminUsersContent({
             {message}
           </p>
         )}
+        <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <h2 className="text-lg font-extrabold">Admins & Staff ({staffUsers.length})</h2>
+          {staffUsers.length === 0 ? <p className="mt-3 text-sm text-slate-500">No staff accounts found.</p> : (
+            <ul className="mt-3 divide-y divide-slate-100">
+              {staffUsers.map((staff) => <li key={staff.user_id} className="flex flex-wrap items-center justify-between gap-2 py-3">
+                <div><p className="font-semibold">{staff.display_name || "Name not provided"}</p><p className="text-sm text-slate-600">{staff.email}</p></div>
+                <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-800">{staff.access_role}</span>
+              </li>)}
+            </ul>
+          )}
+        </section>
+        <h2 className="mt-7 text-xl font-extrabold">Customers ({users.length})</h2>
         {users.length === 0 ? (
           <p className="mt-6 rounded-xl bg-white p-5 text-slate-600">
             No users found.
