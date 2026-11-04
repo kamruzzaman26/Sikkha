@@ -248,8 +248,8 @@ async function PaymentMethodsContent({
             Payment Methods
           </h1>
           <p className="mt-3 max-w-3xl leading-7 text-slate-600">
-            নাম, ধরন, নির্দেশনা, Active অবস্থা এবং Display Order পরিচালনা
-            করুন। Manual Payment যাচাই না করে Paid হয় না। সাইটে checkout বা
+            Manage names, types, instructions, enabled status, and display order
+            Manual payments are not marked Paid until verified. Checkout or
             online payment gateways are not currently enabled.
           </p>
         </header>
@@ -291,7 +291,7 @@ async function PaymentMethodsContent({
 
           {methods.length === 0 ? (
             <p className="mt-4 rounded-2xl border border-dashed border-slate-300 bg-white px-5 py-10 text-center text-slate-600">
-              এখনো কোনো Add Payment Method করা হয়নি।
+              No payment methods have been added yet.
             </p>
           ) : (
             <ul className="mt-4 grid gap-4">
@@ -358,7 +358,7 @@ async function PaymentMethodsContent({
                       type="submit"
                       className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
                     >
-                      {method.is_enabled ? "Inactive করুন" : "Active করুন"}
+                      {method.is_enabled ? "Disable" : "Enable"}
                     </button>
                   </form>
                 </li>
