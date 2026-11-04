@@ -126,3 +126,18 @@ export async function logActivity(
     console.error("Unable to write the activity log.", error);
   }
 }
+
+
+/** Partner approvals and settlement controls are restricted to Super Admins. */
+export async function requireSuperAdmin() {
+  const context = await requireAdmin("admin");
+  const { data: { user } } = await context.supabase.auth.getUser();
+  const { data: staff, error } = await context.supabase
+    .from("staff_roles")
+    .select("staff_role")
+    .eq("user_id", user?.id ?? "")
+    .maybeSingle();
+  if (error) throw new Error("Unable to verify Super Admin role.", { cause: error });
+  if (staff?.staff_role !== "super_admin") redirect("/admin/dashboard?status=forbidden");
+  return context;
+}
