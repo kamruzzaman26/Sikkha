@@ -30,10 +30,10 @@ export const adminNav: AdminNavGroup[] = [
     items: [
       { label: "Homepage Builder", icon: "homepage", href: "/admin/homepage" },
       { label: "Banners", icon: "banners", href: "/admin/banners" },
-      { label: "Navigation", icon: "navigation" },
-      { label: "Pages", icon: "pages" },
+      { label: "Navigation", icon: "navigation", href: "/admin/navigation" },
+      { label: "Pages", icon: "pages", href: "/admin/pages" },
       { label: "Blog", icon: "blog", href: "/admin/blog" },
-      { label: "Marketing", icon: "marketing" },
+      { label: "Marketing", icon: "marketing", href: "/admin/marketing" },
       { label: "SEO", icon: "seo", href: "/admin/seo" },
       { label: "Media Library", icon: "media" },
     ],
@@ -45,7 +45,7 @@ export const adminNav: AdminNavGroup[] = [
       { label: "Roles & Permissions", icon: "roles", href: "/admin/roles" },
       { label: "Activity Logs", icon: "logs", href: "/admin/logs" },
       { label: "Website Settings", icon: "settings", href: "/admin/settings" },
-      { label: "Reports", icon: "reports" },
+      { label: "Reports", icon: "reports", href: "/admin/reports" },
     ],
   },
 ];
