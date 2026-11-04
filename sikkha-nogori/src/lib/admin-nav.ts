@@ -35,7 +35,7 @@ export const adminNav: AdminNavGroup[] = [
       { label: "Blog", icon: "blog", href: "/admin/blog" },
       { label: "Marketing", icon: "marketing", href: "/admin/marketing" },
       { label: "SEO", icon: "seo", href: "/admin/seo" },
-      { label: "Media Library", icon: "media" },
+      { label: "Media Library", icon: "media", href: "/admin/media" },
     ],
   },
   {
