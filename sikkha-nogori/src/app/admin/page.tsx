@@ -685,7 +685,7 @@ async function AdminContent({
         </div>
 
         <header className="mt-7 rounded-[28px] bg-gradient-to-br from-[#0b5949] via-[#0a493e] to-[#082f29] px-6 py-7 text-white shadow-[0_18px_45px_-28px_rgba(5,48,39,0.75)] sm:px-8 sm:py-9">
-          <p className="text-sm font-bold text-emerald-700">
+          <p className="text-[11px] font-extrabold uppercase tracking-[0.2em] text-emerald-200">
             SIKKHA NOGORI · ADMINISTRATION
           </p>
           <h1 className="mt-3 text-3xl font-black tracking-tight text-white sm:text-4xl">
@@ -727,11 +727,11 @@ async function AdminContent({
               <p className="text-sm text-slate-600">Published Products</p>
               <p className="mt-1 text-2xl font-extrabold tabular-nums">{products.filter((product) => product.is_published && !product.archived_at).length}</p>
             </div>
-            <div className="rounded-xl border border-slate-200 bg-white p-4">
+            <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_8px_24px_-20px_rgba(15,55,42,0.45)]">
               <p className="text-sm text-slate-600">Draft Products</p>
               <p className="mt-1 text-2xl font-extrabold tabular-nums">{products.filter((product) => !product.is_published && !product.archived_at).length}</p>
             </div>
-            <div className="rounded-xl border border-slate-200 bg-white p-4">
+            <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_8px_24px_-20px_rgba(15,55,42,0.45)]">
               <p className="text-sm text-slate-600">Active Affiliate Links</p>
               <p className="mt-1 text-2xl font-extrabold tabular-nums">{links.filter((link) => link.is_active).length}</p>
             </div>
@@ -1076,7 +1076,7 @@ async function AdminContent({
                     htmlFor="new-product"
                     className="mb-2 block text-sm font-semibold text-slate-700"
                   >
-                    Products
+                    Product
                   </label>
                   <select
                     id="new-product"
@@ -1173,7 +1173,7 @@ async function AdminContent({
                 return (
                   <li
                     key={link.id}
-                    className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6"
+                    className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_8px_24px_-20px_rgba(15,55,42,0.45)] sm:p-6"
                   >
                     <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
                       <div>
@@ -1219,7 +1219,7 @@ async function AdminContent({
                               <option key={product.id} value={product.id}>
                                 {product.product_type === "course"
                                   ? "Course"
-                                  : "Books"}
+                                  : "Book"}
                                 : {product.title} · {product.slug}
                               </option>
                             ))}
