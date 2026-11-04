@@ -86,8 +86,8 @@ function Summary({ rows }: { rows: BookImportRowResult[] }) {
   return (
     <p className="mt-4 rounded-xl bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-700">
       {counts.imported > 0 && `Imported: ${counts.imported} · `}
-      {`Failed: ${counts.failed}টি · Duplicate: ${counts.duplicate}টি · `}
-      {counts.invalid > 0 && `Needs correction: ${counts.invalid}টি · `}
+      {`Failed: ${counts.failed} · Duplicates: ${counts.duplicate} · `}
+      {counts.invalid > 0 && `Needs correction: ${counts.invalid} · `}
       {counts.ready > 0 && `Ready: ${counts.ready}`}
     </p>
   );
@@ -180,13 +180,13 @@ export function AdminBookImport() {
         Bulk Import Products (CSV)
       </h2>
       <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-        Header অবশ্যই{" "}
+        Required CSV headers:{" "}
         <code className="rounded bg-slate-100 px-1">book_name</code>,{" "}
         <code className="rounded bg-slate-100 px-1">affiliate_url</code>,{" "}
         <code className="rounded bg-slate-100 px-1">image_url</code> are required.
         Maximum 500 rows / 512 KiB. After preview validation, confirm to import only
         valid new products as unpublished drafts. Product names and URLs are preserved exactly.
-        রাখা are required. ভুল সারি ঠিক করে CSV পুনরায় নির্বাচন করে Preview চালান।
+        are required. Fix invalid rows, select the updated CSV, and run Preview again.
       </p>
       <p className="mt-2 text-sm leading-6 text-amber-900">
         Imported affiliate products will not be available for direct checkout.
@@ -243,7 +243,7 @@ export function AdminBookImport() {
       )}
       {report && (
         <p role="status" className="mt-4 text-sm leading-6 text-slate-600">
-          Import রিপোর্ট দেখুন। Failed বা সংশোধনযোগ্য row ঠিক করে CSV আবার
+          Review the import report. Fix failed or invalid rows, select the CSV again
           and run a new preview.
         </p>
       )}
