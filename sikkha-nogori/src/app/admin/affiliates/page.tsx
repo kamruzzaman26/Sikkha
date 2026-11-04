@@ -8,17 +8,17 @@ import { requireAdmin } from "@/lib/supabase/admin";
 import { reviewAffiliate } from "./actions";
 
 export const metadata: Metadata = {
-  title: "অ্যাফিলিয়েট অ্যাকাউন্ট পরিচালনা | শিক্ষা নগরী",
+  title: "Affiliate Accounts | Sikkha Nogori",
   robots: { index: false, follow: false },
 };
 
 const messages: Record<string, string> = {
-  approved: "অ্যাফিলিয়েট অনুমোদিত হয়েছে।",
-  rejected: "অ্যাফিলিয়েট আবেদন প্রত্যাখ্যান করা হয়েছে।",
-  suspended: "অ্যাফিলিয়েট অ্যাকাউন্ট স্থগিত করা হয়েছে।",
-  invalid: "তথ্য যাচাই করুন।",
-  forbidden: "এই কাজের জন্য Admin অনুমতি প্রয়োজন।",
-  "not-found": "আবেদনটি পাওয়া যায়নি।",
+  approved: "Affiliate application approved.",
+  rejected: "Affiliate application rejected.",
+  suspended: "Affiliate account suspended.",
+  invalid: "Please verify the submitted information.",
+  forbidden: "Administrator permission is required for this action.",
+  "not-found": "Application not found.",
 };
 
 async function AdminAffiliatesContent({
@@ -83,20 +83,20 @@ async function AdminAffiliatesContent({
       <div className="mx-auto max-w-5xl">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <Link href="/admin" className="font-semibold text-emerald-700">
-            ← প্রশাসনিক প্যানেল
+            ← Admin workspace
           </Link>
           <form action={logoutAdmin}>
             <button
               type="submit"
               className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-white"
             >
-              লগআউট
+              Sign out
             </button>
           </form>
         </div>
-        <h1 className="mt-8 text-3xl font-extrabold">অ্যাফিলিয়েট অ্যাকাউন্ট</h1>
+        <h1 className="mt-8 text-3xl font-extrabold">Affiliate Accounts</h1>
         <p className="mt-2 leading-7 text-slate-600">
-          অনুমোদন করলে কেবল affiliate membership তৈরি হয়; কাউকে admin role দেওয়া হয় না।
+          Approving an application creates affiliate membership only. It never grants an admin role.
         </p>
         {message && (
           <p role="status" className="mt-5 rounded-lg bg-emerald-50 px-4 py-3">
@@ -105,9 +105,9 @@ async function AdminAffiliatesContent({
         )}
 
         <section className="mt-7 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-          <h2 className="text-xl font-bold">আবেদন · {applications.length}</h2>
+          <h2 className="text-xl font-bold">Applications · {applications.length}</h2>
           {applications.length === 0 ? (
-            <p className="mt-3 text-slate-600">কোনো আবেদন নেই।</p>
+            <p className="mt-3 text-slate-600">No applications found.</p>
           ) : (
             <ul className="mt-4 grid gap-3">
               {applications.map((application) => (
@@ -116,16 +116,16 @@ async function AdminAffiliatesContent({
                   className="rounded-xl border border-slate-200 p-4"
                 >
                   <p className="break-all font-semibold">
-                    {displayNames.get(application.user_id) || "নাম দেওয়া হয়নি"}
+                    {displayNames.get(application.user_id) || "Name not provided"}
                   </p>
                   <p className="mt-1 break-all text-xs text-slate-500">
                     User ID: {application.user_id}
                   </p>
                   <p className="mt-1 text-sm text-slate-600">
-                    অবস্থা: {application.status}
+                    Status: {application.status}
                   </p>
                   <p className="mt-1 text-sm text-slate-600">
-                    আবেদন:{" "}
+                    Application:{" "}
                     {new Date(application.created_at).toLocaleString("bn-BD")}
                   </p>
                   {application.status === "pending" && (
@@ -141,7 +141,7 @@ async function AdminAffiliatesContent({
                           type="submit"
                           className="min-h-10 rounded-lg bg-emerald-700 px-4 py-2 font-bold text-white"
                         >
-                          অনুমোদন
+                          Approve
                         </button>
                       </form>
                       <form action={reviewAffiliate}>
@@ -155,7 +155,7 @@ async function AdminAffiliatesContent({
                           type="submit"
                           className="min-h-10 rounded-lg border border-rose-700 px-4 py-2 font-bold text-rose-800"
                         >
-                          প্রত্যাখ্যান
+                          Reject
                         </button>
                       </form>
                     </div>
@@ -167,9 +167,9 @@ async function AdminAffiliatesContent({
         </section>
 
         <section className="mt-7 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-          <h2 className="text-xl font-bold">সক্রিয় ও স্থগিত অ্যাকাউন্ট</h2>
+          <h2 className="text-xl font-bold">Active & Suspended Accounts</h2>
           {accounts.length === 0 ? (
-            <p className="mt-3 text-slate-600">এখনো কোনো affiliate নেই।</p>
+            <p className="mt-3 text-slate-600">No affiliate accounts yet.</p>
           ) : (
             <ul className="mt-4 grid gap-3">
               {accounts.map((account) => (
@@ -179,7 +179,7 @@ async function AdminAffiliatesContent({
                 >
                   <div>
                     <p className="font-semibold">
-                      কোড: <code>{account.referral_code}</code>
+                      Code: <code>{account.referral_code}</code>
                     </p>
                     <p className="mt-1 break-all text-xs text-slate-500">
                       User ID: {account.user_id} · {account.status}
@@ -196,7 +196,7 @@ async function AdminAffiliatesContent({
                       type="submit"
                       className="min-h-10 rounded-lg border border-slate-300 px-4 py-2 font-semibold hover:bg-slate-50"
                     >
-                      {account.status === "active" ? "স্থগিত করুন" : "আবার সক্রিয় করুন"}
+                      {account.status === "active" ? "Suspend" : "Reactivate"}
                     </button>
                   </form>
                 </li>
