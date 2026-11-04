@@ -28,13 +28,6 @@ const icons: Record<string, AdminIconName> = {
 };
 const money = (value: number) => formatBDT(value);
 
-function signed(entry: Entry) {
-  const amount = Number(entry.amount);
-  if (entry.entry_type === "income") return amount;
-  if (["purchase", "operating_expense", "partner_payable", "refund"].includes(entry.entry_type)) return -amount;
-  if (entry.entry_type === "adjustment") return 0;
-  return 0;
-}
 
 function SummaryCard({ title, value, note, icon }: { title: string; value: string; note: string; icon: AdminIconName }) {
   return (
