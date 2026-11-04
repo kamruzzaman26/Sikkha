@@ -8,6 +8,7 @@ import {
 } from "@/lib/catalog";
 import { getActiveAffiliateLinkMap } from "@/lib/supabase/affiliate-links";
 import type { PublicAffiliateLink } from "@/lib/supabase/affiliate-links";
+import { createSupabasePublicServerClient } from "@/lib/supabase/server";
 
 const slides = [
   {
@@ -108,8 +109,24 @@ function BookRow({
   );
 }
 
+type HomeConfig = { show_categories?: boolean; show_new_arrivals?: boolean; show_deals?: boolean; categories_title?: string; new_arrivals_title?: string; deals_title?: string };
+type Banner = { title: string; text: string; cta: string; href: string; tone: string; active: boolean };
+async function loadHomeConfig() {
+  try {
+    const supabase = createSupabasePublicServerClient();
+    const [{ data: home }, { data: bannerData }] = await Promise.all([
+      supabase.from("site_settings").select("value").eq("key", "homepage").maybeSingle(),
+      supabase.from("site_settings").select("value").eq("key", "banners").maybeSingle(),
+    ]);
+    const config = (home?.value ?? {}) as HomeConfig;
+    const custom = ((bannerData?.value as { items?: Banner[] } | null)?.items ?? []).filter((item) => item.active && item.title && item.href);
+    return { config, slides: custom.length ? custom : slides };
+  } catch { return { config: {} as HomeConfig, slides }; }
+}
+
 export default async function HomeContent() {
-  const [books, categories] = await Promise.all([loadBooks(), loadCategories()]);
+  const [books, categories, homeSettings] = await Promise.all([loadBooks(), loadCategories(), loadHomeConfig()]);
+  const { config } = homeSettings;
   const linkMap = await getActiveAffiliateLinkMap(
     books.filter((book) => book.commerceMode === "affiliate").map((book) => book.slug),
   );
@@ -160,7 +177,7 @@ export default async function HomeContent() {
           aria-label="প্রচার"
           className="mt-4 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 [scrollbar-width:none]"
         >
-          {slides.map((slide) => (
+          {homeSettings.slides.map((slide) => (
             <Link
               key={slide.title}
               href={slide.href}
@@ -179,7 +196,7 @@ export default async function HomeContent() {
           ))}
         </div>
 
-        {categories.length > 0 && (
+        {config.show_categories !== false && categories.length > 0 && (
           <section id="categories" aria-labelledby="home-categories" className="scroll-mt-6 py-6">
             <h2
               id="home-categories"
@@ -210,21 +227,21 @@ export default async function HomeContent() {
           </section>
         )}
 
-        <BookRow
+        {config.show_new_arrivals !== false && <BookRow
           id="new-arrivals"
-          title="New Arrivals · নতুন বই"
+          title={config.new_arrivals_title || "New Arrivals · নতুন বই"}
           subtitle="সদ্য যোগ হওয়া বই"
           href="/books?sort=newest"
           books={newArrivals}
           linkMap={linkMap}
-        />
-        <BookRow
-          title="Best Deals · সেরা ছাড়"
+        />}
+        {config.show_deals !== false && <BookRow
+          title={config.deals_title || "Best Deals · সেরা ছাড়"}
           subtitle="মুদ্রিত মূল্যের চেয়ে কম দামের বই"
           href="/books?sort=price-low"
           books={deals}
           linkMap={linkMap}
-        />
+        />}
         {topCategories.map((category) => (
           <BookRow
             key={category}
