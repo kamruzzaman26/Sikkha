@@ -566,8 +566,8 @@ export function SiteHeader({
       <nav aria-label="Bottom navigation" className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 border-t border-slate-200 bg-white/95 px-1 pb-[env(safe-area-inset-bottom)] pt-1 shadow-[0_-4px_18px_rgba(15,23,42,0.08)] backdrop-blur lg:hidden">
         <BottomNavItem href="/" icon="⌂" label="Home" />
         <BottomNavItem href="/books" icon="▤" label="Categories" />
-        <BottomNavItem disabled icon="🛒" label="Cart" />
-        <BottomNavItem disabled icon="▧" label="E-Library" />
+        <BottomNavItem href="/cart" icon="🛒" label="Cart" />
+        <BottomNavItem href="/e-library" icon="▧" label="E-Library" />
         <BottomNavItem href={identity ? "/dashboard/profile" : "/login"} icon="♙" label="Account" />
       </nav>
     </>
