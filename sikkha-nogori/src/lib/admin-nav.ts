@@ -17,12 +17,12 @@ export const adminNav: AdminNavGroup[] = [
     title: "Daily Operations",
     items: [
       { label: "Dashboard", icon: "dashboard", href: "/admin/dashboard" },
-      { label: "Products / পণ্য", icon: "products", href: "/admin" },
-      { label: "ক্যাটাগরি ব্যবস্থাপনা", icon: "categories", href: "/admin/categories" },
-      { label: "Orders / অর্ডার", icon: "orders", href: "/admin/orders" },
-      { label: "Customers / গ্রাহক", icon: "customers", href: "/admin/users" },
-      { label: "Payments / পেমেন্ট", icon: "payments", href: "/admin/payments" },
-      { label: "Inventory / স্টক", icon: "inventory" },
+      { label: "Products", icon: "products", href: "/admin" },
+      { label: "Categories", icon: "categories", href: "/admin/categories" },
+      { label: "Orders", icon: "orders", href: "/admin/orders" },
+      { label: "Customers", icon: "customers", href: "/admin/users" },
+      { label: "Payments", icon: "payments", href: "/admin/payments" },
+      { label: "Inventory", icon: "inventory" },
     ],
   },
   {
