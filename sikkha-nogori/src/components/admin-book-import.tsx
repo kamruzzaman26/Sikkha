@@ -182,13 +182,11 @@ export function AdminBookImport() {
       <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
         Required CSV headers:{" "}
         <code className="rounded bg-slate-100 px-1">book_name</code>,{" "}
-        <code className="rounded bg-slate-100 px-1">affiliate_url</code>,{" "}
-        <code className="rounded bg-slate-100 px-1">image_url</code> are required.
-        Maximum 500 rows / 512 KiB. After preview validation, confirm to import only
-        valid new products as unpublished drafts. Product names and URLs are preserved exactly.
-        are required. Fix invalid rows, select the updated CSV, and run Preview again.
-      </p>
-      <p className="mt-2 text-sm leading-6 text-amber-900">
+        <code className="rounded bg-slate-100 px-1">affiliate_url</code>, and{" "}
+        <code className="rounded bg-slate-100 px-1">image_url</code>. Maximum 500 rows / 512 KiB.
+        Preview validates every row before import. Only valid new products are saved as unpublished drafts.
+        Product names and URLs are preserved exactly. Fix invalid rows, select the updated CSV, and run Preview again.
+      </p>     <p className="mt-2 text-sm leading-6 text-amber-900">
         Imported affiliate products will not be available for direct checkout.
         No products will be written if the required database migration is missing.
       </p>
