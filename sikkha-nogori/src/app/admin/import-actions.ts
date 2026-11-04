@@ -40,23 +40,23 @@ function generatedSlug(bookName: string): string {
 function reasonForDatabaseCode(code: string | null): string {
   switch (code) {
     case "duplicate_name":
-      return "এই নামের একটি পণ্য database-এ আগে থেকেই আছে।";
+      return "A product with this name already exists in the database.";
     case "duplicate_url":
-      return "এই affiliate URL database-এ আগে থেকেই আছে।";
+      return "This affiliate URL already exists in the database.";
     case "duplicate_slug":
-      return "এই নামের generated catalog identifier আগে থেকেই আছে।";
+      return "A generated catalog identifier for this name already exists.";
     case "invalid_name":
-      return "বইয়ের নাম database validation-এ উত্তীর্ণ হয়নি।";
+      return "The book title did not pass database validation.";
     case "invalid_url":
-      return "Affiliate URL database validation-এ উত্তীর্ণ হয়নি।";
+      return "The affiliate URL did not pass database validation.";
     case "invalid_image_url":
-      return "Image URL database validation-এ উত্তীর্ণ হয়নি।";
+      return "The image URL did not pass database validation.";
     case "partner_not_approved":
-      return "Affiliate URL-এর partner hostname অনুমোদিত নয়।";
+      return "The affiliate URL hostname is not approved for this partner.";
     case "database_constraint":
-      return "Database-এর product validation এই row-টি প্রত্যাখ্যান করেছে।";
+      return "The database product validation rejected this row.";
     default:
-      return "Database এই row-টি সংরক্ষণ করতে পারেনি।";
+      return "The database could not save this row.";
   }
 }
 
@@ -77,7 +77,7 @@ async function validateRows(
 
   if (partnerDomains.length === 0) {
     return {
-      error: "কোনো affiliate partner hostname অনুমোদিত নেই; আগে সেটি configure করুন।",
+      error: "No affiliate partner hostname is approved. Configure one before importing.",
       rows: [],
     };
   }
@@ -118,13 +118,13 @@ async function validateRows(
     if (error.code === "PGRST202" || error.code === "42883") {
       return {
         error:
-          "CSV import-এর database migration এখনো প্রয়োগ করা হয়নি। কোনো পণ্য লেখা হয়নি।",
+          "The database migration for CSV import has not been applied. No products were written.",
         rows: resultRows,
       };
     }
     if (error.code === "42501") {
       return {
-        error: "এই আমদানির জন্য server-side Admin অনুমতি যাচাই হয়নি।",
+        error: "Server-side administrator authorization could not be verified for this import.",
         rows: resultRows,
       };
     }
