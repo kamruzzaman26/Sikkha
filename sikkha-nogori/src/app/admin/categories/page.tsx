@@ -161,7 +161,7 @@ export default async function AdminCategoriesPage({
   };
 
   return (
-    <main className="mx-auto min-h-screen max-w-6xl px-4 py-8 sm:px-6">
+    <main lang="en" className="mx-auto min-h-screen max-w-6xl px-4 py-8 sm:px-6">
       <header className="border-b border-slate-200 pb-6">
         <p className="text-sm font-bold text-emerald-700">CATALOG CONTROL</p>
         <h1 className="mt-1 text-3xl font-extrabold text-slate-950">
