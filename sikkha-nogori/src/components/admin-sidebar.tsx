@@ -44,7 +44,7 @@ function Brand() {
 
 export function AdminShell({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-[#f3f7f5] lg:flex">
+    <div lang="en" className="min-h-screen bg-[#f3f7f5] lg:flex">
       <aside className="hidden w-[276px] shrink-0 flex-col border-r border-white/10 bg-[#082f29] px-4 py-5 text-white lg:flex">
         <Brand />
         <div className="my-5 h-px bg-white/10" />
