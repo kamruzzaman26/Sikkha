@@ -20,14 +20,16 @@ export default async function InventoryPage({ searchParams }: { searchParams: Pr
   const { supabase } = await requirePermission("manage_products", "/admin/dashboard");
   const params = await searchParams;
   const status = Array.isArray(params.status) ? params.status[0] : params.status;
-  const [{ data: products, error: productError }, { data: stocks, error: stockError }, { data: movements, error: movementError }] = await Promise.all([
+  const [{ data: products, error: productError }, { data: stocks, error: stockError }, { data: movements, error: movementError }, { data: priceHistory, error: priceHistoryError }] = await Promise.all([
     supabase.from("products").select("id,title,slug,product_type,is_published,archived_at,price,cost_price,pricing_mode,markup_percent").is("archived_at", null).order("title").limit(1000),
     supabase.from("product_inventory").select("product_id,sku,stock_quantity,low_stock_threshold").limit(2000),
     supabase.from("inventory_movements").select("id,product_id,movement_type,quantity_change,quantity_before,quantity_after,note,created_at,products(title)").order("created_at", { ascending: false }).limit(50),
+    supabase.from("product_price_history").select("id,product_id,old_price,new_price,old_cost_price,new_cost_price,pricing_mode,reason,created_at,products(title)").order("created_at", { ascending: false }).limit(30),
   ]);
   if (productError) throw new Error("Unable to load products.", { cause: productError });
   if (stockError) throw new Error("Unable to load inventory.", { cause: stockError });
   if (movementError) throw new Error("Unable to load inventory history.", { cause: movementError });
+  if (priceHistoryError) throw new Error("Unable to load price history.", { cause: priceHistoryError });
   const inventory = new Map((stocks ?? []).map((stock) => [stock.product_id, stock as Stock]));
   const rows = (products ?? []) as Product[];
   const tracked = rows.filter((product) => inventory.has(product.id));
@@ -125,6 +127,13 @@ export default async function InventoryPage({ searchParams }: { searchParams: Pr
                 <tbody className="divide-y divide-slate-100">{(movements ?? []).map((movement: any) => <tr key={movement.id}><td className="px-5 py-3 font-semibold">{movement.products?.title ?? "Product"}</td><td className="px-5 py-3 capitalize">{movement.movement_type.replace("_", " ")}</td><td className={`px-5 py-3 font-bold tabular-nums ${movement.quantity_change < 0 ? "text-rose-700" : "text-emerald-700"}`}>{movement.quantity_change > 0 ? "+" : ""}{movement.quantity_change}</td><td className="px-5 py-3 tabular-nums">{movement.quantity_before} → {movement.quantity_after}</td><td className="max-w-56 truncate px-5 py-3 text-slate-500">{movement.note ?? "—"}</td><td className="whitespace-nowrap px-5 py-3 text-slate-500">{new Date(movement.created_at).toLocaleString("en-GB")}</td></tr>)}</tbody>
               </table>
             </div>
+          )}
+        </section>
+
+        <section className="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white">
+          <div className="border-b border-slate-100 px-5 py-5 sm:px-6"><p className="text-[10px] font-extrabold uppercase tracking-[.18em] text-emerald-700">Pricing audit</p><h2 className="mt-1 text-xl font-extrabold">Recent price changes</h2></div>
+          {(priceHistory ?? []).length === 0 ? <p className="px-6 py-8 text-sm text-slate-500">No product price changes recorded yet.</p> : (
+            <div className="overflow-x-auto"><table className="w-full min-w-[680px] text-left text-sm"><thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500"><tr><th className="px-5 py-3">Product</th><th className="px-5 py-3">Old price</th><th className="px-5 py-3">New price</th><th className="px-5 py-3">Mode</th><th className="px-5 py-3">Date</th></tr></thead><tbody className="divide-y divide-slate-100">{(priceHistory ?? []).map((entry: any) => <tr key={entry.id}><td className="px-5 py-3 font-semibold">{entry.products?.title ?? "Product"}</td><td className="px-5 py-3 tabular-nums">{entry.old_price == null ? "—" : `৳${Number(entry.old_price).toFixed(2)}`}</td><td className="px-5 py-3 font-bold tabular-nums">৳{Number(entry.new_price).toFixed(2)}</td><td className="px-5 py-3 capitalize">{entry.pricing_mode}</td><td className="whitespace-nowrap px-5 py-3 text-slate-500">{new Date(entry.created_at).toLocaleString("en-GB")}</td></tr>)}</tbody></table></div>
           )}
         </section>
       </div>
