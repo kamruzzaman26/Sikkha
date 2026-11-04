@@ -56,6 +56,7 @@ async function CheckoutContent({
       ? statusMessages[status as keyof typeof statusMessages]
       : undefined;
   const selectedProductId = getSelectedProductId(params.product);
+  const selectedProductIds = new Set((Array.isArray(params.products) ? params.products[0] : params.products ?? "").split(",").filter((id) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)));
 
   return (
     <main className="min-h-screen bg-[#f7faf8] px-5 py-10 text-slate-900 sm:px-8 sm:py-14">
@@ -127,7 +128,7 @@ async function CheckoutContent({
                         type="checkbox"
                         name="productId"
                         value={product.id}
-                        defaultChecked={product.id === selectedProductId}
+                        defaultChecked={selectedProductIds.has(product.id) || product.id === selectedProductId}
                         className="mt-1 size-4 shrink-0 rounded border-slate-300 text-emerald-700"
                       />
                       <span className="min-w-0">
