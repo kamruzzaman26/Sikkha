@@ -17,7 +17,7 @@ export const adminNav: AdminNavGroup[] = [
     title: "Daily Operations",
     items: [
       { label: "Dashboard", icon: "dashboard", href: "/admin/dashboard" },
-      { label: "Products", icon: "products", href: "/admin" },
+      { label: "Products & Affiliate Links", icon: "products", href: "/admin" },
       { label: "Categories", icon: "categories", href: "/admin/categories" },
       { label: "Orders", icon: "orders", href: "/admin/orders" },
       { label: "Customers", icon: "customers", href: "/admin/users" },
