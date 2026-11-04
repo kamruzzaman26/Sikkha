@@ -370,7 +370,7 @@ export async function saveProduct(formData: FormData) {
   const costPrice = costPriceValue === "" ? null : parsePrice(costPriceValue);
   const pricingMode = getFormValue(formData, "pricingMode") || "manual";
   const markupValue = getFormValue(formData, "markupPercent") || "0";
-  const markupPercent = /^(?:0|[1-9]\\d*)(?:\\.\\d{1,2})?$/.test(markupValue) ? Number(markupValue) : NaN;
+  const markupPercent = /^(?:0|[1-9]\d*)(?:\.\d{1,2})?$/.test(markupValue) ? Number(markupValue) : NaN;
   if (
     !["manual", "automatic"].includes(pricingMode) ||
     (costPriceValue !== "" && costPrice === undefined) ||
