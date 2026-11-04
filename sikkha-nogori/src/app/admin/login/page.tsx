@@ -4,13 +4,13 @@ import { Suspense } from "react";
 import { loginAdmin } from "@/app/admin/actions";
 
 export const metadata: Metadata = {
-  title: "অ্যাডমিন লগইন | শিক্ষা নগরী",
+  title: "Admin Login | Sikkha Nogori",
   robots: { index: false, follow: false },
 };
 
 const loginMessages: Record<string, string> = {
-  invalid: "ইমেইল বা পাসওয়ার্ড সঠিক নয়।",
-  unauthorized: "এই অ্যাকাউন্টটি অ্যাডমিন হিসেবে অনুমোদিত নয়।",
+  invalid: "The email or password is incorrect.",
+  unauthorized: "This account is not authorized as an administrator.",
 };
 
 async function AdminLoginContent({
@@ -29,15 +29,15 @@ async function AdminLoginContent({
     <main className="flex min-h-screen items-center justify-center bg-slate-100 px-5 py-10 text-slate-900">
       <section className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
         <Link href="/" className="font-semibold text-emerald-700">
-          ← শিক্ষা নগরী
+          ← Back to Sikkha Nogori
         </Link>
 
         <p className="mt-8 text-sm font-bold text-emerald-700">
-          প্রশাসনিক প্যানেল
+          ADMIN PORTAL
         </p>
-        <h1 className="mt-2 text-3xl font-bold">অ্যাডমিন লগইন</h1>
+        <h1 className="mt-2 text-3xl font-bold">Administrator Sign In</h1>
         <p className="mt-3 leading-7 text-slate-600">
-          শুধু অনুমোদিত অ্যাডমিন অ্যাকাউন্ট দিয়ে প্রবেশ করুন।
+          Sign in with an authorized administrator account.
         </p>
 
         {errorMessage && (
@@ -55,7 +55,7 @@ async function AdminLoginContent({
               htmlFor="admin-email"
               className="mb-2 block text-sm font-semibold text-slate-700"
             >
-              ইমেইল
+              Email address
             </label>
             <input
               id="admin-email"
@@ -73,7 +73,7 @@ async function AdminLoginContent({
               htmlFor="admin-password"
               className="mb-2 block text-sm font-semibold text-slate-700"
             >
-              পাসওয়ার্ড
+              Password
             </label>
             <input
               id="admin-password"
@@ -89,7 +89,7 @@ async function AdminLoginContent({
             type="submit"
             className="mt-2 min-h-11 rounded-lg bg-emerald-700 px-4 py-2.5 font-semibold text-white transition hover:bg-emerald-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700"
           >
-            লগইন
+            Sign in
           </button>
         </form>
       </section>
