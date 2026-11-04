@@ -1,4 +1,5 @@
-import Link from "next/link";
+import { AdminIcon } from "@/components/admin-icons";
+import { AdminNavLink } from "@/components/admin-nav-link";
 import { adminNav } from "@/lib/admin-nav";
 
 function NavList() {
@@ -6,28 +7,17 @@ function NavList() {
     <nav aria-label="অ্যাডমিন নেভিগেশন" className="space-y-5">
       {adminNav.map((group) => (
         <div key={group.title}>
-          <p className="px-3 text-xs font-bold uppercase tracking-wide text-slate-500">
-            {group.title}
-          </p>
+          <p className="px-3 text-xs font-bold uppercase tracking-wide text-slate-500">{group.title}</p>
           <ul className="mt-2 space-y-0.5">
             {group.items.map((item) => (
               <li key={item.label}>
                 {item.href ? (
-                  <Link
-                    href={item.href}
-                    className="flex min-h-10 items-center rounded-lg px-3 text-sm font-semibold text-slate-800 hover:bg-emerald-50 hover:text-emerald-900 focus-visible:outline-2 focus-visible:outline-emerald-700"
-                  >
-                    {item.label}
-                  </Link>
+                  <AdminNavLink href={item.href} label={item.label} icon={item.icon} />
                 ) : (
-                  <span
-                    aria-disabled="true"
-                    className="flex min-h-10 items-center justify-between rounded-lg px-3 text-sm text-slate-400"
-                  >
-                    {item.label}
-                    <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[11px] font-semibold text-slate-500">
-                      শীঘ্রই
-                    </span>
+                  <span aria-disabled="true" className="flex min-h-10 items-center gap-3 rounded-lg px-3 text-sm text-slate-400">
+                    <AdminIcon name={item.icon} className="size-5 shrink-0" />
+                    <span className="flex-1">{item.label}</span>
+                    <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[11px] font-semibold text-slate-500">শীঘ্রই</span>
                   </span>
                 )}
               </li>
@@ -46,15 +36,12 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         <NavList />
       </aside>
       <details className="group border-b border-slate-200 bg-white lg:hidden">
-        <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between px-5 text-sm font-bold text-slate-800">
-          অ্যাডমিন মেনু
-          <span aria-hidden="true" className="text-slate-500 group-open:rotate-180">
-            ▾
-          </span>
+        <summary className="flex min-h-12 cursor-pointer list-none items-center gap-3 px-5 text-sm font-bold text-slate-800">
+          <AdminIcon name="menu" className="size-5 text-slate-600" />
+          <span className="flex-1">অ্যাডমিন মেনু</span>
+          <AdminIcon name="chevron" className="size-5 text-slate-500 transition-transform group-open:rotate-180" />
         </summary>
-        <div className="border-t border-slate-100 px-2 py-4">
-          <NavList />
-        </div>
+        <div className="border-t border-slate-100 px-2 py-4"><NavList /></div>
       </details>
       <div className="min-w-0 flex-1">{children}</div>
     </div>
