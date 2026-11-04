@@ -383,7 +383,7 @@ export async function saveProduct(formData: FormData) {
     commerceMode === "affiliate" && priceValue === ""
       ? null
       : parsePrice(priceValue);
-  const calculatedPrice = costPrice === null ? null : Math.round(costPrice * (1 + markupPercent / 100) * 100) / 100;
+  const calculatedPrice = costPrice == null ? null : Math.round(costPrice * (1 + markupPercent / 100) * 100) / 100;
   const price = pricingMode === "automatic" ? calculatedPrice : manualPrice;
   const listPriceValue = getFormValue(formData, "listPrice");
   const listPrice = listPriceValue === "" ? null : parsePrice(listPriceValue);
