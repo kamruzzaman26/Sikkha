@@ -57,6 +57,7 @@ async function CheckoutContent({
       : undefined;
   const selectedProductId = getSelectedProductId(params.product);
   const selectedProductIds = new Set((Array.isArray(params.products) ? params.products[0] : params.products ?? "").split(",").filter((id) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)));
+  const selectedQuantities = new Map((Array.isArray(params.quantities) ? params.quantities[0] : params.quantities ?? "").split(",").map((entry) => { const [id, quantity] = entry.split(":"); return [id, /^[1-9]\\d?$/.test(quantity ?? "") ? Number(quantity) : 1] as const; }));
 
   return (
     <main className="min-h-screen bg-[#f7faf8] px-5 py-10 text-slate-900 sm:px-8 sm:py-14">
@@ -158,7 +159,7 @@ async function CheckoutContent({
                         min={1}
                         max={99}
                         step={1}
-                        defaultValue={1}
+                        defaultValue={selectedQuantities.get(product.id) ?? 1}
                         required={false}
                         className="w-full rounded-lg border border-slate-300 px-3 py-2"
                       />
