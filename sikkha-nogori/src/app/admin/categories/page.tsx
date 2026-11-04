@@ -245,7 +245,7 @@ export default async function AdminCategoriesPage({
 
       {editId && !editing && (
         <p className="mt-6 rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-950">
-          নির্বাচিত Category not found.
+          Selected category not found.
         </p>
       )}
 
@@ -270,7 +270,7 @@ export default async function AdminCategoriesPage({
               <input id="edit-name" name="name" required maxLength={120} defaultValue={editing.name} className={inputClass} />
             </div>
             <div>
-              <label htmlFor="edit-name-en" className={labelClass}>English Name (ঐচ্ছিক)</label>
+              <label htmlFor="edit-name-en" className={labelClass}>English Name (optional)</label>
               <input id="edit-name-en" name="nameEn" maxLength={120} defaultValue={editing.name_en ?? ""} className={inputClass} />
             </div>
             <div>
