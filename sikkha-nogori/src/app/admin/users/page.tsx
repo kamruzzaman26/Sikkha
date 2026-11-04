@@ -81,7 +81,7 @@ async function AdminUsersContent({
         )}
         {users.length === 0 ? (
           <p className="mt-6 rounded-xl bg-white p-5 text-slate-600">
-            কোনো User not found.
+            No users found.
           </p>
         ) : (
           <ul className="mt-6 grid gap-3">
