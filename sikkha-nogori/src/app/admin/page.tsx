@@ -723,7 +723,7 @@ async function AdminContent({
               <p className="text-sm text-slate-600">Total Products</p>
               <p className="mt-1 text-2xl font-extrabold tabular-nums">{products.length}</p>
             </div>
-            <div className="rounded-xl border border-slate-200 bg-white p-4">
+            <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_8px_24px_-20px_rgba(15,55,42,0.45)]">
               <p className="text-sm text-slate-600">Published Products</p>
               <p className="mt-1 text-2xl font-extrabold tabular-nums">{products.filter((product) => product.is_published && !product.archived_at).length}</p>
             </div>
@@ -930,7 +930,7 @@ async function AdminContent({
                           ) : (
                             <div
                               role="img"
-                              aria-label={`${product.title} Products No image`}
+                              aria-label={`${product.title} image unavailable`}
                               className="flex h-24 w-[4.5rem] shrink-0 items-center justify-center rounded-lg bg-emerald-50 px-1 text-center text-xs text-emerald-900"
                             >
                               No image
@@ -1317,7 +1317,7 @@ export default function AdminPage({
   return (
     <Suspense
       fallback={
-        <main className="min-h-screen bg-[#f7faf8] px-5 py-10 text-slate-900 sm:px-8 sm:py-14">
+        <main lang="en" className="min-h-screen bg-[#f3f7f5] px-5 py-10 text-slate-900 sm:px-8 sm:py-14">
           <div className="mx-auto max-w-5xl animate-pulse rounded-2xl bg-white p-8">
             <div className="h-8 w-64 rounded bg-slate-100" />
             <div className="mt-8 h-40 rounded-xl bg-slate-100" />
