@@ -11,26 +11,26 @@ import {
 } from "./actions";
 
 export const metadata: Metadata = {
-  title: "পেমেন্ট মেথড ব্যবস্থাপনা | শিক্ষা নগরী",
+  title: "Payment Methods | Sikkha Nogori",
   robots: { index: false, follow: false },
 };
 
 const methodTypes = [
-  { value: "manual", label: "ম্যানুয়াল পেমেন্ট" },
-  { value: "cod", label: "ক্যাশ অন ডেলিভারি (COD)" },
-  { value: "gateway", label: "অনলাইন গেটওয়ে (এখনো সংযুক্ত নয়)" },
+  { value: "manual", label: "Manual Payment" },
+  { value: "cod", label: "Cash on Delivery (COD)" },
+  { value: "gateway", label: "Online Gateway (Not Connected)" },
 ] as const;
 
 const statusMessages: Record<string, string> = {
-  created: "পেমেন্ট মেথড যোগ করা হয়েছে।",
-  updated: "পেমেন্ট মেথড হালনাগাদ করা হয়েছে।",
-  enabled: "পেমেন্ট মেথড গ্রাহকের জন্য চালু করা হয়েছে।",
-  disabled: "পেমেন্ট মেথড গ্রাহকের জন্য বন্ধ করা হয়েছে।",
-  invalid: "তথ্য যাচাই করুন এবং সব ঘর সঠিকভাবে পূরণ করুন।",
-  "duplicate-code": "এই code-টি আগে থেকেই ব্যবহৃত হয়েছে।",
+  created: "Payment method created.",
+  updated: "Payment method updated.",
+  enabled: "Payment method enabled for customers.",
+  disabled: "Payment method disabled for customers.",
+  invalid: "Please verify the information and complete all required fields.",
+  "duplicate-code": "This code is already in use.",
   "gateway-unavailable":
-    "অনলাইন গেটওয়ে এখনো সংযুক্ত নয়; এটি গ্রাহকের জন্য চালু করা যাবে না।",
-  "not-found": "পেমেন্ট মেথডটি পাওয়া যায়নি বা আর সম্পাদনাযোগ্য নয়।",
+    "The online gateway is not connected and cannot be enabled for customers.",
+  "not-found": "Payment method not found or no longer editable.",
 };
 
 type PaymentMethodFormValue = {
@@ -64,7 +64,7 @@ function PaymentMethodForm({
             htmlFor={`${idPrefix}-name`}
             className="mb-2 block text-sm font-semibold text-slate-700"
           >
-            প্রদর্শিত নাম
+            Display Name
           </label>
           <input
             id={`${idPrefix}-name`}
@@ -80,7 +80,7 @@ function PaymentMethodForm({
             htmlFor={`${idPrefix}-code`}
             className="mb-2 block text-sm font-semibold text-slate-700"
           >
-            ইউনিক code (ইংরেজি ছোট অক্ষর)
+            Unique Code (lowercase English letters)
           </label>
           <input
             id={`${idPrefix}-code`}
@@ -100,7 +100,7 @@ function PaymentMethodForm({
             htmlFor={`${idPrefix}-type`}
             className="mb-2 block text-sm font-semibold text-slate-700"
           >
-            পেমেন্টের ধরন
+            Payment Type
           </label>
           <select
             id={`${idPrefix}-type`}
@@ -121,7 +121,7 @@ function PaymentMethodForm({
             htmlFor={`${idPrefix}-sort`}
             className="mb-2 block text-sm font-semibold text-slate-700"
           >
-            প্রদর্শনের ক্রম
+            Display Order
           </label>
           <input
             id={`${idPrefix}-sort`}
@@ -142,7 +142,7 @@ function PaymentMethodForm({
           htmlFor={`${idPrefix}-description`}
           className="mb-2 block text-sm font-semibold text-slate-700"
         >
-          সংক্ষিপ্ত বিবরণ
+          Short Description
         </label>
         <textarea
           id={`${idPrefix}-description`}
@@ -159,7 +159,7 @@ function PaymentMethodForm({
           htmlFor={`${idPrefix}-instructions`}
           className="mb-2 block text-sm font-semibold text-slate-700"
         >
-          গ্রাহকের জন্য নির্দেশনা
+          Customer Instructions
         </label>
         <textarea
           id={`${idPrefix}-instructions`}
@@ -180,14 +180,14 @@ function PaymentMethodForm({
           defaultChecked={method?.is_enabled ?? false}
           className="size-4 rounded border-slate-300 text-emerald-700"
         />
-        গ্রাহকের সামনে প্রদর্শন চালু করুন
+        Make this method visible to customers
       </label>
 
       <button
         type="submit"
         className="w-fit rounded-lg bg-emerald-700 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-emerald-800"
       >
-        {method ? "পেমেন্ট মেথড সংরক্ষণ" : "পেমেন্ট মেথড যোগ"}
+        {method ? "Save Payment Method" : "Add Payment Method"}
       </button>
     </form>
   );
@@ -228,29 +228,29 @@ async function PaymentMethodsContent({
       <div className="mx-auto max-w-5xl">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <Link href="/admin" className="font-semibold text-emerald-700">
-            ← প্রশাসনিক প্যানেল
+            ← Admin workspace
           </Link>
           <form action={logoutAdmin}>
             <button
               type="submit"
               className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-white"
             >
-              লগআউট
+              Sign out
             </button>
           </form>
         </div>
 
         <header className="mt-8">
           <p className="text-sm font-bold text-emerald-700">
-            শিক্ষা নগরী · প্রশাসন
+            SIKKHA NOGORI · ADMINISTRATION
           </p>
           <h1 className="mt-2 text-3xl font-extrabold sm:text-4xl">
-            পেমেন্ট মেথড ব্যবস্থাপনা
+            Payment Methods
           </h1>
           <p className="mt-3 max-w-3xl leading-7 text-slate-600">
-            নাম, ধরন, নির্দেশনা, সক্রিয় অবস্থা এবং প্রদর্শনের ক্রম পরিচালনা
-            করুন। ম্যানুয়াল পেমেন্ট যাচাই না করে Paid হয় না। সাইটে checkout বা
-            অনলাইন payment gateway এখনো চালু নেই।
+            নাম, ধরন, নির্দেশনা, Active অবস্থা এবং Display Order পরিচালনা
+            করুন। Manual Payment যাচাই না করে Paid হয় না। সাইটে checkout বা
+            online payment gateways are not currently enabled.
           </p>
         </header>
 
@@ -271,10 +271,10 @@ async function PaymentMethodsContent({
         )}
 
         <section className="mt-8 rounded-2xl border border-emerald-100 bg-white p-5 shadow-sm sm:p-7">
-          <h2 className="text-xl font-bold">নতুন পেমেন্ট মেথড</h2>
+          <h2 className="text-xl font-bold">Add Payment Method</h2>
           <p className="mb-5 mt-2 text-sm leading-6 text-slate-600">
-            bKash, Nagad, Rocket, Bank Transfer বা COD-এর মতো মেথড নিজে যোগ
-            করুন। তালিকার নামগুলো কোনো চালু পেমেন্টের নিশ্চয়তা নয়।
+            Add payment methods such as bKash, Nagad, Rocket, Bank Transfer, or COD.
+            Names in the list do not mean that a payment gateway is connected.
           </p>
           <PaymentMethodForm idPrefix="new-payment-method" />
         </section>
@@ -282,16 +282,16 @@ async function PaymentMethodsContent({
         <section className="mt-8">
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
-              <h2 className="text-xl font-bold">সংরক্ষিত পেমেন্ট মেথড</h2>
+              <h2 className="text-xl font-bold">Saved Payment Methods</h2>
               <p className="mt-1 text-sm text-slate-600">
-                মোট {methods.length}টি · ক্রম ও নাম অনুযায়ী সাজানো
+                {methods.length} total · sorted by display order and name
               </p>
             </div>
           </div>
 
           {methods.length === 0 ? (
             <p className="mt-4 rounded-2xl border border-dashed border-slate-300 bg-white px-5 py-10 text-center text-slate-600">
-              এখনো কোনো পেমেন্ট মেথড যোগ করা হয়নি।
+              এখনো কোনো Add Payment Method করা হয়নি।
             </p>
           ) : (
             <ul className="mt-4 grid gap-4">
@@ -304,12 +304,12 @@ async function PaymentMethodsContent({
                     <div>
                       <h3 className="font-bold">{method.name}</h3>
                       <p className="mt-1 text-sm text-slate-600">
-                        {method.code} · ক্রম {method.sort_order} ·{" "}
+                        {method.code} · Order {method.sort_order} ·{" "}
                         {method.method_type === "manual"
-                          ? "ম্যানুয়াল"
+                          ? "Manual"
                           : method.method_type === "cod"
                             ? "COD"
-                            : "গেটওয়ে"}
+                            : "Gateway"}
                       </p>
                       {method.description && (
                         <p className="mt-2 text-sm leading-6 text-slate-600">
@@ -324,20 +324,20 @@ async function PaymentMethodsContent({
                           : "bg-slate-100 text-slate-600"
                       }`}
                     >
-                      {method.is_enabled ? "সক্রিয়" : "নিষ্ক্রিয়"}
+                      {method.is_enabled ? "Active" : "Inactive"}
                     </span>
                   </div>
 
                   {method.method_type === "gateway" && (
                     <p className="mb-4 rounded-lg bg-amber-50 px-3 py-2 text-sm leading-6 text-amber-950">
-                      কোনো gateway adapter সংযুক্ত নয়। এই মেথড গ্রাহককে দেখানো
-                      বা পেমেন্ট নেওয়ার জন্য উপলভ্য নয়।
+                      No gateway adapter is connected. This method is not shown to customers
+                      and cannot accept payments.
                     </p>
                   )}
 
                   <details className="border-t border-slate-100 pt-4">
                     <summary className="cursor-pointer text-sm font-semibold text-emerald-800">
-                      সম্পাদনা
+                      Edit
                     </summary>
                     <div className="mt-4">
                       <PaymentMethodForm
@@ -358,7 +358,7 @@ async function PaymentMethodsContent({
                       type="submit"
                       className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
                     >
-                      {method.is_enabled ? "নিষ্ক্রিয় করুন" : "সক্রিয় করুন"}
+                      {method.is_enabled ? "Inactive করুন" : "Active করুন"}
                     </button>
                   </form>
                 </li>
