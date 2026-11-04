@@ -366,11 +366,25 @@ export async function saveProduct(formData: FormData) {
   const commerceMode = getFormValue(formData, "commerceMode");
   const imageUrlValue = getFormValue(formData, "imageUrl");
   const imageUrl = imageUrlValue ? parseProductImageUrl(imageUrlValue) : null;
+  const costPriceValue = getFormValue(formData, "costPrice");
+  const costPrice = costPriceValue === "" ? null : parsePrice(costPriceValue);
+  const pricingMode = getFormValue(formData, "pricingMode") || "manual";
+  const markupValue = getFormValue(formData, "markupPercent") || "0";
+  const markupPercent = /^(?:0|[1-9]\\d*)(?:\\.\\d{1,2})?$/.test(markupValue) ? Number(markupValue) : NaN;
+  if (
+    !["manual", "automatic"].includes(pricingMode) ||
+    (costPriceValue !== "" && costPrice === undefined) ||
+    !Number.isFinite(markupPercent) || markupPercent < 0 || markupPercent > 10000 ||
+    (pricingMode === "automatic" && (costPrice === null || costPrice === undefined))
+  ) redirect("/admin?status=product-invalid");
+
   const priceValue = getFormValue(formData, "price");
-  const price =
+  const manualPrice =
     commerceMode === "affiliate" && priceValue === ""
       ? null
       : parsePrice(priceValue);
+  const calculatedPrice = costPrice === null ? null : Math.round(costPrice * (1 + markupPercent / 100) * 100) / 100;
+  const price = pricingMode === "automatic" ? calculatedPrice : manualPrice;
   const listPriceValue = getFormValue(formData, "listPrice");
   const listPrice = listPriceValue === "" ? null : parsePrice(listPriceValue);
   const edition = getFormValue(formData, "edition");
@@ -419,6 +433,7 @@ export async function saveProduct(formData: FormData) {
     !isCommerceMode(commerceMode) ||
     (imageUrlValue !== "" && !imageUrl) ||
     (commerceMode === "direct" && price === undefined) ||
+    (pricingMode === "manual" && commerceMode === "direct" && manualPrice === undefined) ||
     (commerceMode === "affiliate" && priceValue !== "" && price === undefined) ||
     listPrice === undefined ||
     (listPrice !== null && (price == null || listPrice < price)) ||
@@ -452,6 +467,9 @@ export async function saveProduct(formData: FormData) {
     publisher: publisher || null,
     product_type: productType,
     price,
+    cost_price: costPrice,
+    pricing_mode: pricingMode,
+    markup_percent: markupPercent,
     list_price: listPrice,
     edition: edition || null,
     isbn: isbn || null,
@@ -482,6 +500,12 @@ export async function saveProduct(formData: FormData) {
       }
     }
 
+    const { data: oldProduct, error: oldProductError } = await supabase
+      .from("products")
+      .select("price,cost_price")
+      .eq("id", id)
+      .maybeSingle();
+    if (oldProductError) throw new Error("Unable to read previous product pricing.", { cause: oldProductError });
     const { data, error } = await supabase
       .from("products")
       .update(values)
@@ -503,6 +527,15 @@ export async function saveProduct(formData: FormData) {
 
     if (categoriesSubmitted) {
       await syncProductCategories(supabase, id, categoryIds, primaryCategoryId);
+    }
+    if (!oldProduct || Number(oldProduct.price ?? -1) !== Number(price ?? -1) || Number(oldProduct.cost_price ?? -1) !== Number(costPrice ?? -1)) {
+      const { data: { user } } = await supabase.auth.getUser();
+      const { error: historyError } = await supabase.from("product_price_history").insert({
+        product_id: id, old_price: oldProduct?.price ?? null, new_price: price ?? 0,
+        old_cost_price: oldProduct?.cost_price ?? null, new_cost_price: costPrice,
+        pricing_mode: pricingMode, reason: "Product pricing updated", changed_by: user?.id ?? null,
+      });
+      if (historyError) throw new Error("Product saved, but price history could not be recorded.", { cause: historyError });
     }
     await logActivity(supabase, "product_updated", "product", id, { slug, title });
     finishAction("product-updated");
@@ -526,6 +559,15 @@ export async function saveProduct(formData: FormData) {
 
   if (categoriesSubmitted && created) {
     await syncProductCategories(supabase, created.id, categoryIds, primaryCategoryId);
+  }
+  if (price !== null) {
+    const { data: { user } } = await supabase.auth.getUser();
+    const { error: historyError } = await supabase.from("product_price_history").insert({
+      product_id: created.id, old_price: null, new_price: price,
+      old_cost_price: null, new_cost_price: costPrice,
+      pricing_mode: pricingMode, reason: "Initial product price", changed_by: user?.id ?? null,
+    });
+    if (historyError) throw new Error("Product created, but initial price history could not be recorded.", { cause: historyError });
   }
   await logActivity(supabase, "product_created", "product", slug, { title });
   finishAction("product-created");
