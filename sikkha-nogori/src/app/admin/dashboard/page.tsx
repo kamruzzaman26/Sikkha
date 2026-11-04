@@ -81,7 +81,7 @@ async function DashboardContent() {
   const top = bestSellers(itemsResult.data ?? []);
 
   return (
-    <main className="min-h-screen bg-[#f3f7f5] px-4 py-6 text-slate-900 sm:px-7 sm:py-8 xl:px-10">
+    <main lang="en" className="min-h-screen bg-[#f3f7f5] px-4 py-6 text-slate-900 sm:px-7 sm:py-8 xl:px-10">
       <div className="mx-auto max-w-[1500px]">
         <p className="text-[11px] font-extrabold uppercase tracking-[0.2em] text-emerald-700">SIKKHA NOGORI · ADMINISTRATION</p>
         <h1 className="mt-2 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">Dashboard Overview</h1>
@@ -180,7 +180,7 @@ async function DashboardContent() {
             <h2 className="text-lg font-bold">Best Selling Products</h2>
             {itemsResult.error ? (
               <div className="mt-3">
-                <Unavailable what="বিক্রির তথ্য" />
+                <Unavailable what="sales data" />
               </div>
             ) : top.length === 0 ? (
               <p className="mt-3 rounded-xl border border-slate-200 bg-white px-4 py-6 text-center text-sm text-slate-600">
