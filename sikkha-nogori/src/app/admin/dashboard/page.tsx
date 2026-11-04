@@ -83,14 +83,16 @@ async function DashboardContent() {
   return (
     <main lang="en" className="min-h-screen bg-[#f3f7f5] px-4 py-6 text-slate-900 sm:px-7 sm:py-8 xl:px-10">
       <div className="mx-auto max-w-[1500px]">
-        <p className="text-[11px] font-extrabold uppercase tracking-[0.2em] text-emerald-700">SIKKHA NOGORI · ADMINISTRATION</p>
-        <h1 className="mt-2 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">Dashboard Overview</h1>
-        <p className="mt-2 text-sm leading-6 text-slate-600">
-          All metrics are retrieved directly from the database. Sales include only payment-verified
-          orders (today / month based on Dhaka time).
-        </p>
+        <header className="rounded-[28px] bg-gradient-to-br from-[#0b5949] via-[#0a493e] to-[#082f29] px-6 py-7 text-white shadow-[0_18px_45px_-28px_rgba(5,48,39,0.75)] sm:px-8 sm:py-9">
+          <p className="text-[11px] font-extrabold uppercase tracking-[0.2em] text-emerald-200">SIKKHA NOGORI · ADMINISTRATION</p>
+          <h1 className="mt-3 text-3xl font-black tracking-tight text-white sm:text-4xl">Dashboard Overview</h1>
+          <p className="mt-3 max-w-3xl text-sm leading-7 text-emerald-50/80 sm:text-base">
+            Live store performance at a glance. Sales include only payment-verified orders (today / month based on Dhaka time).
+          </p>
+          <Link href="/admin" className="mt-5 inline-flex min-h-10 items-center rounded-xl border border-white/25 bg-white/10 px-4 py-2 text-sm font-bold text-white transition hover:bg-white/20">Open Product Catalog <span className="ml-2">→</span></Link>
+        </header>
 
-        <h2 className="mt-8 text-lg font-bold">Sales Overview</h2>
+        <h2 className="mt-8 text-lg font-extrabold tracking-tight">Sales Overview</h2>
         {ordersResult.error ? (
           <div className="mt-3">
             <Unavailable what="order data" />
@@ -107,7 +109,7 @@ async function DashboardContent() {
           </div>
         )}
 
-        <h2 className="mt-8 text-lg font-bold">Catalog & Customers</h2>
+        <h2 className="mt-8 text-lg font-extrabold tracking-tight">Catalog & Customers</h2>
         <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {productsResult.error ? (
             <div className="sm:col-span-2 lg:col-span-4">
@@ -143,7 +145,7 @@ async function DashboardContent() {
 
         <div className="mt-8 grid gap-6 lg:grid-cols-2">
           <section>
-            <h2 className="text-lg font-bold">Recent Orders</h2>
+            <h2 className="text-lg font-extrabold tracking-tight">Recent Orders</h2>
             {recent.length === 0 ? (
               <p className="mt-3 rounded-xl border border-slate-200 bg-white px-4 py-6 text-center text-sm text-slate-600">
                 No orders yet.
@@ -175,7 +177,7 @@ async function DashboardContent() {
           </section>
 
           <section>
-            <h2 className="text-lg font-bold">Best Selling Products</h2>
+            <h2 className="text-lg font-extrabold tracking-tight">Best Selling Products</h2>
             {itemsResult.error ? (
               <div className="mt-3">
                 <Unavailable what="sales data" />
