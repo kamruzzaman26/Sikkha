@@ -189,7 +189,7 @@ function ProductForm({
             htmlFor={`${idPrefix}-commerce-mode`}
             className="mb-2 block text-sm font-semibold text-slate-700"
           >
-            বিক্রির Type
+            Sales Type
           </label>
           <select
             id={`${idPrefix}-commerce-mode`}
@@ -199,7 +199,7 @@ function ProductForm({
             className={inputClass}
           >
             <option value="" disabled>
-              বিক্রির Type নির্বাচন করুন
+              Sales Type নির্বাচন করুন
             </option>
             <option value="affiliate">Third-party affiliate product</option>
             <option value="direct">Sikkha Nogori direct-sale product</option>
@@ -691,7 +691,7 @@ async function AdminContent({
             Affiliate & Catalog Management
           </h1>
           <p className="mt-3 max-w-3xl leading-7 text-slate-600">
-            Productsের Type, বিক্রির মাধ্যম, Category ও প্রচ্ছদ পরিচালনা করুন। বাইরের
+            Product Type, বিক্রির মাধ্যম, Category ও প্রচ্ছদ পরিচালনা করুন। বাইরের
             বিক্রেতার Products checkout-এ অর্ডারযোগ্য হবে না।
           </p>
         </header>
@@ -728,7 +728,7 @@ async function AdminContent({
         {role === "admin" && (
           <section aria-label="Catalog overview" className="mt-7 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
             <div className="rounded-xl border border-slate-200 bg-white p-4">
-              <p className="text-sm text-slate-600">মোট Products</p>
+              <p className="text-sm text-slate-600">Total Products</p>
               <p className="mt-1 text-2xl font-extrabold tabular-nums">{products.length}</p>
             </div>
             <div className="rounded-xl border border-slate-200 bg-white p-4">
@@ -736,7 +736,7 @@ async function AdminContent({
               <p className="mt-1 text-2xl font-extrabold tabular-nums">{products.filter((product) => product.is_published && !product.archived_at).length}</p>
             </div>
             <div className="rounded-xl border border-slate-200 bg-white p-4">
-              <p className="text-sm text-slate-600">খসড়া Products</p>
+              <p className="text-sm text-slate-600">Draft Products</p>
               <p className="mt-1 text-2xl font-extrabold tabular-nums">{products.filter((product) => !product.is_published && !product.archived_at).length}</p>
             </div>
             <div className="rounded-xl border border-slate-200 bg-white p-4">
@@ -762,17 +762,17 @@ async function AdminContent({
           id="product-catalog"
           className="mt-7 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_8px_30px_-18px_rgba(15,55,42,0.22)] sm:p-7"
         >
-          <h2 className="text-xl font-bold">Products ক্যাটালগ</h2>
+          <h2 className="text-xl font-bold">Product Catalog</h2>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-            Published ও শ্রেণিবদ্ধ Products public catalog-এ দেখানো হয়। Affiliate
-            Productsের বর্তমান মূল্য প্রকাশ করা হয় না; সরাসরি বিক্রির Productsের জন্য
+            Published and categorized products appear in the public catalog. Affiliate
+            Products বর্তমান মূল্য প্রকাশ করা হয় না; সরাসরি বিক্রির Products জন্য
             enter a verified selling price.
           </p>
 
           {role === "admin" && (
             <details className="mt-5 rounded-xl border border-slate-200 p-4">
               <summary className="cursor-pointer font-bold text-emerald-900">
-                ক্যাটালগে Add Product
+                Add a Product to Catalog
               </summary>
               <div className="mt-4">
                 <ProductForm
@@ -795,7 +795,7 @@ async function AdminContent({
                 htmlFor="admin-product-query"
                 className="mb-2 block text-sm font-semibold text-slate-700"
               >
-                Name, slug, Category, লেখক/প্রকাশক বা Description
+                Search name, slug, category, author, publisher, or description
               </label>
               <input
                 id="admin-product-query"
@@ -810,7 +810,7 @@ async function AdminContent({
                 htmlFor="admin-product-type"
                 className="mb-2 block text-sm font-semibold text-slate-700"
               >
-                Productsের Type
+                Product Type
               </label>
               <select
                 id="admin-product-type"
@@ -818,7 +818,7 @@ async function AdminContent({
                 defaultValue={productTypeFilter}
                 className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5"
               >
-                <option value="all">সব Type</option>
+                <option value="all">All Types</option>
                 {productTypes.map((type) => (
                   <option key={type.slug} value={type.slug}>
                     {type.label}
@@ -839,7 +839,7 @@ async function AdminContent({
                 defaultValue={archivedFilter}
                 className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5"
               >
-                <option value="all">সব Products</option>
+                <option value="all">All Products</option>
                 <option value="active">Not Archived</option>
                 <option value="archived">Archived</option>
               </select>
@@ -859,7 +859,7 @@ async function AdminContent({
               >
                 <option value="all">All Statuses</option>
                 <option value="published">Published</option>
-                <option value="draft">অPublished</option>
+                <option value="draft">Draft</option>
               </select>
             </div>
             <button
@@ -879,7 +879,7 @@ async function AdminContent({
           </form>
 
           <p aria-live="polite" className="mt-4 text-sm text-slate-600">
-            {filteredProducts.length}টি Products দেখানো হচ্ছে · মোট {products.length}টি
+            Showing {filteredProducts.length} products · {products.length} total
           </p>
 
           <div className="mt-6 grid gap-5 lg:grid-cols-2">
@@ -913,24 +913,24 @@ async function AdminContent({
                               ? "Archived"
                               : product.is_published
                                 ? "Published"
-                                : "খসড়া"}
+                                : "Draft"}
                             {product.commerce_mode
                               ? ` · ${
                                   product.commerce_mode === "affiliate"
                                     ? "affiliate"
-                                    : "নিজস্ব বিক্রি"
+                                    : "Direct sale"
                                 }`
-                              : " · বিক্রির Type নির্বাচন প্রয়োজন"}
+                              : " · Sales Type নির্বাচন প্রয়োজন"}
                           </span>
                         </div>
                         <article
-                          aria-label={`${product.title} Productsের কার্ড প্রিভিউ`}
+                          aria-label={`${product.title} Products কার্ড প্রিভিউ`}
                           className="mt-3 flex max-w-sm gap-3 rounded-xl border border-slate-200 bg-white p-3"
                         >
                           {product.image_url ? (
                             <Image
                               src={product.image_url}
-                              alt={`${product.title} Productsের প্রচ্ছদ`}
+                              alt={`${product.title} Products প্রচ্ছদ`}
                               width={72}
                               height={96}
                               unoptimized
@@ -939,7 +939,7 @@ async function AdminContent({
                           ) : (
                             <div
                               role="img"
-                              aria-label={`${product.title} Productsের No image`}
+                              aria-label={`${product.title} Products No image`}
                               className="flex h-24 w-[4.5rem] shrink-0 items-center justify-center rounded-lg bg-emerald-50 px-1 text-center text-xs text-emerald-900"
                             >
                               No image
@@ -1003,8 +1003,8 @@ async function AdminContent({
                                 className="min-h-11 rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
                               >
                                 {product.archived_at
-                                  ? "Archived থেকে ফিরিয়ে আনুন"
-                                  : "Archived করুন"}
+                                  ? "Restore from Archive"
+                                  : "Archive Product"}
                               </button>
                             </form>
                           </>
@@ -1021,9 +1021,9 @@ async function AdminContent({
 
         {role === "admin" && (
           <section className="mt-7 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_8px_30px_-18px_rgba(15,55,42,0.22)] sm:p-7">
-            <h2 className="text-xl font-bold">Productsের Type বাড়ান</h2>
+            <h2 className="text-xl font-bold">Product Type বাড়ান</h2>
             <p className="mt-2 text-sm leading-6 text-slate-600">
-              নতুন Type যোগ করলে তা Products ফর্মে নির্বাচন করা যাবে। ব্যবহৃত Type
+              নতুন Type যোগ করলে তা product forms নির্বাচন করা যাবে। ব্যবহৃত Type
               cannot be deleted.
             </p>
             <form
@@ -1035,7 +1035,7 @@ async function AdminContent({
                   htmlFor="new-product-type-label"
                   className="mb-2 block text-sm font-semibold text-slate-700"
                 >
-                  Typeটির Name
+                  Type Name
                 </label>
                 <input
                   id="new-product-type-label"
@@ -1065,7 +1065,7 @@ async function AdminContent({
                 type="submit"
                 className="min-h-11 rounded-lg bg-emerald-700 px-4 py-2.5 text-sm font-bold text-white hover:bg-emerald-800"
               >
-                Type যোগ করুন
+                Add Type
               </button>
             </form>
           </section>
@@ -1075,7 +1075,7 @@ async function AdminContent({
           <h2 className="text-xl font-bold">Create Affiliate Link</h2>
           {affiliateProducts.length === 0 ? (
             <p className="mt-4 rounded-xl bg-amber-50 px-4 py-3 leading-6 text-amber-900">
-              প্রথমে কোনো Productsকে affiliate বিক্রির Type দিয়ে সংরক্ষণ করতে হবে।
+              প্রথমে কোনো Products in Affiliate Sales Type দিয়ে সংরক্ষণ করতে হবে।
             </p>
           ) : (
             <form action={saveAffiliateLink} className="mt-5 grid gap-4">
@@ -1095,7 +1095,7 @@ async function AdminContent({
                     className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5"
                   >
                     <option value="" disabled>
-                      একটি Products নির্বাচন করুন
+                      একটি Select a product
                     </option>
                     {affiliateProducts.map((product) => (
                       <option key={product.id} value={product.id}>
@@ -1187,7 +1187,7 @@ async function AdminContent({
                     <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
                       <div>
                         <h3 className="font-bold">
-                          {link.products?.[0]?.title ?? "Products পাওয়া যায়নি"}
+                          {link.products?.[0]?.title ?? "Product not found"}
                         </h3>
                         <p className="mt-1 break-all text-sm text-slate-600">
                           {partnerName ?? "Select a partner"} · {link.url}
@@ -1306,7 +1306,7 @@ async function AdminContent({
                         type="submit"
                         className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
                       >
-                        {link.is_active ? "Inactive করুন" : "Active করুন"}
+                        {link.is_active ? "Deactivate" : "Activate"}
                       </button>
                     </form>
                   </li>
