@@ -138,9 +138,7 @@ async function DashboardContent() {
           )}
         </div>
         <p className="mt-3 rounded-xl border border-dashed border-slate-300 bg-white px-4 py-3 text-sm leading-6 text-slate-600">
-          Low Stock / Out of Stock: <strong>Not available yet</strong> — স্টক
-          ট্র্যাকিং (Inventory) ডেটাবেসে এখনো যোগ হয়নি, তাই কোনো সংখ্যা
-          are displayed.
+          Low Stock / Out of Stock: <strong>Not available yet</strong> — inventory tracking has not been added to the database, so no figures are displayed.
         </p>
 
         <div className="mt-8 grid gap-6 lg:grid-cols-2">
