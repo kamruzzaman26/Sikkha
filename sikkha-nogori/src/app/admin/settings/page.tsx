@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { connection } from "next/server";
 import { requirePermission } from "@/lib/supabase/admin";
 import { saveGeneralSettings } from "../settings-actions";
+import { AdminSubmitButton } from "@/components/admin-submit-button";
 
 export const metadata: Metadata = { title: "Website Settings | Sikkha Nogori Admin", robots: { index: false, follow: false } };
 const input = "min-h-11 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 outline-none transition focus:border-emerald-600 focus:ring-4 focus:ring-emerald-600/10";
@@ -31,6 +32,6 @@ export default async function WebsiteSettingsPage({ searchParams }: { searchPara
     <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7"><div className="mb-5"><p className="text-[10px] font-extrabold uppercase tracking-[.18em] text-emerald-700">Social presence</p><h2 className="mt-1 text-xl font-extrabold">Official social links</h2><p className="mt-1 text-sm text-slate-500">Only HTTPS links are accepted.</p></div><div className="grid gap-4 sm:grid-cols-2">
       {(["facebook","instagram","youtube"] as const).map((key)=><div key={key}><label className={label} htmlFor={key}>{key[0].toUpperCase()+key.slice(1)} URL</label><input className={input} id={key} name={key} type="url" placeholder="https://" defaultValue={s.social?.[key] ?? ""} /></div>)}
     </div></section>
-    <div className="flex justify-end"><button className="min-h-12 rounded-xl bg-[#0b5b48] px-7 text-sm font-extrabold text-white shadow-lg transition hover:bg-[#084b3c]">Save website settings</button></div>
+    <div className="flex justify-end"><AdminSubmitButton pendingLabel="Saving settings…" className="min-h-12 rounded-xl bg-[#0b5b48] px-7 text-sm font-extrabold text-white shadow-lg transition hover:bg-[#084b3c]">Save website settings</AdminSubmitButton></div>
     </form></div></main>;
 }
