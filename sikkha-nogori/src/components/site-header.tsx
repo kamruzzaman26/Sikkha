@@ -111,6 +111,41 @@ function NavigationIcon({ name }: { name: NavigationIconName }) {
   }
 }
 
+
+function CategoryGlyph({ name }: { name: string }) {
+  const value = name.toLowerCase();
+  const glyph =
+    /author|লেখক/.test(value) ? "✍" :
+    /subject|বিষয়|বিষয়/.test(value) ? "▤" :
+    /publisher|প্রকাশক/.test(value) ? "▣" :
+    /discount|offer|ছাড়|ছাড়/.test(value) ? "％" :
+    /academic|একাডেমিক|পাঠ্য/.test(value) ? "🎓" :
+    /hsc|এইচএসসি/.test(value) ? "📘" :
+    /admission|ভর্তি/.test(value) ? "📝" :
+    /ebook|e-book|ই-বুক/.test(value) ? "▧" :
+    /islam|ইসলাম|কুরআন|হাদিস/.test(value) ? "☪" :
+    /stationery|স্টেশনারি/.test(value) ? "✏" :
+    /food|grocery|খাদ্য|মুদি/.test(value) ? "▦" :
+    /beauty|personal care|সৌন্দর্য/.test(value) ? "✿" :
+    /diary|ডায়েরি|ডায়েরি/.test(value) ? "▣" :
+    /calculator|ক্যালকুলেটর/.test(value) ? "＋" :
+    /fan|ফ্যান/.test(value) ? "✥" :
+    /art|শিল্প|আঁকা/.test(value) ? "✎" :
+    /computer|কম্পিউটার|laptop/.test(value) ? "▣" :
+    /mobile|phone|মোবাইল/.test(value) ? "▯" :
+    /office|অফিস/.test(value) ? "▤" :
+    /gaming|গেম/.test(value) ? "♢" :
+    /network|নেটওয়ার্ক|নেটওয়ার্ক/.test(value) ? "⌘" :
+    /sound|audio|সাউন্ড/.test(value) ? "♫" :
+    /groom|গ্রুম/.test(value) ? "✂" :
+    /appliance|যন্ত্রপাতি/.test(value) ? "⚙" :
+    /science|বিজ্ঞান/.test(value) ? "⚗" :
+    /baby|বেবি|শিশু/.test(value) ? "♡" :
+    /kid|শিশু|বাচ্চা/.test(value) ? "☆" :
+    /book|বই/.test(value) ? "▤" : "◇";
+  return <span aria-hidden="true" className="inline-flex size-5 shrink-0 items-center justify-center text-base text-emerald-800">{glyph}</span>;
+}
+
 const iconButtonClass =
   "inline-flex size-11 shrink-0 items-center justify-center rounded-xl text-slate-700 transition hover:bg-emerald-50 hover:text-emerald-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700";
 
@@ -527,8 +562,23 @@ export function SiteHeader({
           </aside>
         </div>
       )}
+
+      <nav aria-label="Bottom navigation" className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 border-t border-slate-200 bg-white/95 px-1 pb-[env(safe-area-inset-bottom)] pt-1 shadow-[0_-4px_18px_rgba(15,23,42,0.08)] backdrop-blur lg:hidden">
+        <BottomNavItem href="/" icon="⌂" label="Home" />
+        <BottomNavItem href="/books" icon="▤" label="Categories" />
+        <BottomNavItem disabled icon="🛒" label="Cart" />
+        <BottomNavItem disabled icon="▧" label="E-Library" />
+        <BottomNavItem href={identity ? "/dashboard/profile" : "/login"} icon="♙" label="Account" />
+      </nav>
     </>
   );
+}
+
+
+function BottomNavItem({ href, icon, label, disabled = false }: { href?: string; icon: string; label: string; disabled?: boolean }) {
+  const className = "flex min-h-14 flex-col items-center justify-center gap-0.5 rounded-lg px-1 text-[10px] font-semibold text-slate-600";
+  if (disabled || !href) return <span aria-disabled="true" title={label+" page is not available yet"} className={className+" opacity-45"}><span aria-hidden="true" className="text-lg leading-5">{icon}</span>{label}</span>;
+  return <Link href={href} className={className+" hover:bg-emerald-50 hover:text-emerald-800"}><span aria-hidden="true" className="text-lg leading-5">{icon}</span>{label}</Link>;
 }
 
 function AccountLink({
@@ -589,15 +639,15 @@ function CategoryTree({
         const href = `${basePath}?category=${encodeURIComponent(item.name)}`;
         if (item.children.length === 0) {
           return (
-            <DrawerLink key={item.name} icon="book" href={href} onClick={onNavigate}>
+            <Link key={item.name} href={href} onClick={onNavigate} className="flex min-h-11 items-center gap-3 border-b border-slate-100 px-3 text-sm font-medium text-slate-600 hover:bg-emerald-50 hover:text-emerald-900"><CategoryGlyph name={item.name} />
               {item.name}
-            </DrawerLink>
+            </Link>
           );
         }
         return (
           <details key={item.name} className="group/sub border-b border-slate-100">
             <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 rounded-lg px-3 text-sm font-semibold text-slate-700 outline-none hover:bg-emerald-50 focus-visible:ring-2 focus-visible:ring-emerald-700 [&::-webkit-details-marker]:hidden">
-              {item.name}
+              <span className="flex items-center gap-3"><CategoryGlyph name={item.name} />{item.name}</span>
               <span aria-hidden="true" className="transition group-open/sub:rotate-180">⌄</span>
             </summary>
             <div className="pl-4">
