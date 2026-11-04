@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import BookCard from "@/components/book-card";
-import { getSavings, type Book } from "@/lib/books";
+import { bookCategories, getSavings, type Book } from "@/lib/books";
 import {
   getPublishedBookCategories,
   getPublishedBooks,
@@ -78,7 +78,14 @@ async function loadCategoryTiles(): Promise<HomeCategory[]> {
       .in("category_group", ["books", "products"])
       .order("sort_order")
       .limit(40);
-    if (error || !data) return [];
+    if (error || !data || data.length === 0) {
+      return bookCategories.map((category, index) => ({
+        id: category.slug,
+        name: category.title,
+        category_group: "books" as const,
+        sort_order: index,
+      }));
+    }
     return data as HomeCategory[];
   } catch {
     return [];
@@ -208,8 +215,8 @@ export default async function HomeContent() {
           </section>
         )}
 
-        {/* Trending books: real published catalog records, not hard-coded demo products. */}
-        <BookRow title="Trending · ট্রেন্ডিং বই" subtitle="নতুন প্রকাশিত বইয়ের সংগ্রহ" href="/books?sort=newest" books={books.slice(0, 12)} linkMap={linkMap} />
+        {/* Curated book row: catalog records, not a claimed popularity ranking. */}
+        <BookRow title="Explore Books · বইয়ের সংগ্রহ" subtitle="ক্যাটালগে প্রকাশিত বই থেকে বেছে নিন" href="/books" books={books.slice(0, 12)} linkMap={linkMap} />
         <ProductRow products={products} />
 
         {config.show_new_arrivals !== false && <BookRow id="new-arrivals" title={config.new_arrivals_title || "New Arrivals · নতুন বই"} subtitle="সদ্য যোগ হওয়া বই" href="/books?sort=newest" books={newArrivals} linkMap={linkMap} />}
