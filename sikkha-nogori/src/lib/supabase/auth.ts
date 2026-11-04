@@ -18,5 +18,21 @@ export async function requireCustomer() {
     redirect("/login?status=sign-in-required");
   }
 
+  const { data: customerProfile, error: profileError } = await supabase
+    .from("customer_profiles")
+    .select("account_status")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (profileError) {
+    throw new Error("Unable to verify customer account status.", {
+      cause: profileError,
+    });
+  }
+  if (customerProfile?.account_status === "suspended") {
+    await supabase.auth.signOut();
+    redirect("/login?status=suspended");
+  }
+
   return { supabase, user };
 }

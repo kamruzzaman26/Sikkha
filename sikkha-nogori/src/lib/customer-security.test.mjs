@@ -23,7 +23,7 @@ test("customer role and profile fields cannot be elevated by authenticated users
   );
 });
 
-test("customer email signup returns through the configured confirmation callback", async () => {
+test("customer email signup verifies a one-time code and keeps the confirmation callback route", async () => {
   const actions = await readFile(
     new URL("../app/login/actions.ts", import.meta.url),
     "utf8",
@@ -37,7 +37,7 @@ test("customer email signup returns through the configured confirmation callback
     "utf8",
   );
 
-  assert.match(actions, /emailRedirectTo:\s*new URL\("\/auth\/confirm", getPublicSiteOrigin\(\)\)/);
+  assert.match(actions, /verifyOtp\(\{ email, token, type: "email" \}\)/);
   assert.match(confirmation, /exchangeCodeForSession\(code\)/);
   assert.match(confirmation, /verifyOtp\(\s*\{\s*token_hash:\s*tokenHash/s);
   assert.match(supabaseEnv, /NEXT_PUBLIC_SITE_URL/);
@@ -100,4 +100,62 @@ test("affiliate referrals cannot grant admin permissions and only verified order
   assert.match(migration, /create or replace function public\.admin_review_affiliate/i);
   assert.match(migration, /create or replace function public\.get_my_affiliate_stats\(\)[\s\S]+status = 'active'/i);
   assert.match(migration, /grant execute on function public\.get_my_affiliate_stats\(\) to authenticated/i);
+});
+
+
+test("customer authentication supports either email or verified phone identifiers", async () => {
+  const actions = await readFile(
+    new URL("../app/login/actions.ts", import.meta.url),
+    "utf8",
+  );
+  const loginPage = await readFile(
+    new URL("../app/login/page.tsx", import.meta.url),
+    "utf8",
+  );
+  const verifyPage = await readFile(
+    new URL("../app/verify-phone/page.tsx", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(actions, /signInWithPassword\(credentials\)/);
+  assert.match(actions, /phone:\s*contact\.value/);
+  assert.match(actions, /email:\s*contact\.value/);
+  assert.match(actions, /verifyOtp\([\s\S]+type:\s*"sms"/);
+  assert.match(loginPage, /ইমেইল অথবা মোবাইল নম্বর/);
+  assert.match(verifyPage, /one-time-code/);
+});
+
+test("customer admin RPC returns real phone and status fields and can update suspension", async () => {
+  const migration = await readFile(
+    new URL("../../../supabase/migrations/20261102150000_customer_auth_and_admin_account_fix.sql", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(migration, /coalesce\(nullif\(cp\.phone, ''\), u\.phone, ''\)/);
+  assert.match(migration, /coalesce\(cp\.account_status, 'active'\)/);
+  assert.match(migration, /set account_status = excluded\.account_status/);
+  assert.match(migration, /new\.phone/);
+  assert.match(migration, /role = 'admin'/);
+});
+
+test("customer signup enforces the agreed 8-character password minimum in server and forms", async () => {
+  const actions = await readFile(
+    new URL("../app/login/actions.ts", import.meta.url),
+    "utf8",
+  );
+  const loginPage = await readFile(
+    new URL("../app/login/page.tsx", import.meta.url),
+    "utf8",
+  );
+  const registerPage = await readFile(
+    new URL("../app/register/page.tsx", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(actions, /password\.length < 8/);
+  assert.match(loginPage, /minLength=\{8\}/);
+  assert.match(registerPage, /minLength=\{8\}/);
+  assert.doesNotMatch(actions, /password\.length < 12/);
+  assert.doesNotMatch(loginPage, /minLength=\{12\}/);
+  assert.doesNotMatch(registerPage, /minLength=\{12\}/);
 });
