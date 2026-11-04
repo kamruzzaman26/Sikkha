@@ -138,7 +138,7 @@ function ProductRow({ products }: { products: CatalogProduct[] }) {
   return (
     <section className="py-6 sm:py-8">
       <div className="mb-4 flex items-end justify-between gap-3">
-        <div><h2 className="text-xl font-extrabold tracking-tight text-slate-900 sm:text-2xl">Trending Products · জনপ্রিয় পণ্য</h2><p className="mt-1 text-sm text-slate-600">ক্যাটালগে প্রকাশিত পণ্য</p></div>
+        <div><h2 className="text-xl font-extrabold tracking-tight text-slate-900 sm:text-2xl">Featured Products · প্রয়োজনীয় পণ্য</h2><p className="mt-1 text-sm text-slate-600">বাছাই করা প্রয়োজনীয় পণ্য</p></div>
         <Link href="/products" className="inline-flex min-h-10 items-center rounded-xl px-3 text-sm font-bold text-emerald-800 hover:bg-emerald-50">সব দেখুন →</Link>
       </div>
       <div className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-3 [scrollbar-width:none] sm:mx-0 sm:px-0">
@@ -198,6 +198,39 @@ export default async function HomeContent() {
             ))}
           </div>
           <div className="mt-1 flex justify-center gap-1.5" aria-hidden="true">{homeSettings.slides.map((slide, index) => <span key={slide.title} className={`h-1.5 rounded-full ${index === 0 ? "w-5 bg-emerald-700" : "w-1.5 bg-slate-300"}`} />)}</div>
+        </section>
+
+        {/* Store benefits and curated discovery shortcuts. Keep claims limited to features currently available. */}
+        <section aria-label="শিক্ষা নগরীর সুবিধা" className="mt-3 grid grid-cols-1 gap-2 rounded-2xl border border-emerald-100 bg-white p-3 shadow-sm sm:grid-cols-3 sm:gap-3 sm:p-4">
+          <div className="flex items-center gap-3 rounded-xl bg-emerald-50/70 px-3 py-3">
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-white text-xl" aria-hidden="true">📚</span>
+            <div><p className="text-sm font-extrabold text-slate-900">বইয়ের বিশাল সংগ্রহ</p><p className="text-xs text-slate-600">বিভিন্ন বিষয়ের বই এক জায়গায়</p></div>
+          </div>
+          <div className="flex items-center gap-3 rounded-xl bg-emerald-50/70 px-3 py-3">
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-white text-xl" aria-hidden="true">🔎</span>
+            <div><p className="text-sm font-extrabold text-slate-900">সহজে খুঁজে নিন</p><p className="text-xs text-slate-600">নাম, লেখক বা বিভাগ দিয়ে সার্চ</p></div>
+          </div>
+          <div className="flex items-center gap-3 rounded-xl bg-emerald-50/70 px-3 py-3">
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-white text-xl" aria-hidden="true">🛒</span>
+            <div><p className="text-sm font-extrabold text-slate-900">সহজ অর্ডার</p><p className="text-xs text-slate-600">বইয়ের বিস্তারিত দেখে অর্ডার করুন</p></div>
+          </div>
+        </section>
+
+        <section aria-labelledby="featured-collections" className="mt-5">
+          <div className="mb-3 flex items-end justify-between gap-3">
+            <div><h2 id="featured-collections" className="text-lg font-extrabold text-slate-900 sm:text-xl">বিশেষ বইয়ের সংগ্রহ</h2><p className="mt-1 text-sm text-slate-600">আপনার প্রয়োজন অনুযায়ী বই খুঁজুন</p></div>
+            <Link href="/books" className="shrink-0 text-sm font-bold text-emerald-800 hover:underline">সব বই →</Link>
+          </div>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <Link href="/books?q=আরবি" className="group relative flex min-h-32 items-center justify-between overflow-hidden rounded-2xl bg-gradient-to-r from-[#075b46] to-[#0b8061] p-5 text-white shadow-sm transition hover:shadow-md">
+              <span className="relative z-10"><span className="block text-xs font-semibold text-emerald-100">ARABIC BOOKS</span><span className="mt-1 block text-xl font-extrabold">আরবি ও ইসলামি বই</span><span className="mt-2 inline-flex rounded-lg bg-white/15 px-3 py-1.5 text-xs font-bold">বই খুঁজুন →</span></span>
+              <span className="absolute -right-2 -bottom-7 text-8xl opacity-20 transition group-hover:scale-110" aria-hidden="true">📖</span>
+            </Link>
+            <Link href="/books?q=বোর্ড" className="group relative flex min-h-32 items-center justify-between overflow-hidden rounded-2xl bg-gradient-to-r from-[#344c72] to-[#526b94] p-5 text-white shadow-sm transition hover:shadow-md">
+              <span className="relative z-10"><span className="block text-xs font-semibold text-blue-100">BOARD BOOKS</span><span className="mt-1 block text-xl font-extrabold">বোর্ডের পাঠ্যবই</span><span className="mt-2 inline-flex rounded-lg bg-white/15 px-3 py-1.5 text-xs font-bold">বই খুঁজুন →</span></span>
+              <span className="absolute -right-2 -bottom-7 text-8xl opacity-20 transition group-hover:scale-110" aria-hidden="true">🎓</span>
+            </Link>
+          </div>
         </section>
 
         {/* Category icon grid: root categories come from the active database taxonomy. */}
