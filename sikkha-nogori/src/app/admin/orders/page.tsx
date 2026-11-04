@@ -14,38 +14,38 @@ import {
 } from "./actions";
 
 export const metadata: Metadata = {
-  title: "অর্ডার পরিচালনা | শিক্ষা নগরী",
+  title: "Order Management | Sikkha Nogori",
   robots: { index: false, follow: false },
 };
 
 const orderStatusLabels = {
-  pending: "অপেক্ষমাণ",
-  confirmed: "নিশ্চিত",
-  processing: "প্রস্তুত হচ্ছে",
-  shipped: "পাঠানো হয়েছে",
-  delivered: "ডেলিভারি সম্পন্ন",
-  cancelled: "বাতিল",
+  pending: "Pending",
+  confirmed: "Confirmed",
+  processing: "Processing",
+  shipped: "Shipped",
+  delivered: "Delivered",
+  cancelled: "Cancelled",
 } as const;
 
 const paymentStatusLabels = {
-  awaiting: "পেমেন্টের অপেক্ষায়",
-  submitted: "যাচাইয়ের অপেক্ষায়",
-  verified: "পেমেন্ট যাচাই হয়েছে",
-  rejected: "পেমেন্ট রেফারেন্স প্রত্যাখ্যাত",
-  failed: "পেমেন্ট ব্যর্থ",
-  cancelled: "পেমেন্ট বাতিল",
-  refunded: "পেমেন্ট ফেরত দেওয়া হয়েছে",
+  awaiting: "Awaiting payment",
+  submitted: "Awaiting verification",
+  verified: "Payment verified",
+  rejected: "Payment reference rejected",
+  failed: "Payment failed",
+  cancelled: "পেমেন্ট Cancelled",
+  refunded: "Refunded",
 } as const;
 
 const statusMessages = {
-  "order-updated": "অর্ডারের অবস্থা হালনাগাদ হয়েছে।",
-  "payment-verified": "পেমেন্ট যাচাই করে Paid চিহ্নিত হয়েছে।",
-  "payment-rejected": "পেমেন্ট reference প্রত্যাখ্যান করা হয়েছে।",
-  "refund-recorded": "রিফান্ড রেকর্ড হয়েছে; entitlement প্রত্যাহার করা হয়েছে।",
-  invalid: "তথ্য যাচাই করুন।",
-  forbidden: "এই কাজের জন্য Admin অনুমতি প্রয়োজন।",
-  "not-found": "অর্ডারটি পাওয়া যায়নি।",
-  "invalid-transition": "এই অর্ডারের বর্তমান অবস্থায় পরিবর্তনটি অনুমোদিত নয়।",
+  "order-updated": "Order status updated.",
+  "payment-verified": "Payment verified and marked as Paid.",
+  "payment-rejected": "Payment reference rejected.",
+  "refund-recorded": "Refund recorded and entitlement revoked.",
+  invalid: "Please verify the information.",
+  forbidden: "Administrator permission is required for this action.",
+  "not-found": "Order not found.",
+  "invalid-transition": "This status transition is not allowed for the current order state.",
 } as const;
 
 type AdminOrder = {
@@ -147,28 +147,28 @@ async function AdminOrdersContent({
       <div className="mx-auto max-w-5xl">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <Link href="/admin" className="font-semibold text-emerald-700">
-            ← প্রশাসনিক প্যানেল
+            ← Admin workspace
           </Link>
           <form action={logoutAdmin}>
             <button
               type="submit"
               className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-white"
             >
-              লগআউট
+              Sign out
             </button>
           </form>
         </div>
 
         <header className="mt-8">
           <p className="text-sm font-bold text-emerald-700">
-            শিক্ষা নগরী · প্রশাসন
+            SIKKHA NOGORI · ADMINISTRATION
           </p>
           <h1 className="mt-2 text-3xl font-extrabold sm:text-4xl">
-            অর্ডার পরিচালনা
+            Order Management
           </h1>
           <p className="mt-3 leading-7 text-slate-600">
-            সর্বশেষ ১০০টি অর্ডার দেখুন। ম্যানুয়াল পেমেন্ট যাচাই ছাড়া Paid হয়
-            না; COD-তে ডেলিভারি সম্পন্ন ও নগদ গ্রহণের পর যাচাই করুন।
+            Showing the latest 100 orders. Orders are not marked Paid without manual payment verification
+            না; COD-তে Delivered ও নগদ গ্রহণের পর যাচাই করুন।
           </p>
         </header>
 
@@ -183,7 +183,7 @@ async function AdminOrdersContent({
 
         {typedOrders.length === 0 ? (
           <p className="mt-7 rounded-2xl border border-dashed border-slate-300 bg-white px-5 py-10 text-center text-slate-600">
-            এখনো কোনো অর্ডার নেই।
+            No orders yet.
           </p>
         ) : (
           <ul className="mt-7 grid gap-5">
@@ -217,7 +217,7 @@ async function AdminOrdersContent({
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div>
                       <h2 className="font-bold">
-                        অর্ডার · {order.id.slice(0, 8).toUpperCase()}
+                        Order · {order.id.slice(0, 8).toUpperCase()}
                       </h2>
                       <p className="mt-1 break-all text-xs text-slate-500">
                         Customer ID: {order.user_id}
@@ -263,27 +263,27 @@ async function AdminOrdersContent({
 
                   <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
                     <div>
-                      <dt className="font-semibold text-slate-600">গ্রাহক</dt>
+                      <dt className="font-semibold text-slate-600">Customer</dt>
                       <dd className="mt-1">
                         {order.customer_name} · {order.customer_phone}
                       </dd>
                     </div>
                     <div>
                       <dt className="font-semibold text-slate-600">
-                        পেমেন্ট মেথড
+                        Payment Method
                       </dt>
                       <dd className="mt-1">{order.payment_method_name}</dd>
                     </div>
                     <div>
                       <dt className="font-semibold text-slate-600">
-                        ডেলিভারি ঠিকানা
+                        Delivery Address
                       </dt>
                       <dd className="mt-1 whitespace-pre-wrap">
                         {order.delivery_address}
                       </dd>
                     </div>
                     <div>
-                      <dt className="font-semibold text-slate-600">সর্বমোট</dt>
+                      <dt className="font-semibold text-slate-600">Grand Total</dt>
                       <dd className="mt-1 text-lg font-extrabold text-emerald-800">
                         {formatBDT(order.total_amount)}{" "}
                         <span className="text-sm">({order.currency})</span>
@@ -299,7 +299,7 @@ async function AdminOrdersContent({
                       </span>
                       {latestSubmission.rejection_reason && (
                         <span className="mt-1 block text-amber-900">
-                          প্রত্যাখ্যানের কারণ: {latestSubmission.rejection_reason}
+                          Rejection reason: {latestSubmission.rejection_reason}
                         </span>
                       )}
                     </p>
@@ -312,7 +312,7 @@ async function AdminOrdersContent({
                     >
                       <input type="hidden" name="orderId" value={order.id} />
                       <label className="sr-only" htmlFor={`refund-${order.id}`}>
-                        রিফান্ডের কারণ ও সম্পন্ন হওয়ার বিবরণ
+                        Refund reason and completion details
                       </label>
                       <input
                         id={`refund-${order.id}`}
@@ -320,18 +320,18 @@ async function AdminOrdersContent({
                         required
                         minLength={3}
                         maxLength={500}
-                        placeholder="পেমেন্ট ফেরত সম্পন্ন হওয়ার বিবরণ"
+                        placeholder="Refund completion details"
                         className="w-full rounded-lg border border-rose-300 px-3 py-2"
                       />
                       <button
                         type="submit"
                         className="min-h-10 rounded-lg border border-rose-700 px-4 py-2 font-bold text-rose-900 hover:bg-rose-100"
                       >
-                        সম্পন্ন রিফান্ড রেকর্ড
+                        Record Completed Refund
                       </button>
                       <p className="text-sm leading-6 text-rose-900 sm:col-span-2">
-                        বাইরের payment provider/ব্যাংকে ফেরত সম্পন্ন হওয়ার পরই
-                        রেকর্ড করুন; এই সিস্টেম টাকা পাঠায় না।
+                        Only record this after the refund has been completed by the external payment provider or bank.
+                        This system does not transfer money.
                       </p>
                     </form>
                   )}
@@ -340,12 +340,12 @@ async function AdminOrdersContent({
                     <section className="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-4">
                       <h3 className="font-bold text-amber-950">
                         {canVerifyCodPayment
-                          ? "COD পেমেন্ট যাচাই"
-                          : "ম্যানুয়াল পেমেন্ট যাচাই"}
+                          ? "Verify COD Payment"
+                          : "Verify Manual Payment"}
                       </h3>
                       {canVerifyCodPayment && (
                         <p className="mt-1 text-sm leading-6 text-amber-950">
-                          গ্রাহকের কাছ থেকে নগদ গ্রহণ নিশ্চিত না হলে যাচাই করবেন না।
+                          Customerের কাছ থেকে নগদ গ্রহণ Confirmed না হলে যাচাই করবেন না।
                         </p>
                       )}
                       <div className="mt-3 flex flex-wrap gap-3">
@@ -364,7 +364,7 @@ async function AdminOrdersContent({
                             type="submit"
                             className="min-h-10 rounded-lg bg-emerald-700 px-4 py-2 font-bold text-white hover:bg-emerald-800"
                           >
-                            পেমেন্ট যাচাই ও Paid করুন
+                            Verify Payment & Mark Paid
                           </button>
                         </form>
                         {canReviewManualPayment && (
@@ -383,21 +383,21 @@ async function AdminOrdersContent({
                               value="rejected"
                             />
                             <label className="sr-only" htmlFor={`reject-${order.id}`}>
-                              পেমেন্ট প্রত্যাখ্যানের কারণ
+                              Payment Rejection Reason
                             </label>
                             <input
                               id={`reject-${order.id}`}
                               name="rejectionReason"
                               required
                               maxLength={500}
-                              placeholder="প্রত্যাখ্যানের কারণ"
+                              placeholder="Reason for rejection"
                               className="w-full rounded-lg border border-amber-300 px-3 py-2"
                             />
                             <button
                               type="submit"
                               className="min-h-10 rounded-lg border border-amber-700 px-4 py-2 font-bold text-amber-900 hover:bg-amber-100"
                             >
-                              Reference প্রত্যাখ্যান
+                              Reject Reference
                             </button>
                           </form>
                         )}
