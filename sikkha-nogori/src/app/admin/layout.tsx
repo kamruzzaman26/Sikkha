@@ -27,8 +27,10 @@ async function AdminChrome({ children }: { children: React.ReactNode }) {
 
 export default function AdminLayout({ children }: LayoutProps<"/admin">) {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[#f7faf8]" />}>
-      <AdminChrome>{children}</AdminChrome>
-    </Suspense>
+    <div data-admin-route>
+      <Suspense fallback={<div className="min-h-screen bg-[#f3f7f5]" />}>
+        <AdminChrome>{children}</AdminChrome>
+      </Suspense>
+    </div>
   );
 }
