@@ -7,17 +7,17 @@ import { bestSellers, summarizeOrders } from "@/lib/admin-stats.mjs";
 import { requireAdmin } from "@/lib/supabase/admin";
 
 export const metadata: Metadata = {
-  title: "Dashboard | শিক্ষা নগরী প্রশাসন",
+  title: "Dashboard | Sikkha Nogori Admin",
   robots: { index: false, follow: false },
 };
 
 const orderStatusLabels: Record<string, string> = {
-  pending: "অপেক্ষমাণ",
-  confirmed: "নিশ্চিত",
-  processing: "প্রস্তুত হচ্ছে",
-  shipped: "পাঠানো হয়েছে",
-  delivered: "ডেলিভারি সম্পন্ন",
-  cancelled: "বাতিল",
+  pending: "Pending",
+  confirmed: "Confirmed",
+  processing: "Processing",
+  shipped: "Shipped",
+  delivered: "Delivered",
+  cancelled: "Cancelled",
 };
 
 function Card({
@@ -30,7 +30,7 @@ function Card({
   note?: string;
 }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-4">
+    <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_8px_24px_-20px_rgba(15,55,42,0.45)]">
       <p className="text-sm text-slate-600">{label}</p>
       <p className="mt-1 text-2xl font-extrabold tabular-nums">{value}</p>
       {note && <p className="mt-1 text-xs text-slate-500">{note}</p>}
@@ -41,7 +41,7 @@ function Card({
 function Unavailable({ what }: { what: string }) {
   return (
     <p className="rounded-xl bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-950">
-      {what} লোড করা যায়নি। ডেটাবেস অনুমতি বা সংযোগ যাচাই করুন।
+      Unable to load {what}. Check database permissions or connectivity.
     </p>
   );
 }
@@ -81,19 +81,19 @@ async function DashboardContent() {
   const top = bestSellers(itemsResult.data ?? []);
 
   return (
-    <main className="min-h-screen bg-[#f7faf8] px-5 py-8 text-slate-900 sm:px-8">
-      <div className="mx-auto max-w-6xl">
-        <p className="text-sm font-bold text-emerald-700">শিক্ষা নগরী · প্রশাসন</p>
-        <h1 className="mt-1 text-3xl font-extrabold">Dashboard</h1>
+    <main className="min-h-screen bg-[#f3f7f5] px-4 py-6 text-slate-900 sm:px-7 sm:py-8 xl:px-10">
+      <div className="mx-auto max-w-[1500px]">
+        <p className="text-[11px] font-extrabold uppercase tracking-[0.2em] text-emerald-700">SIKKHA NOGORI · ADMINISTRATION</p>
+        <h1 className="mt-2 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">Dashboard Overview</h1>
         <p className="mt-2 text-sm leading-6 text-slate-600">
-          সব সংখ্যা সরাসরি ডেটাবেস থেকে। বিক্রি গণনায় শুধু পেমেন্ট যাচাই হওয়া
-          অর্ডার ধরা হয় (ঢাকার সময় অনুযায়ী আজ/মাস)।
+          All metrics are retrieved directly from the database. Sales include only payment-verified
+          orders (today / month based on Dhaka time).
         </p>
 
-        <h2 className="mt-8 text-lg font-bold">Sales / বিক্রি</h2>
+        <h2 className="mt-8 text-lg font-bold">Sales Overview</h2>
         {ordersResult.error ? (
           <div className="mt-3">
-            <Unavailable what="অর্ডারের তথ্য" />
+            <Unavailable what="order data" />
           </div>
         ) : (
           <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -107,11 +107,11 @@ async function DashboardContent() {
           </div>
         )}
 
-        <h2 className="mt-8 text-lg font-bold">Catalog ও Customers</h2>
+        <h2 className="mt-8 text-lg font-bold">Catalog & Customers</h2>
         <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {productsResult.error ? (
             <div className="sm:col-span-2 lg:col-span-4">
-              <Unavailable what="পণ্যের তথ্য" />
+              <Unavailable what="product data" />
             </div>
           ) : (
             <>
@@ -127,20 +127,20 @@ async function DashboardContent() {
           )}
           {usersResult.error ? (
             <div className="sm:col-span-2">
-              <Unavailable what="ব্যবহারকারীর তথ্য" />
+              <Unavailable what="user data" />
             </div>
           ) : (
             <Card
               label="Total Users"
               value={String((usersResult.data ?? []).length)}
-              note="অ্যাডমিনসহ সব নিবন্ধিত অ্যাকাউন্ট"
+              note="All registered accounts, including administrators"
             />
           )}
         </div>
         <p className="mt-3 rounded-xl border border-dashed border-slate-300 bg-white px-4 py-3 text-sm leading-6 text-slate-600">
-          Low Stock / Out of Stock: <strong>এখনো প্রযোজ্য নয়</strong> — স্টক
+          Low Stock / Out of Stock: <strong>Not available yet</strong> — স্টক
           ট্র্যাকিং (Inventory) ডেটাবেসে এখনো যোগ হয়নি, তাই কোনো সংখ্যা
-          দেখানো হচ্ছে না।
+          are displayed.
         </p>
 
         <div className="mt-8 grid gap-6 lg:grid-cols-2">
@@ -148,7 +148,7 @@ async function DashboardContent() {
             <h2 className="text-lg font-bold">Recent Orders</h2>
             {recent.length === 0 ? (
               <p className="mt-3 rounded-xl border border-slate-200 bg-white px-4 py-6 text-center text-sm text-slate-600">
-                এখনো কোনো অর্ডার নেই।
+                No orders yet.
               </p>
             ) : (
               <ul className="mt-3 divide-y divide-slate-100 rounded-xl border border-slate-200 bg-white">
@@ -172,7 +172,7 @@ async function DashboardContent() {
               href="/admin/orders"
               className="mt-3 inline-block text-sm font-semibold text-emerald-800 hover:underline"
             >
-              সব অর্ডার দেখুন
+              View all orders
             </Link>
           </section>
 
@@ -184,7 +184,7 @@ async function DashboardContent() {
               </div>
             ) : top.length === 0 ? (
               <p className="mt-3 rounded-xl border border-slate-200 bg-white px-4 py-6 text-center text-sm text-slate-600">
-                এখনো বিক্রির তথ্য নেই।
+                No sales data yet.
               </p>
             ) : (
               <ol className="mt-3 divide-y divide-slate-100 rounded-xl border border-slate-200 bg-white">
@@ -197,7 +197,7 @@ async function DashboardContent() {
                       {item.title}
                     </span>
                     <span className="shrink-0 tabular-nums text-slate-600">
-                      {item.quantity} কপি
+                      {item.quantity} units
                     </span>
                   </li>
                 ))}
@@ -207,8 +207,8 @@ async function DashboardContent() {
         </div>
 
         <p className="mt-8 text-xs leading-5 text-slate-500">
-          Sales Analytics চার্ট, Revenue Report ও Date-range রিপোর্ট পরবর্তী
-          ফেজে (Reports) যুক্ত হবে — এখনো তৈরি হয়নি।
+          Sales analytics charts, revenue reports, and date-range reports will be added in a future
+          phase (Reports). These features are not available yet.
         </p>
       </div>
     </main>
@@ -219,7 +219,7 @@ export default function AdminDashboardPage() {
   return (
     <Suspense
       fallback={
-        <main className="min-h-screen bg-[#f7faf8] px-5 py-8">
+        <main className="min-h-screen bg-[#f3f7f5] px-5 py-8">
           <div className="mx-auto h-64 max-w-6xl animate-pulse rounded-2xl bg-white" />
         </main>
       }
