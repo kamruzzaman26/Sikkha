@@ -2,6 +2,7 @@ import "server-only";
 
 import { createSupabasePublicServerClient } from "@/lib/supabase/server";
 import { getCategorySlug, type Book } from "@/lib/books";
+import { collectCategoryIds, rootCategoryCounts } from "@/lib/category-tree.mjs";
 
 export type CatalogProduct = {
   id: string;
@@ -113,6 +114,39 @@ export async function getPublishedCourseBySlug(
   return data ?? undefined;
 }
 
+const emptyUuid = "00000000-0000-0000-0000-000000000000";
+
+async function getBookCategoryProductIds(
+  supabase: ReturnType<typeof createSupabasePublicServerClient>,
+  category: string,
+): Promise<string[] | null> {
+  const { data: rows, error } = await supabase
+    .from("categories")
+    .select("id, parent_id, name")
+    .eq("category_group", "books")
+    .eq("is_active", true)
+    .limit(1000);
+  if (error || !rows) {
+    return null;
+  }
+
+  const categoryIds = collectCategoryIds(rows, category);
+  if (categoryIds.length === 0) {
+    return null;
+  }
+
+  const { data: links, error: linkError } = await supabase
+    .from("product_categories")
+    .select("product_id")
+    .in("category_id", categoryIds)
+    .limit(1000);
+  if (linkError || !links) {
+    return null;
+  }
+
+  return [...new Set(links.map((link) => link.product_id as string))];
+}
+
 export async function getPublishedBooks({
   page,
   query,
@@ -150,7 +184,23 @@ export async function getPublishedBooks({
     request = request.or(searchFilters);
   }
   if (category) {
-    request = request.eq("category", category);
+    const linkedIds = await getBookCategoryProductIds(supabase, category);
+    if (linkedIds === null) {
+      request = request.eq("category", category);
+    } else {
+      const { data: legacyRows } = await supabase
+        .from("products")
+        .select("id")
+        .eq("category", category)
+        .limit(1000);
+      const ids = [
+        ...new Set([
+          ...linkedIds,
+          ...(legacyRows ?? []).map((row) => row.id as string),
+        ]),
+      ];
+      request = request.in("id", ids.length > 0 ? ids : [emptyUuid]);
+    }
   }
 
   if (sort === "newest") {
@@ -355,8 +405,50 @@ export async function getPublishedBookBySlug(
   return data ?? undefined;
 }
 
+async function getTaxonomyBookCategoryNames(
+  supabase: ReturnType<typeof createSupabasePublicServerClient>,
+): Promise<string[]> {
+  const [categoriesResult, linksResult, productsResult] = await Promise.all([
+    supabase
+      .from("categories")
+      .select("id, parent_id, name, sort_order")
+      .eq("category_group", "books")
+      .eq("is_active", true)
+      .limit(1000),
+    supabase.from("product_categories").select("category_id, product_id").limit(5000),
+    supabase
+      .from("products")
+      .select("id")
+      .eq("product_type", "book")
+      .eq("is_published", true)
+      .is("archived_at", null)
+      .not("commerce_mode", "is", null)
+      .limit(5000),
+  ]);
+
+  if (
+    categoriesResult.error ||
+    linksResult.error ||
+    productsResult.error ||
+    !categoriesResult.data ||
+    !linksResult.data ||
+    !productsResult.data
+  ) {
+    return [];
+  }
+
+  const publishedIds = new Set(productsResult.data.map((row) => row.id as string));
+  const links = linksResult.data.filter((link) => publishedIds.has(link.product_id));
+  return rootCategoryCounts(categoriesResult.data, links).map(({ name }) => name);
+}
+
 export async function getPublishedBookCategories(): Promise<string[] | null> {
   const supabase = createSupabasePublicServerClient();
+  const taxonomyNames = await getTaxonomyBookCategoryNames(supabase);
+  if (taxonomyNames.length > 0) {
+    return taxonomyNames;
+  }
+
   const { data, error } = await supabase
     .from("products")
     .select("category")
