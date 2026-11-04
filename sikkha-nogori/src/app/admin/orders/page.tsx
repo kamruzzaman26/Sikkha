@@ -223,7 +223,7 @@ async function AdminOrdersContent({
                         Customer ID: {order.user_id}
                       </p>
                       <p className="mt-1 text-sm text-slate-600">
-                        {new Date(order.created_at).toLocaleString("bn-BD")}
+                        {new Date(order.created_at).toLocaleString("en-GB")}
                       </p>
                     </div>
                     <div className="flex flex-wrap gap-2">
