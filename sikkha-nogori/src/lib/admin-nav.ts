@@ -28,8 +28,8 @@ export const adminNav: AdminNavGroup[] = [
   {
     title: "Website Control",
     items: [
-      { label: "Homepage Builder", icon: "homepage" },
-      { label: "Banners", icon: "banners" },
+      { label: "Homepage Builder", icon: "homepage", href: "/admin/homepage" },
+      { label: "Banners", icon: "banners", href: "/admin/banners" },
       { label: "Navigation", icon: "navigation" },
       { label: "Pages", icon: "pages" },
       { label: "Blog", icon: "blog", href: "/admin/blog" },
