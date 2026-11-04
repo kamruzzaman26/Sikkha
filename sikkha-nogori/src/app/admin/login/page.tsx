@@ -35,7 +35,7 @@ async function AdminLoginContent({
         <p className="mt-8 text-[11px] font-extrabold uppercase tracking-[0.2em] text-emerald-700">
           ADMIN PORTAL
         </p>
-        <h1 className="mt-2 text-3xl font-black tracking-tight text-slate-950">Administrator Sign In</h1>
+        <h1 className="mt-2 text-3xl font-black tracking-tight text-slate-950">Admin Login</h1>
         <p className="mt-3 leading-7 text-slate-600">
           Sign in with an authorized administrator account.
         </p>
