@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useRef } from "react";
 import { AdminIcon } from "@/components/admin-icons";
 import { AdminNavLink } from "@/components/admin-nav-link";
 import { adminNav } from "@/lib/admin-nav";
@@ -43,6 +46,8 @@ function Brand() {
 }
 
 export function AdminShell({ children }: { children: React.ReactNode }) {
+  const mobileMenuRef = useRef<HTMLDetailsElement>(null);
+
   return (
     <div lang="en" className="min-h-screen bg-[#f3f7f5] lg:flex">
       <aside className="sticky top-0 hidden h-screen w-[276px] shrink-0 flex-col overflow-y-auto border-r border-white/10 bg-[#082f29] px-4 py-5 text-white lg:flex">
@@ -57,7 +62,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         </div>
       </aside>
       <div className="min-w-0 flex-1">
-        <details className="group sticky top-0 z-30 border-b border-slate-200 bg-white/95 shadow-sm backdrop-blur lg:hidden">
+        <details ref={mobileMenuRef} className="group sticky top-0 z-30 border-b border-slate-200 bg-white/95 shadow-sm backdrop-blur lg:hidden">
           <summary className="flex min-h-[62px] cursor-pointer list-none items-center gap-3 px-4">
             <span className="flex size-9 items-center justify-center rounded-xl bg-[#0a5748] text-xs font-black text-white">SN</span>
             <span className="flex-1">
@@ -66,7 +71,14 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             </span>
             <span className="flex size-9 items-center justify-center rounded-xl bg-emerald-50 text-emerald-900"><AdminIcon name="menu" /></span>
           </summary>
-          <div className="max-h-[75vh] overflow-y-auto border-t border-slate-100 bg-[#082f29] px-3 py-5 text-white">
+          <div
+            onClick={(event) => {
+              if ((event.target as HTMLElement).closest("a")) {
+                mobileMenuRef.current?.removeAttribute("open");
+              }
+            }}
+            className="max-h-[75vh] overflow-y-auto border-t border-slate-100 bg-[#082f29] px-3 py-5 text-white"
+          >
             <NavList />
           </div>
         </details>
