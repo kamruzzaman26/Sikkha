@@ -229,7 +229,7 @@ export default async function AdminCategoriesPage({
               name="markdown"
               required
               rows={10}
-              placeholder={"- উপন্যাস | novels\n  - সমকালীন উপন্যাস\n  - ঐতিহাসিক উপন্যাস\n- গল্প\n  - ছোটগল্প"}
+              placeholder={"- Novels | novels\n  - Contemporary Novels\n  - Historical Novels\n- Stories\n  - Short Stories"}
               className="w-full rounded-lg border border-slate-300 p-3 font-mono text-sm leading-6"
             />
             <p className="mt-1 text-xs text-slate-500">Up to 200 lines per import.</p>
