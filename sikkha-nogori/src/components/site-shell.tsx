@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { Suspense } from "react";
 import { connection } from "next/server";
 import { SiteHeader } from "@/components/site-header";
+import { SiteChrome } from "@/components/site-chrome";
 import { SiteFooter } from "@/components/site-footer";
 import {
   createSupabasePublicServerClient,
@@ -80,12 +81,15 @@ async function AuthenticatedSiteHeader() {
 
 export function SiteShell({ children }: { children: ReactNode }) {
   return (
-    <>
-      <Suspense fallback={<SiteHeader identity={null} />}>
-        <AuthenticatedSiteHeader />
-      </Suspense>
+    <SiteChrome
+      header={
+        <Suspense fallback={<SiteHeader identity={null} />}>
+          <AuthenticatedSiteHeader />
+        </Suspense>
+      }
+      footer={<SiteFooter />}
+    >
       {children}
-      <SiteFooter />
-    </>
+    </SiteChrome>
   );
 }
