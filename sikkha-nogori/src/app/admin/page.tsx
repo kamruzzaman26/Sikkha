@@ -4,6 +4,7 @@ import Link from "next/link";
 import { connection } from "next/server";
 import { Suspense } from "react";
 import { AdminBookImport } from "@/components/admin-book-import";
+import { ProductImageUpload } from "@/components/admin-product-image-upload";
 import { AdminIcon } from "@/components/admin-icons";
 import {
   logoutAdmin,
@@ -386,23 +387,7 @@ function ProductForm({
         </div>
       </div>
 
-      <div>
-        <label
-          htmlFor={`${idPrefix}-image-url`}
-          className="mb-2 block text-sm font-semibold text-slate-700"
-        >
-          Cover / Image HTTPS URL (optional)
-        </label>
-        <input
-          id={`${idPrefix}-image-url`}
-          name="imageUrl"
-          type="url"
-          inputMode="url"
-          maxLength={2048}
-          defaultValue={product?.image_url ?? ""}
-          className={inputClass}
-        />
-      </div>
+      <ProductImageUpload idPrefix={idPrefix} initialUrl={product?.image_url ?? ""} />
 
       {categoryOptions.length > 0 && (
         <fieldset className="rounded-xl border border-slate-200 p-4">
