@@ -25,7 +25,7 @@ export function CartPageClient() {
   if(cleaned.length!==current.length)writeCart(cleaned);
   setItems(cleaned);setLoading(false);
  },[]);
- useEffect(()=>{void refresh();const onChange=()=>void refresh();window.addEventListener("storage",onChange);window.addEventListener("sikkha-cart-change",onChange);return()=>{window.removeEventListener("storage",onChange);window.removeEventListener("sikkha-cart-change",onChange)}},[refresh]);
+ useEffect(()=>{void Promise.resolve().then(refresh);const onChange=()=>void refresh();window.addEventListener("storage",onChange);window.addEventListener("sikkha-cart-change",onChange);return()=>{window.removeEventListener("storage",onChange);window.removeEventListener("sikkha-cart-change",onChange)}},[refresh]);
  function update(id:string,quantity:number){const next=items.map(x=>x.productId===id?{...x,quantity}:x).filter(x=>x.quantity>0);writeCart(next);setItems(next)}
  const rows=items.map(line=>({line,product:products.find(p=>p.id===line.productId)})).filter(x=>x.product);
  const total=rows.reduce((sum,x)=>sum+(x.product?.price??0)*x.line.quantity,0);
