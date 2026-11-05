@@ -3,6 +3,7 @@ import Link from "next/link";
 // This page uses request-specific query parameters and auth cookies.
 export const instant = false;
 import { requestPasswordReset, verifyPasswordResetOtp } from "./actions";
+import { SubmitButton } from "@/components/submit-button";
 
 type PageProps = {
   searchParams: Promise<{ status?: string | string[] }>;
@@ -11,7 +12,7 @@ type PageProps = {
 const messages: Record<string, string> = {
   sent: "If an account exists for this email, a 6-digit reset code has been sent. Check your inbox and spam folder.",
   "invalid-email": "Please enter a valid email address.",
-  "invalid-code": "Invalid pin code or password",
+  "invalid-code": "Invalid code. Please check the 6-digit code and try again.",
   error: "Something went wrong. Please try again.",
 };
 
@@ -19,7 +20,6 @@ export default async function ForgotPasswordPage({ searchParams }: PageProps) {
   const params = await searchParams;
   const status = Array.isArray(params.status) ? params.status[0] : params.status;
   const message = status ? messages[status] : undefined;
-  const showCodeForm = status === "sent" || status === "invalid-code";
 
   return (
     <main className="min-h-screen bg-[#f5f8f6] px-4 py-10 text-slate-900 sm:px-6">
@@ -36,24 +36,28 @@ export default async function ForgotPasswordPage({ searchParams }: PageProps) {
             </p>
           )}
 
-          {showCodeForm ? (
-            <form action={verifyPasswordResetOtp} className="mt-6 grid gap-4">
-              <div>
-                <label htmlFor="reset-token" className="mb-2 block text-sm font-bold">Enter 6-digit code</label>
-                <input id="reset-token" name="token" type="text" inputMode="numeric" autoComplete="one-time-code" pattern="[0-9]{6}" minLength={6} maxLength={6} required placeholder="000000" className="min-h-12 w-full rounded-xl border border-slate-300 px-4 text-center text-xl tracking-[0.4em] outline-none transition focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100" />
-              </div>
-              <button type="submit" className="min-h-12 rounded-xl bg-emerald-700 px-5 font-bold text-white transition hover:bg-emerald-800">Verify Code</button>
-              <Link href="/forgot-password" className="text-center text-sm font-semibold text-emerald-800 hover:underline">Use a different email address</Link>
-            </form>
-          ) : (
-            <form action={requestPasswordReset} className="mt-6 grid gap-4">
-              <div>
-                <label htmlFor="reset-email" className="mb-2 block text-sm font-bold">Enter your email address</label>
-                <input id="reset-email" name="email" type="email" autoComplete="email" required maxLength={254} placeholder="name@example.com" className="min-h-12 w-full rounded-xl border border-slate-300 px-4 outline-none transition focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100" />
-              </div>
-              <button type="submit" className="min-h-12 rounded-xl bg-emerald-700 px-5 font-bold text-white transition hover:bg-emerald-800">Send Reset Code</button>
-            </form>
-          )}
+          <form action={requestPasswordReset} className="mt-6 grid gap-3">
+            <div>
+              <label htmlFor="reset-email" className="mb-2 block text-sm font-bold">Email Address</label>
+              <input id="reset-email" name="email" type="email" autoComplete="email" required maxLength={254} placeholder="name@example.com" className="min-h-12 w-full rounded-xl border border-slate-300 px-4 outline-none transition focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100" />
+            </div>
+            <SubmitButton pendingLabel="Sending code..." className="min-h-12 rounded-xl bg-emerald-700 px-5 font-bold text-white transition hover:bg-emerald-800">Send Reset Code</SubmitButton>
+          </form>
+
+          <div className="my-6 flex items-center gap-3" aria-hidden="true">
+            <span className="h-px flex-1 bg-slate-200" />
+            <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">Then verify your code</span>
+            <span className="h-px flex-1 bg-slate-200" />
+          </div>
+
+          <form action={verifyPasswordResetOtp} className="grid gap-3">
+            <div>
+              <label htmlFor="reset-token" className="mb-2 block text-sm font-bold">6-Digit Verification Code</label>
+              <input id="reset-token" name="token" type="text" inputMode="numeric" autoComplete="one-time-code" pattern="[0-9]{6}" minLength={6} maxLength={6} required placeholder="000000" aria-describedby="reset-code-help" className="min-h-14 w-full rounded-xl border border-slate-300 px-4 text-center text-2xl font-bold tracking-[0.5em] outline-none transition focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100" />
+              <p id="reset-code-help" className="mt-2 text-xs leading-5 text-slate-500">Enter the 6-digit code from the password reset email. The code is valid for a limited time.</p>
+            </div>
+            <SubmitButton pendingLabel="Verifying code..." className="min-h-12 rounded-xl bg-slate-900 px-5 font-bold text-white transition hover:bg-slate-800">Verify Code</SubmitButton>
+          </form>
 
           <p className="mt-6 text-center text-sm"><Link href="/login" className="font-bold text-emerald-800 hover:underline">Back to Login</Link></p>
         </section>
