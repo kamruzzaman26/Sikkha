@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 import { signOutCustomer } from "@/app/login/actions";
 
 type SiteIdentity = {
@@ -523,11 +524,11 @@ export function SiteHeader({
       )}
 
       <nav aria-label="Bottom navigation" className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 border-t border-slate-200 bg-white/95 px-1 pb-[env(safe-area-inset-bottom)] pt-1 shadow-[0_-4px_18px_rgba(15,23,42,0.08)] backdrop-blur lg:hidden">
-        <BottomNavItem href="/" icon="⌂" label="Home" />
-        <BottomNavItem href="/books" icon="▤" label="Categories" />
-        <BottomNavItem href="/cart" icon="🛒" label="Cart" />
-        <BottomNavItem href="/e-library" icon="▧" label="E-Library" />
-        <BottomNavItem href={identity ? "/dashboard/profile" : "/login"} icon="♙" label="Account" />
+        <BottomNavItem href="/" icon="⌂" label="হোম" />
+        <BottomNavItem href="/books" icon="▤" label="বই/ক্যাটাগরি" />
+        <BottomNavItem href="/cart" icon="🛒" label="কার্ট" />
+        <BottomNavItem href="/e-library" icon="▧" label="ই-লাইব্রেরি" />
+        <BottomNavItem href={identity ? "/dashboard/profile" : "/login"} icon="♙" label="অ্যাকাউন্ট" />
       </nav>
     </>
   );
@@ -571,9 +572,11 @@ function NavigationGroup({
 }
 
 function BottomNavItem({ href, icon, label, disabled = false }: { href?: string; icon: string; label: string; disabled?: boolean }) {
-  const className = "flex min-h-14 flex-col items-center justify-center gap-0.5 rounded-lg px-1 text-[10px] font-semibold text-slate-600";
-  if (disabled || !href) return <span aria-disabled="true" title={label+" page is not available yet"} className={className+" opacity-45"}><span aria-hidden="true" className="text-lg leading-5">{icon}</span>{label}</span>;
-  return <Link href={href} className={className+" hover:bg-emerald-50 hover:text-emerald-800"}><span aria-hidden="true" className="text-lg leading-5">{icon}</span>{label}</Link>;
+  const pathname = usePathname();
+  const active = Boolean(href && (href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(href + "/")));
+  const baseClass = "flex min-h-14 flex-col items-center justify-center gap-0.5 rounded-xl px-1 text-[10px] font-bold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700";
+  if (disabled || !href) return <span aria-disabled="true" title={label+" পৃষ্ঠা এখনো চালু হয়নি"} className={baseClass+" text-slate-400 opacity-60"}><span aria-hidden="true" className="text-lg leading-5">{icon}</span>{label}</span>;
+  return <Link href={href} aria-current={active ? "page" : undefined} className={baseClass + (active ? " bg-emerald-50 text-emerald-800" : " text-slate-600 hover:bg-emerald-50 hover:text-emerald-800")}><span aria-hidden="true" className="text-lg leading-5">{icon}</span><span>{label}</span>{active && <span className="sr-only">বর্তমান পৃষ্ঠা</span>}</Link>;
 }
 
 function AccountLink({
