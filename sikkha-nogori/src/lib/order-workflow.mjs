@@ -13,7 +13,23 @@ export function parseCheckoutForm(formData) {
   const customerPhone = value("customerPhone").replace(/[০-৯]/g, (digit) =>
     String(digit.charCodeAt(0) - "০".charCodeAt(0)),
   );
-  const deliveryAddress = value("deliveryAddress");
+  const streetAddress = value("deliveryAddress");
+  const division = value("division");
+  const district = value("district");
+  const thana = value("thana");
+  const area = value("area");
+  const deliveryInstructions = value("deliveryInstructions");
+  const hasStructuredAddress = [division, district, thana, area].some(Boolean);
+  const deliveryAddress = hasStructuredAddress
+    ? [
+        division && `বিভাগ: ${division}`,
+        district && `জেলা: ${district}`,
+        thana && `উপজেলা/থানা: ${thana}`,
+        area && `এলাকা: ${area}`,
+        streetAddress && `বিস্তারিত ঠিকানা: ${streetAddress}`,
+        deliveryInstructions && `ডেলিভারি নির্দেশনা: ${deliveryInstructions}`,
+      ].filter(Boolean).join(", ")
+    : streetAddress;
   const productIds = formData
     .getAll("productId")
     .map((entry) => (typeof entry === "string" ? entry.trim() : ""));
@@ -29,6 +45,14 @@ export function parseCheckoutForm(formData) {
     customerPhone.replace(/[^0-9]/g, "").length < 7 ||
     deliveryAddress.length < 10 ||
     deliveryAddress.length > 1000 ||
+    (hasStructuredAddress && (
+      division.length < 2 || division.length > 40 ||
+      district.length < 2 || district.length > 80 ||
+      thana.length < 2 || thana.length > 80 ||
+      area.length < 2 || area.length > 120 ||
+      streetAddress.length < 5 || streetAddress.length > 700 ||
+      deliveryInstructions.length > 200
+    )) ||
     productIds.length < 1 ||
     productIds.length > 20
   ) {
