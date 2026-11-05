@@ -12,6 +12,7 @@ const statusMessages: Record<string, string> = {
   "sign-in-required": "চালিয়ে যেতে আগে লগইন করুন।",
   suspended: "এই অ্যাকাউন্টটি স্থগিত; প্রশাসকের সঙ্গে যোগাযোগ করুন।",
   "confirmation-failed": "যাচাইকরণ ব্যর্থ হয়েছে। নতুন কোড নিয়ে আবার চেষ্টা করুন।",
+  "password-updated": "আপনার পাসওয়ার্ড সফলভাবে পরিবর্তন হয়েছে। নতুন পাসওয়ার্ড দিয়ে লগইন করুন।",
 };
 
 async function LoginContent({ searchParams }: Pick<PageProps<"/login">, "searchParams">) {
@@ -37,6 +38,7 @@ async function LoginContent({ searchParams }: Pick<PageProps<"/login">, "searchP
               <div><label htmlFor="signin-password" className="mb-2 block text-sm font-bold">পাসওয়ার্ড</label><input id="signin-password" name="password" type="password" autoComplete="current-password" required maxLength={128} className="min-h-12 w-full rounded-xl border border-slate-300 px-4 outline-none transition focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100" /></div>
               <SubmitButton pendingLabel="লগইন হচ্ছে…" className="min-h-12 rounded-xl bg-emerald-700 px-5 font-bold text-white transition hover:bg-emerald-800">লগইন করুন</SubmitButton>
             </form>
+            <p className="mt-4 text-right text-sm"><Link href="/forgot-password" className="font-bold text-emerald-800 hover:underline">পাসওয়ার্ড ভুলে গেছেন?</Link></p>
             <p className="mt-5 text-center text-xs leading-6 text-slate-500">মোবাইল নম্বর দিয়ে লগইন করতে হলে সেই নম্বরটি আগে Supabase Phone Auth-এ যাচাই করা থাকতে হবে।</p>
           </section>
           <section className="rounded-3xl border border-emerald-100 bg-white p-5 shadow-sm sm:p-7">
