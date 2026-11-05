@@ -12,7 +12,7 @@ const statusMessages: Record<string, string> = {
   "sign-in-required": "চালিয়ে যেতে আগে লগইন করুন।",
   suspended: "এই অ্যাকাউন্টটি স্থগিত; প্রশাসকের সঙ্গে যোগাযোগ করুন।",
   "confirmation-failed": "যাচাইকরণ ব্যর্থ হয়েছে। নতুন কোড নিয়ে আবার চেষ্টা করুন।",
-  "password-updated": "আপনার পাসওয়ার্ড সফলভাবে পরিবর্তন হয়েছে। নতুন পাসওয়ার্ড দিয়ে লগইন করুন।",
+  "password-updated": "Password updated successfully.",
 };
 
 async function LoginContent({ searchParams }: Pick<PageProps<"/login">, "searchParams">) {
