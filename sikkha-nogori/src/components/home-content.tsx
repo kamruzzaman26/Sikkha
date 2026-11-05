@@ -143,13 +143,24 @@ function ProductRow({ products }: { products: CatalogProduct[] }) {
       </div>
       <div className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-3 [scrollbar-width:none] sm:mx-0 sm:px-0">
         {products.slice(0, 12).map((product) => (
-          <Link key={product.id} href={`/products/${product.slug}`} className="w-36 shrink-0 snap-start overflow-hidden rounded-2xl border border-slate-100 bg-white p-3 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md sm:w-40">
-            <div className="flex h-32 items-center justify-center rounded-xl bg-slate-50">
-              {product.image_url ? <Image src={product.image_url} alt={product.title} width={140} height={140} unoptimized className="h-full w-full object-contain" /> : <span className="text-4xl" aria-hidden="true">🛍️</span>}
-            </div>
-            <p className="mt-3 line-clamp-2 min-h-10 text-sm font-bold leading-5 text-slate-800">{product.title}</p>
+          <article key={product.id} className="flex w-36 shrink-0 snap-start flex-col overflow-hidden rounded-2xl border border-slate-100 bg-white p-3 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md sm:w-40">
+            <Link href={`/products/${product.slug}`} className="block">
+              <div className="flex h-32 items-center justify-center rounded-xl bg-slate-50">
+                {product.image_url ? <Image src={product.image_url} alt={product.title} width={140} height={140} unoptimized className="h-full w-full object-contain" /> : <span className="text-4xl" aria-hidden="true">🛍️</span>}
+              </div>
+              <p className="mt-3 line-clamp-2 min-h-10 text-sm font-bold leading-5 text-slate-800">{product.title}</p>
+            </Link>
             <p className="mt-2 text-sm font-extrabold text-emerald-800">{product.price !== null ? `৳${new Intl.NumberFormat("en-BD").format(product.price)}` : "বিস্তারিত দেখুন"}</p>
-          </Link>
+            {product.commerce_mode === "direct" && product.price !== null ? (
+              <Link href={`/checkout?product=${encodeURIComponent(product.id)}`} className="mt-3 inline-flex min-h-10 items-center justify-center rounded-lg bg-emerald-700 px-2 py-2 text-center text-xs font-bold text-white hover:bg-emerald-800">
+                অর্ডার করুন
+              </Link>
+            ) : (
+              <Link href={`/products/${product.slug}`} className="mt-3 inline-flex min-h-10 items-center justify-center rounded-lg border border-emerald-700 px-2 py-2 text-center text-xs font-semibold text-emerald-800 hover:bg-emerald-50">
+                বিস্তারিত
+              </Link>
+            )}
+          </article>
         ))}
       </div>
     </section>
