@@ -5,7 +5,8 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import BookCover from "@/components/book-cover";
 import BookTabs, { type BookSpecRow } from "@/components/book-tabs";
-import { WishlistButton } from "@/components/wishlist-button";\nimport { AddToCartButton } from "@/components/add-to-cart-button";
+import { WishlistButton } from "@/components/wishlist-button";
+import { AddToCartButton } from "@/components/add-to-cart-button";
 import { getActiveAffiliateLinks } from "@/lib/supabase/affiliate-links";
 import { getBookBySlug, formatPrice, getSavings } from "@/lib/books";
 import {
@@ -220,12 +221,17 @@ async function BookDetails({
 
             {book.commerceMode === "direct" && book.productId ? (
               <section aria-label="কেনার অপশন" className="mt-5">
-                <Link
-                  href={`/checkout?product=${encodeURIComponent(book.productId)}`}
-                  className={`${buyButtonClass} hidden sm:inline-flex`}
-                >
-                  এখনই কিনুন · Buy Now
-                </Link>
+                <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                  <Link
+                    href={`/checkout?product=${encodeURIComponent(book.productId)}`}
+                    className={`${buyButtonClass} hidden sm:inline-flex`}
+                  >
+                    এখনই কিনুন · Buy Now
+                  </Link>
+                  <div className="sm:min-w-48">
+                    <AddToCartButton productId={book.productId} />
+                  </div>
+                </div>
                 <p className="mt-3 text-sm leading-6 text-slate-600">
                   এটি শিক্ষা নগরীর নিজস্ব বিক্রির পণ্য; অর্ডার ও ডেলিভারি সাইটের
                   checkout-এ হবে।
