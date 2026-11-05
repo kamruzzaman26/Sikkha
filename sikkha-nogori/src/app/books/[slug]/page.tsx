@@ -160,7 +160,7 @@ async function BookDetails({
 
             <section className="flex flex-col p-5 sm:p-7 lg:p-9">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="rounded-md bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-800">{book.category}</span>
+                {book.category && <span className="rounded-md bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-800">{book.category}</span>}
                 {book.edition && <span className="rounded-md bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600">{book.edition}</span>}
               </div>
               <h1 className="mt-3 text-2xl font-extrabold leading-snug text-slate-950 sm:text-3xl">{book.title}</h1>
@@ -227,7 +227,7 @@ async function BookDetails({
           <span aria-hidden="true">←</span> বইয়ের সংগ্রহে ফিরুন
         </Link>
 
-        {(isDirectProduct || primaryAffiliateLink) && (
+        {((isDirectProduct && stockQuantity !== 0) || primaryAffiliateLink) && (
           <div className="fixed inset-x-0 bottom-0 z-30 border-t border-slate-200 bg-white/95 p-3 shadow-[0_-6px_20px_rgba(15,23,42,0.12)] backdrop-blur sm:hidden">
             {isDirectProduct && book.productId ? (
               <div className="grid grid-cols-2 gap-2">
