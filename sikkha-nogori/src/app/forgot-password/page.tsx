@@ -5,10 +5,7 @@ export const instant = false;
 import { requestPasswordReset, verifyPasswordResetOtp } from "./actions";
 
 type PageProps = {
-  searchParams: Promise<{
-    status?: string | string[];
-    email?: string | string[];
-  }>;
+  searchParams: Promise<{ status?: string | string[] }>;
 };
 
 const messages: Record<string, string> = {
@@ -21,8 +18,6 @@ const messages: Record<string, string> = {
 export default async function ForgotPasswordPage({ searchParams }: PageProps) {
   const params = await searchParams;
   const status = Array.isArray(params.status) ? params.status[0] : params.status;
-  const emailParam = Array.isArray(params.email) ? params.email[0] : params.email;
-  const email = typeof emailParam === "string" ? emailParam : "";
   const message = status ? messages[status] : undefined;
   const showCodeForm = status === "sent" || status === "invalid-code";
 
@@ -41,9 +36,8 @@ export default async function ForgotPasswordPage({ searchParams }: PageProps) {
             </p>
           )}
 
-          {showCodeForm && email ? (
+          {showCodeForm ? (
             <form action={verifyPasswordResetOtp} className="mt-6 grid gap-4">
-              <input type="hidden" name="email" value={email} />
               <div>
                 <label htmlFor="reset-token" className="mb-2 block text-sm font-bold">Enter 6-digit code</label>
                 <input id="reset-token" name="token" type="text" inputMode="numeric" autoComplete="one-time-code" pattern="[0-9]{6}" minLength={6} maxLength={6} required placeholder="000000" className="min-h-12 w-full rounded-xl border border-slate-300 px-4 text-center text-xl tracking-[0.4em] outline-none transition focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100" />
