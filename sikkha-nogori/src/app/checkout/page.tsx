@@ -174,7 +174,7 @@ async function CheckoutContent({
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
                 <div>
                   <label htmlFor="customer-name" className="mb-2 block font-semibold">
-                    গ্রাহকের নাম
+                    গ্রাহকের নাম *
                   </label>
                   <input
                     id="customer-name"
@@ -183,12 +183,13 @@ async function CheckoutContent({
                     minLength={2}
                     maxLength={100}
                     autoComplete="name"
+                    placeholder="আপনার সম্পূর্ণ নাম"
                     className="w-full rounded-lg border border-slate-300 px-3 py-2.5"
                   />
                 </div>
                 <div>
                   <label htmlFor="customer-phone" className="mb-2 block font-semibold">
-                    ফোন নম্বর
+                    মোবাইল নম্বর *
                   </label>
                   <input
                     id="customer-phone"
@@ -198,24 +199,53 @@ async function CheckoutContent({
                     minLength={7}
                     maxLength={25}
                     autoComplete="tel"
+                    placeholder="01XXXXXXXXX"
                     className="w-full rounded-lg border border-slate-300 px-3 py-2.5"
                   />
                 </div>
               </div>
-              <div className="mt-4">
-                <label htmlFor="delivery-address" className="mb-2 block font-semibold">
-                  সম্পূর্ণ ডেলিভারি ঠিকানা
-                </label>
-                <textarea
-                  id="delivery-address"
-                  name="deliveryAddress"
-                  required
-                  minLength={10}
-                  maxLength={1000}
-                  autoComplete="street-address"
-                  rows={3}
-                  className="w-full rounded-lg border border-slate-300 px-3 py-2.5"
-                />
+              <div className="mt-5 border-t border-slate-100 pt-5">
+                <h3 className="font-bold text-slate-900">ডেলিভারি ঠিকানা</h3>
+                <p className="mt-1 text-sm text-slate-500">যে ঠিকানায় বই ও পণ্য পৌঁছে দিতে হবে</p>
+                <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <label htmlFor="delivery-division" className="mb-2 block text-sm font-semibold">বিভাগ *</label>
+                    <select id="delivery-division" name="division" required defaultValue="" className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5">
+                      <option value="" disabled>বিভাগ নির্বাচন করুন</option>
+                      {["ঢাকা","চট্টগ্রাম","রাজশাহী","খুলনা","বরিশাল","সিলেট","রংপুর","ময়মনসিংহ"].map((division) => <option key={division} value={division}>{division}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label htmlFor="delivery-district" className="mb-2 block text-sm font-semibold">জেলা *</label>
+                    <input id="delivery-district" name="district" required maxLength={80} placeholder="জেলার নাম লিখুন" className="w-full rounded-lg border border-slate-300 px-3 py-2.5" />
+                  </div>
+                  <div>
+                    <label htmlFor="delivery-thana" className="mb-2 block text-sm font-semibold">উপজেলা / থানা *</label>
+                    <input id="delivery-thana" name="thana" required maxLength={80} placeholder="উপজেলা বা থানার নাম" className="w-full rounded-lg border border-slate-300 px-3 py-2.5" />
+                  </div>
+                  <div>
+                    <label htmlFor="delivery-area" className="mb-2 block text-sm font-semibold">এলাকা / মহল্লা *</label>
+                    <input id="delivery-area" name="area" required maxLength={120} placeholder="এলাকা, রোড বা মহল্লা" className="w-full rounded-lg border border-slate-300 px-3 py-2.5" />
+                  </div>
+                </div>
+                <div className="mt-4">
+                  <label htmlFor="delivery-address" className="mb-2 block text-sm font-semibold">বাড়ি / ফ্ল্যাট / রোড নম্বর ও বিস্তারিত ঠিকানা *</label>
+                  <textarea
+                    id="delivery-address"
+                    name="deliveryAddress"
+                    required
+                    minLength={5}
+                    maxLength={700}
+                    autoComplete="street-address"
+                    rows={3}
+                    placeholder="বাড়ি নম্বর, ফ্ল্যাট, রোড, ল্যান্ডমার্ক ইত্যাদি লিখুন"
+                    className="w-full rounded-lg border border-slate-300 px-3 py-2.5"
+                  />
+                </div>
+                <div className="mt-4">
+                  <label htmlFor="delivery-instructions" className="mb-2 block text-sm font-semibold">ডেলিভারি নির্দেশনা (ঐচ্ছিক)</label>
+                  <input id="delivery-instructions" name="deliveryInstructions" maxLength={200} placeholder="যেমন: কল করে আসবেন" className="w-full rounded-lg border border-slate-300 px-3 py-2.5" />
+                </div>
               </div>
             </section>
 
