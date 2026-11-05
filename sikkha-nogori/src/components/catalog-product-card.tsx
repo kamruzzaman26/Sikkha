@@ -12,13 +12,30 @@ export function CatalogProductCard({
   product: CatalogProduct;
   productType?: PublishedProductType;
 }) {
+  const discountPercent =
+    product.price !== null &&
+    product.list_price !== null &&
+    product.list_price > product.price
+      ? Math.round(((product.list_price - product.price) / product.list_price) * 100)
+      : null;
+
   return (
-    <article className="flex h-full flex-col rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-emerald-200 hover:shadow-md">
+    <article className="flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-emerald-200 hover:shadow-lg">
       <Link
         href={`/products/${product.slug}`}
         aria-label={`পণ্যের বিস্তারিত: ${product.title}`}
-        className="flex min-h-52 items-center justify-center overflow-hidden rounded-xl bg-emerald-50 p-5"
+        className="relative flex min-h-52 items-center justify-center overflow-hidden bg-gradient-to-br from-emerald-50 to-slate-50 p-5"
       >
+        {product.slug.startsWith("demo-") && (
+          <span className="absolute left-3 top-3 z-10 rounded-full bg-amber-100 px-2.5 py-1 text-[10px] font-extrabold text-amber-900">
+            DEMO
+          </span>
+        )}
+        {discountPercent !== null && (
+          <span className="absolute right-3 top-3 z-10 rounded-full bg-rose-600 px-2.5 py-1 text-xs font-extrabold text-white">
+            -{discountPercent}%
+          </span>
+        )}
         {product.image_url ? (
           <Image
             src={product.image_url}
@@ -39,7 +56,7 @@ export function CatalogProductCard({
         )}
       </Link>
 
-      <div className="flex flex-1 flex-col pt-4">
+      <div className="flex flex-1 flex-col p-3 pt-4 sm:p-4">
         <div className="flex flex-wrap items-center gap-2 text-xs font-semibold">
           {productType && (
             <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-emerald-800">
@@ -64,9 +81,16 @@ export function CatalogProductCard({
           {product.description}
         </p>
         {product.commerce_mode === "direct" && product.price !== null ? (
-          <p className="mt-4 font-extrabold text-emerald-800">
-            {formatBDT(product.price)}
-          </p>
+          <div className="mt-4 flex flex-wrap items-baseline gap-2">
+            <p className="font-extrabold text-emerald-800">
+              {formatBDT(product.price)}
+            </p>
+            {product.list_price !== null && product.list_price > product.price && (
+              <p className="text-xs text-slate-400 line-through">
+                {formatBDT(product.list_price)}
+              </p>
+            )}
+          </div>
         ) : (
           <p className="mt-4 text-sm font-semibold text-slate-600">
             বাইরের বিক্রেতার কাছে উপলভ্য
