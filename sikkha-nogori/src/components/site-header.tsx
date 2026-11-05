@@ -460,7 +460,7 @@ export function SiteHeader({
                 "Buy 1 Get 1 Offer", "Beauty & Personal Care", "Voucher", "Diary/Notebook",
                 "Calculator", "Groceries", "Fan and Ventilator", "Drawing & Art Supplies"
               ]} basePath="/products" />
-              <DrawerLink icon="article" href="/quiz" onClick={closeDrawer}>শিক্ষা কুইজ</DrawerLink>
+              <DrawerLink icon="article" href="/books?category=শিক্ষা%20কুইজ" onClick={closeDrawer}>শিক্ষা কুইজ</DrawerLink>
 
               <NavigationGroup title="ইলেকট্রনিক্স" href="/products" onNavigate={closeDrawer} items={[
                 "Computer & Accessories", "Mobile & Accessories", "Office Equipment", "Gaming Zone",
