@@ -20,6 +20,6 @@ export default async function PagesAdmin({ searchParams }: { searchParams: Promi
  <p className="mt-2 text-xs leading-5 text-slate-500">Use unique lowercase slugs with hyphens, such as about-us. Set status to published or draft. Maximum 50 pages.</p>
  <div className="mt-5 flex justify-end"><button className="min-h-11 rounded-xl bg-[#0b5b48] px-6 text-sm font-extrabold text-white hover:bg-[#084b3c]">Save pages</button></div>
  </form>
- <section className="mt-5 rounded-2xl border border-slate-200 bg-white p-5"><h2 className="font-extrabold">Published pages</h2><ul className="mt-3 space-y-2">{pages.filter((p)=>p.status==="published").map((p:any)=><li key={p.slug} className="flex items-center justify-between gap-3 rounded-xl bg-slate-50 px-4 py-3 text-sm"><span className="font-semibold">{p.title}</span><a className="font-bold text-emerald-800 hover:underline" href={"/page/"+p.slug} target="_blank" rel="noreferrer">Open page ↗</a></li>)}</ul></section>
+ <section className="mt-5 rounded-2xl border border-slate-200 bg-white p-5"><h2 className="font-extrabold">Published pages</h2><ul className="mt-3 space-y-2">{pages.filter((p)=>p.status==="published").map((p)=><li key={p.slug} className="flex items-center justify-between gap-3 rounded-xl bg-slate-50 px-4 py-3 text-sm"><span className="font-semibold">{p.title}</span><a className="font-bold text-emerald-800 hover:underline" href={"/page/"+p.slug} target="_blank" rel="noreferrer">Open page ↗</a></li>)}</ul></section>
  </div></main>;
 }
