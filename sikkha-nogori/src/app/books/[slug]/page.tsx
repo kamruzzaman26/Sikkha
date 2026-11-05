@@ -7,6 +7,8 @@ import BookCover from "@/components/book-cover";
 import BookTabs, { type BookSpecRow } from "@/components/book-tabs";
 import { WishlistButton } from "@/components/wishlist-button";
 import { AddToCartButton } from "@/components/add-to-cart-button";
+import BookFeedback from "@/components/book-feedback";
+import { createSupabasePublicServerClient } from "@/lib/supabase/server";
 import { getActiveAffiliateLinks } from "@/lib/supabase/affiliate-links";
 import { getBookBySlug, formatPrice, getSavings } from "@/lib/books";
 import {
@@ -88,6 +90,10 @@ async function BookDetails({
   }
 
   const savings = getSavings(book.price, book.listPrice);
+  const inventory = book.productId
+    ? await createSupabasePublicServerClient().from("product_inventory").select("stock_quantity").eq("product_id", book.productId).maybeSingle()
+    : { data: null, error: null };
+  const stockQuantity = inventory.data?.stock_quantity ?? null;
   const specRows: BookSpecRow[] = [
     { label: "Name", value: book.title },
     { label: "Category", value: book.category },
@@ -175,6 +181,7 @@ async function BookDetails({
                   </>
                 ) : <p className="text-sm text-slate-500">মূল্য জানতে বিক্রেতার সঙ্গে যোগাযোগ করুন</p>}
                 <p className="mt-3 text-xs leading-5 text-slate-500">মূল্য ও প্রাপ্যতা অর্ডার নিশ্চিত করার সময় যাচাই করুন।</p>
+                {book.commerceMode === "direct" && (stockQuantity === null ? <p className="mt-2 text-sm text-slate-500">স্টকের তথ্য পাওয়া যায়নি।</p> : stockQuantity > 0 ? <p className="mt-2 text-sm font-semibold text-emerald-700">স্টকে আছে · {stockQuantity}টি</p> : <p className="mt-2 text-sm font-semibold text-rose-700">স্টক শেষ</p>)}
               </div>
 
               <div className="flex flex-wrap items-center gap-2">
@@ -213,6 +220,8 @@ async function BookDetails({
           </div>
           <BookTabs summary={book.description ?? ""} specs={specRows} author={book.author} />
         </section>
+
+        {book.productId && <BookFeedback productId={book.productId} />}
 
         <Link href="/books" className="mt-6 inline-flex min-h-10 items-center gap-2 rounded-lg border border-emerald-700 px-4 py-2.5 text-sm font-bold text-emerald-800 transition hover:bg-emerald-50">
           <span aria-hidden="true">←</span> বইয়ের সংগ্রহে ফিরুন
