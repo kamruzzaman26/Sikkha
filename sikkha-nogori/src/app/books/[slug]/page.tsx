@@ -143,7 +143,7 @@ async function BookDetails({
         </nav>
 
         <article className="mt-5 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-          <div className="grid grid-cols-1 gap-0 md:grid-cols-[minmax(17rem,0.82fr)_minmax(0,1.18fr)]">
+          <div className="grid min-w-0 grid-cols-1 gap-0 md:grid-cols-[minmax(17rem,0.82fr)_minmax(0,1.18fr)]">
             <section className="flex flex-col items-center border-b border-slate-100 bg-[#f8faf9] px-5 py-7 md:border-b-0 md:border-r md:px-8 md:py-9">
               <span className="mb-3 text-xs font-bold tracking-wide text-emerald-800">বইয়ের প্রচ্ছদ</span>
               <div className="flex min-h-[20rem] w-full max-w-[19rem] items-center justify-center rounded-xl bg-white p-4 shadow-[0_8px_30px_rgba(15,23,42,0.08)] ring-1 ring-slate-200 sm:min-h-[26rem]">
@@ -158,7 +158,7 @@ async function BookDetails({
               <p className="mt-4 text-center text-xs text-slate-500">প্রচ্ছদের ছবি ও সংস্করণ প্রকাশকের তথ্য অনুযায়ী</p>
             </section>
 
-            <section className="flex flex-col p-5 sm:p-7 lg:p-9">
+            <section className="flex min-w-0 flex-col p-5 sm:p-7 lg:p-9">
               <div className="flex flex-wrap items-center gap-2">
                 {book.category && <span className="rounded-md bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-800">{book.category}</span>}
                 {book.edition && <span className="rounded-md bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600">{book.edition}</span>}
@@ -185,7 +185,7 @@ async function BookDetails({
               </div>
 
               <div className="flex flex-wrap items-center gap-2">
-                <Link href="#book-information" className="inline-flex min-h-10 items-center rounded-lg border border-slate-200 px-3 text-sm font-semibold text-slate-700 hover:border-emerald-300 hover:bg-emerald-50">বিস্তারিত তথ্য</Link>
+                <Link href="#book-information" className="inline-flex min-h-10 items-center rounded-lg border border-slate-200 px-3 text-sm font-semibold text-slate-700 hover:border-emerald-300 hover:bg-emerald-50">একটু পড়ে দেখুন ↴</Link>
                 <div className="min-w-36"><WishlistButton slug={book.slug} /></div>
               </div>
 
@@ -216,7 +216,7 @@ async function BookDetails({
         <section id="book-information" className="mt-6">
           <div className="mb-3">
             <h2 className="text-xl font-extrabold text-slate-950">বই সম্পর্কে বিস্তারিত</h2>
-            <p className="mt-1 text-sm text-slate-500">বইয়ের সারসংক্ষেপ, প্রকাশনা ও অন্যান্য তথ্য</p>
+            <p className="mt-1 text-sm text-slate-500">বইয়ের সারসংক্ষেপ, লেখক, প্রকাশনী, স্পেসিফিকেশন ও অন্যান্য তথ্য</p>
           </div>
           <BookTabs summary={book.description ?? ""} specs={specRows} author={book.author} />
         </section>
