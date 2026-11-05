@@ -9,7 +9,8 @@ export default async function PagesAdmin({ searchParams }: { searchParams: Promi
  const { supabase } = await requirePermission("manage_homepage", "/admin/dashboard");
  const [{data,error},{status}] = await Promise.all([supabase.from("site_settings").select("value").eq("key","pages").maybeSingle(),searchParams]);
  if(error) throw new Error("Unable to load pages.",{cause:error});
- const pages = Array.isArray(data?.value) ? data.value : [];
+ type PageEntry = { title: string; slug: string; status?: string };
+ const pages = (Array.isArray(data?.value) ? data.value : []) as PageEntry[];
  return <main lang="en" className="min-h-screen px-4 py-7 text-slate-900 sm:px-8"><div className="mx-auto max-w-5xl">
  <header className="rounded-3xl bg-[#082f29] p-7 text-white"><p className="text-xs font-bold uppercase tracking-[.2em] text-emerald-200">Website control</p><h1 className="mt-2 text-3xl font-black">Pages</h1><p className="mt-2 text-sm text-emerald-50/75">Create and manage public information pages. Draft pages remain private.</p></header>
  {status && <p role="status" className="mt-4 rounded-xl bg-emerald-50 p-3 text-sm font-semibold text-emerald-900">{status==="saved"?"Pages saved.":"Please check the page data and try again."}</p>}
@@ -19,6 +20,6 @@ export default async function PagesAdmin({ searchParams }: { searchParams: Promi
  <p className="mt-2 text-xs leading-5 text-slate-500">Use unique lowercase slugs with hyphens, such as about-us. Set status to published or draft. Maximum 50 pages.</p>
  <div className="mt-5 flex justify-end"><button className="min-h-11 rounded-xl bg-[#0b5b48] px-6 text-sm font-extrabold text-white hover:bg-[#084b3c]">Save pages</button></div>
  </form>
- <section className="mt-5 rounded-2xl border border-slate-200 bg-white p-5"><h2 className="font-extrabold">Published pages</h2><ul className="mt-3 space-y-2">{pages.filter((p:any)=>p.status==="published").map((p:any)=><li key={p.slug} className="flex items-center justify-between gap-3 rounded-xl bg-slate-50 px-4 py-3 text-sm"><span className="font-semibold">{p.title}</span><a className="font-bold text-emerald-800 hover:underline" href={"/page/"+p.slug} target="_blank" rel="noreferrer">Open page ↗</a></li>)}</ul></section>
+ <section className="mt-5 rounded-2xl border border-slate-200 bg-white p-5"><h2 className="font-extrabold">Published pages</h2><ul className="mt-3 space-y-2">{pages.filter((p)=>p.status==="published").map((p:any)=><li key={p.slug} className="flex items-center justify-between gap-3 rounded-xl bg-slate-50 px-4 py-3 text-sm"><span className="font-semibold">{p.title}</span><a className="font-bold text-emerald-800 hover:underline" href={"/page/"+p.slug} target="_blank" rel="noreferrer">Open page ↗</a></li>)}</ul></section>
  </div></main>;
 }
