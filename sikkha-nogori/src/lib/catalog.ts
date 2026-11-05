@@ -228,6 +228,44 @@ export async function getPublishedBooks({
   return { products: data, total: count ?? 0 };
 }
 
+async function getProductCategoryProductIds(
+  supabase: ReturnType<typeof createSupabasePublicServerClient>,
+  category: string,
+): Promise<string[] | null> {
+  const { data: categories, error: categoryError } = await supabase
+    .from("categories")
+    .select("id, parent_id, name")
+    .in("category_group", ["products", "electronics"])
+    .eq("is_active", true)
+    .limit(1000);
+
+  if (categoryError || !categories) return null;
+  const categoryIds = collectCategoryIds(categories, category);
+  const linkedIds: string[] = [];
+
+  if (categoryIds.length > 0) {
+    const { data: links, error: linksError } = await supabase
+      .from("product_categories")
+      .select("product_id")
+      .in("category_id", categoryIds)
+      .limit(5000);
+    if (linksError || !links) return null;
+    linkedIds.push(...links.map((link) => link.product_id as string));
+  }
+
+  const { data: legacyRows, error: legacyError } = await supabase
+    .from("products")
+    .select("id")
+    .eq("category", category)
+    .limit(1000);
+  if (legacyError || !legacyRows) return null;
+
+  return [...new Set([
+    ...linkedIds,
+    ...legacyRows.map((row) => row.id as string),
+  ])];
+}
+
 export async function getPublishedProducts({
   page,
   query,
@@ -268,7 +306,10 @@ export async function getPublishedProducts({
     request = request.or(searchFilters);
   }
   if (category) {
-    request = request.eq("category", category);
+    const categoryProductIds = await getProductCategoryProductIds(supabase, category);
+    request = categoryProductIds === null
+      ? request.eq("category", category)
+      : request.in("id", categoryProductIds.length > 0 ? categoryProductIds : [emptyUuid]);
   }
 
   const { data, count, error } = await request
