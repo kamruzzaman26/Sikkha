@@ -4,6 +4,7 @@ import { formatPrice, type Book } from "@/lib/books";
 import type { PublicAffiliateLink } from "@/lib/supabase/affiliate-links";
 import BookCover from "@/components/book-cover";
 import { WishlistButton } from "@/components/wishlist-button";
+import { AddToCartButton } from "@/components/add-to-cart-button";
 
 function partnerLabel(partner: string | null): string {
   if (partner === "rokomari") return "রকমারিতে কিনুন";
@@ -118,6 +119,7 @@ export default function BookCard({
             অর্ডার করুন
           </Link>
         ) : null}
+        {isDirect && book.productId && <AddToCartButton productId={book.productId} />}
         <Link
           href={`/books/${book.slug}`}
           className="mt-2 inline-flex min-h-11 w-full items-center justify-center rounded-lg border border-emerald-700 px-3 py-2.5 text-center text-sm font-semibold text-emerald-800 transition hover:bg-emerald-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700"
