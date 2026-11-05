@@ -4,6 +4,7 @@ import Link from "next/link";
 export const instant = false;
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { updateCustomerPassword } from "./actions";
+import { SubmitButton } from "@/components/submit-button";
 
 type PageProps = {
   searchParams: Promise<{ status?: string | string[] }>;
@@ -28,7 +29,7 @@ export default async function ResetPasswordPage({ searchParams }: PageProps) {
         <Link href="/" className="text-sm font-bold text-emerald-800">← Sikkha Nogori</Link>
         <section className="mt-8 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
           <h1 className="text-center text-2xl font-black">Reset Password</h1>
-          <p className="mt-2 text-center text-sm leading-6 text-slate-600">Enter a new password for your account.</p>
+          <p className="mt-2 text-center text-sm leading-6 text-slate-600">Create a new password for your account.</p>
           {message && <p role="alert" className="mt-5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-950">{message}</p>}
           {user ? (
             <form action={updateCustomerPassword} className="mt-6 grid gap-4">
@@ -41,11 +42,11 @@ export default async function ResetPasswordPage({ searchParams }: PageProps) {
                 <input id="confirm-password" name="confirmPassword" type="password" autoComplete="new-password" minLength={8} maxLength={128} required className="min-h-12 w-full rounded-xl border border-slate-300 px-4 outline-none transition focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100" />
               </div>
               <p className="text-xs text-slate-500">Use a password with at least 8 characters.</p>
-              <button type="submit" className="min-h-12 rounded-xl bg-emerald-700 px-5 font-bold text-white transition hover:bg-emerald-800">Update Password</button>
+              <SubmitButton pendingLabel="Updating password..." className="min-h-12 rounded-xl bg-emerald-700 px-5 font-bold text-white transition hover:bg-emerald-800">Update Password</SubmitButton>
             </form>
           ) : (
             <div className="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-950">
-              Invalid pin code or password
+              Your verification session is missing or has expired.
               <Link href="/forgot-password" className="mt-3 block font-bold text-emerald-800 underline">Request a new code</Link>
             </div>
           )}
