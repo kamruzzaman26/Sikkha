@@ -12,7 +12,7 @@ export default function BookTabs({
   specs: BookSpecRow[];
 }) {
   const hasSummary = summary.trim() !== "";
-  const hasSpecs = specs.length > 0;
+  const hasSpecs = specs.length > 0;\n  const hasAuthor = Boolean(author?.trim());
   const [active, setActive] = useState<"summary" | "specs">(
     hasSummary ? "summary" : "specs",
   );
@@ -23,7 +23,7 @@ export default function BookTabs({
 
   const tabs = [
     hasSummary ? ({ id: "summary", label: "সারসংক্ষেপ" } as const) : null,
-    hasSpecs ? ({ id: "specs", label: "স্পেসিফিকেশন" } as const) : null,
+    hasSpecs ? ({ id: "specs", label: "স্পেসিফিকেশন" } as const) : null,\n    hasAuthor ? ({ id: "author", label: "লেখক" } as const) : null,
   ].filter((tab) => tab !== null);
 
   return (
@@ -66,7 +66,7 @@ export default function BookTabs({
         </div>
       )}
 
-      {active === "specs" && hasSpecs && (
+      {active === "author" && hasAuthor && (\n        <div role="tabpanel" id="book-panel-author" aria-labelledby="book-tab-author" className="pt-5">\n          <h3 className="text-base font-bold text-slate-900">{author}</h3>\n          <p className="mt-2 text-sm leading-6 text-slate-600">এই বইয়ের লেখক হিসেবে তালিকাভুক্ত। লেখকের বিস্তারিত পরিচিতি যুক্ত হলে এখানে দেখানো হবে।</p>\n        </div>\n      )}\n\n      {active === "specs" && hasSpecs && (
         <div
           role="tabpanel"
           id="book-panel-specs"
