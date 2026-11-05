@@ -1,4 +1,7 @@
 import Link from "next/link";
+
+// These account-recovery pages depend on request-specific search parameters and auth cookies.
+export const instant = false;
 import { requestPasswordReset } from "./actions";
 
 type PageProps = {
