@@ -445,74 +445,33 @@ export function SiteHeader({
               aria-label="Main navigation"
               className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 py-3"
             >
-              <DrawerLink icon="home" href="/" onClick={closeDrawer}>
-                Home
-              </DrawerLink>
-              <details className="group border-b border-slate-100">
-                <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 rounded-lg px-3 text-sm font-bold text-slate-800 outline-none hover:bg-emerald-50 focus-visible:ring-2 focus-visible:ring-emerald-700 [&::-webkit-details-marker]:hidden">
-                  <span className="flex items-center gap-3">
-                    <span aria-hidden="true" className="text-lg">▤</span>
-                    Categories
-                  </span>
-                  <span aria-hidden="true" className="transition group-open:rotate-180">⌄</span>
-                </summary>
-                <div className="pb-2 pl-9">
-                  <DrawerLink icon="book" href="/books" onClick={closeDrawer}>
-                    All Books
-                  </DrawerLink>
-                  <CategoryTree
-                    items={categoryMenu.books}
-                    basePath="/books"
-                    onNavigate={closeDrawer}
-                  />
-                </div>
-              </details>
-              {categoryMenu.products.length > 0 ? (
-                <details className="group border-b border-slate-100">
-                  <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 rounded-lg px-3 text-sm font-bold text-slate-800 outline-none hover:bg-emerald-50 focus-visible:ring-2 focus-visible:ring-emerald-700 [&::-webkit-details-marker]:hidden">
-                    <span className="flex items-center gap-3">
-                      <span aria-hidden="true" className="text-lg">▤</span>
-                      Other Products
-                    </span>
-                    <span aria-hidden="true" className="transition group-open:rotate-180">⌄</span>
-                  </summary>
-                  <div className="pb-2 pl-9">
-                    <DrawerLink icon="book" href="/products" onClick={closeDrawer}>
-                      All Products
-                    </DrawerLink>
-                    <CategoryTree
-                      items={categoryMenu.products}
-                      basePath="/products"
-                      onNavigate={closeDrawer}
-                    />
-                  </div>
-                </details>
-              ) : (
-                <DrawerLink icon="book" href="/products" onClick={closeDrawer}>
-                  Other Products
-                </DrawerLink>
-              )}
-              <DrawerLink icon="book" href="/courses" onClick={closeDrawer}>
-                Courses
-              </DrawerLink>
-              {identity?.hasOrders && (
-                <DrawerLink icon="history" href="/account/orders" onClick={closeDrawer}>
-                  Order History
-                </DrawerLink>
-              )}
-              <DrawerLink icon="article" href="/blog" onClick={closeDrawer}>
-                Blog
-              </DrawerLink>
-              <DrawerLink icon="about" href="/about" onClick={closeDrawer}>
-                About Us
-              </DrawerLink>
-              <DrawerLink icon="contact" href="/contact" onClick={closeDrawer}>
-                Contact Us
-              </DrawerLink>
-              <DrawerLink icon="disclosure" href="/affiliate-disclosure" onClick={closeDrawer}>
-                Affiliate Disclosure
-              </DrawerLink>
-            </nav>
+              <DrawerLink icon="home" href="/" onClick={closeDrawer}>Home</DrawerLink>
+              <DrawerLink icon="history" href="/account/orders" onClick={closeDrawer}>Buy Again</DrawerLink>
+              <DrawerLink icon="article" href="/books?category=বই%20মেলা%202026" onClick={closeDrawer}>বই মেলা ২০২৬</DrawerLink>
+
+              <NavigationGroup title="বই" href="/books" onNavigate={closeDrawer} items={[
+                "লেখক", "বিষয়", "প্রকাশনী", "অতিরিক্ত ছাড়ের বই", "একাডেমিক বই",
+                "একাদশ ও দ্বাদশ শ্রেণির বই", "ভর্তি প্রস্তুতি", "বইমেলা ২০২৬"
+              ]} basePath="/books" />
+              <DrawerLink icon="book" href="/products?category=ই-বুক" onClick={closeDrawer}>ই-বুক</DrawerLink>
+
+              <NavigationGroup title="সুপার স্টোর" href="/products" onNavigate={closeDrawer} items={[
+                "Weekly Bestseller", "Islamic Accessories", "Stationery", "Organic Food",
+                "Buy 1 Get 1 Offer", "Beauty & Personal Care", "Voucher", "Diary/Notebook",
+                "Calculator", "Groceries", "Fan and Ventilator", "Drawing & Art Supplies"
+              ]} basePath="/products" />
+              <DrawerLink icon="article" href="/quiz" onClick={closeDrawer}>শিক্ষা কুইজ</DrawerLink>
+
+              <NavigationGroup title="ইলেকট্রনিক্স" href="/products" onNavigate={closeDrawer} items={[
+                "Computer & Accessories", "Mobile & Accessories", "Office Equipment", "Gaming Zone",
+                "Networking", "Sound System", "Grooming & Lifestyle", "Appliances",
+                "Fan and ventilator", "Science Kit"
+              ]} basePath="/products" />
+              <NavigationGroup title="কিডস জোন" href="/products" onNavigate={closeDrawer} items={[
+                "Diaper & Potty", "Feeding", "Kids Toys", "Lotions & Creams", "Teethers & Pacifier",
+                "Grooming", "Oral & Health", "Body Wash", "Mum Pot & Cups", "Bathing"
+              ]} basePath="/products" />
+            </nav>      </nav>
 
             <div className="border-t border-slate-100 p-3">
               {identity ? (
@@ -574,6 +533,42 @@ export function SiteHeader({
   );
 }
 
+
+function NavigationGroup({
+  title,
+  href,
+  items,
+  basePath,
+  onNavigate,
+}: {
+  title: string;
+  href: string;
+  items: string[];
+  basePath: string;
+  onNavigate: () => void;
+}) {
+  return (
+    <details className="group border-b border-slate-100">
+      <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 rounded-lg px-3 text-sm font-bold text-slate-800 outline-none hover:bg-emerald-50 focus-visible:ring-2 focus-visible:ring-emerald-700 [&::-webkit-details-marker]:hidden">
+        <span className="flex items-center gap-3"><CategoryGlyph name={title} />{title}</span>
+        <span aria-hidden="true" className="transition group-open:rotate-180">⌄</span>
+      </summary>
+      <div className="pb-2 pl-5">
+        <DrawerLink icon="book" href={href} onClick={onNavigate}>সব {title}</DrawerLink>
+        {items.map((item) => (
+          <Link
+            key={item}
+            href={`${basePath}?category=${encodeURIComponent(item)}`}
+            onClick={onNavigate}
+            className="flex min-h-11 items-center gap-3 border-b border-slate-100 px-3 text-sm font-medium text-slate-600 hover:bg-emerald-50 hover:text-emerald-900"
+          >
+            <CategoryGlyph name={item} />{item}
+          </Link>
+        ))}
+      </div>
+    </details>
+  );
+}
 
 function BottomNavItem({ href, icon, label, disabled = false }: { href?: string; icon: string; label: string; disabled?: boolean }) {
   const className = "flex min-h-14 flex-col items-center justify-center gap-0.5 rounded-lg px-1 text-[10px] font-semibold text-slate-600";
