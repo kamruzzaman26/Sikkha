@@ -109,10 +109,6 @@ async function CheckoutContent({
           <p className="mt-7 rounded-xl border border-slate-200 bg-white px-4 py-5 leading-7 text-slate-600">
             অর্ডারের জন্য কোনো প্রকাশিত পণ্য এখন উপলভ্য নেই।
           </p>
-        ) : options.paymentMethods.length === 0 ? (
-          <p className="mt-7 rounded-xl border border-slate-200 bg-white px-4 py-5 leading-7 text-slate-600">
-            কোনো সক্রিয় পেমেন্ট মেথড নেই। অর্ডার জমা দেওয়া যাবে না।
-          </p>
         ) : (
           <form action={placeOrder} className="mt-7 grid gap-6">
             <input type="hidden" name="idempotencyKey" value={randomUUID()} />
@@ -252,6 +248,11 @@ async function CheckoutContent({
 
             <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
               <h2 className="text-xl font-bold">পেমেন্ট মেথড</h2>
+              {options.paymentMethods.length === 0 ? (
+                <p className="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-950">
+                  এখনো কোনো পেমেন্ট পদ্ধতি চালু নেই। আপনি ডেলিভারি ঠিকানা পূরণ করে দেখতে পারবেন, তবে অর্ডার জমা দিতে Admin Panel থেকে একটি পেমেন্ট পদ্ধতি সক্রিয় করতে হবে।
+                </p>
+              ) : (
               <fieldset className="mt-4 grid gap-3">
                 <legend className="sr-only">একটি পেমেন্ট মেথড নির্বাচন করুন</legend>
                 {options.paymentMethods.map((method, index) => (
@@ -294,6 +295,7 @@ async function CheckoutContent({
                   </label>
                 ))}
               </fieldset>
+              )}
             </section>
 
             <p className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-950">
@@ -302,12 +304,22 @@ async function CheckoutContent({
               গ্রহণ করা হয় না।
             </p>
 
-            <SubmitButton
-              pendingLabel="অর্ডার জমা হচ্ছে…"
-              className="min-h-12 rounded-xl bg-emerald-700 px-5 py-3 font-bold text-white hover:bg-emerald-800"
-            >
-              অর্ডার জমা দিন
-            </SubmitButton>
+            {options.paymentMethods.length > 0 ? (
+              <SubmitButton
+                pendingLabel="অর্ডার জমা হচ্ছে…"
+                className="min-h-12 rounded-xl bg-emerald-700 px-5 py-3 font-bold text-white hover:bg-emerald-800"
+              >
+                অর্ডার জমা দিন
+              </SubmitButton>
+            ) : (
+              <button
+                type="button"
+                disabled
+                className="min-h-12 cursor-not-allowed rounded-xl bg-slate-300 px-5 py-3 font-bold text-slate-600"
+              >
+                পেমেন্ট পদ্ধতি চালু হলে অর্ডার করতে পারবেন
+              </button>
+            )}
           </form>
         )}
 
