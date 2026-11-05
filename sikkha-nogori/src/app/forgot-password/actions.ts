@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { isValidEmail } from "@/lib/email.mjs";
 import { getPublicSiteOrigin } from "@/lib/supabase/env";
 
 function getEmail(formData: FormData): string {
@@ -11,10 +12,7 @@ function getEmail(formData: FormData): string {
 
 export async function requestPasswordReset(formData: FormData) {
   const email = getEmail(formData);
-  if (
-    !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email) ||
-    email.length > 254
-  ) {
+  if (!isValidEmail(email)) {
     redirect("/forgot-password?status=invalid");
   }
 
