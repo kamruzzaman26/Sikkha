@@ -121,7 +121,7 @@ test("customer authentication supports either email or verified phone identifier
   assert.match(actions, /phone:\s*contact\.value/);
   assert.match(actions, /email:\s*contact\.value/);
   assert.match(actions, /verifyOtp\([\s\S]+type:\s*"sms"/);
-  assert.match(loginPage, /ইমেইল অথবা মোবাইল নম্বর/);
+  assert.match(loginPage, /Email Address or Mobile Number/);
   assert.match(verifyPage, /one-time-code/);
 });
 
