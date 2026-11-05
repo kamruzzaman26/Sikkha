@@ -471,7 +471,7 @@ export function SiteHeader({
                 "Diaper & Potty", "Feeding", "Kids Toys", "Lotions & Creams", "Teethers & Pacifier",
                 "Grooming", "Oral & Health", "Body Wash", "Mum Pot & Cups", "Bathing"
               ]} basePath="/products" />
-            </nav>      </nav>
+            </nav>
 
             <div className="border-t border-slate-100 p-3">
               {identity ? (
