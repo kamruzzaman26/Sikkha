@@ -47,7 +47,7 @@ export default function BookTabs({
             onClick={() => setActive(tab.id)}
             className={`-mb-px min-h-11 border-b-2 px-1 pb-2 text-sm font-bold transition sm:text-base ${
               active === tab.id
-                ? "border-blue-700 text-slate-950"
+                ? "border-emerald-700 text-slate-950"
                 : "border-transparent text-slate-500 hover:text-slate-800"
             }`}
           >
