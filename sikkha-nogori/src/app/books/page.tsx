@@ -1,4 +1,3 @@
-```tsx
 import Link from "next/link";
 
 const books = [
@@ -64,4 +63,3 @@ export default function BooksPage() {
     </main>
   );
 }
-```
