@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
+import { connection } from "next/server";
 import { applyForAffiliate } from "./actions";
 import { requireCustomer } from "@/lib/supabase/auth";
 import { formatBDT } from "@/lib/money";
@@ -20,6 +21,7 @@ async function AffiliateContent({
 }: {
   searchParams: Promise<{ status?: string | string[] }>;
 }) {
+  await connection();
   const { supabase, user } = await requireCustomer();
   const params = await searchParams;
   const status = Array.isArray(params.status) ? params.status[0] : params.status;
