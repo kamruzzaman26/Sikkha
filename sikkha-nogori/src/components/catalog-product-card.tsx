@@ -77,7 +77,7 @@ export function CatalogProductCard({
               <Link href={`/checkout?product=${encodeURIComponent(product.id)}`} className="inline-flex min-h-11 items-center justify-center rounded-lg bg-emerald-700 px-3 py-2.5 text-center text-sm font-bold text-white transition hover:bg-emerald-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700">এখনই কিনুন</Link>
             </>
           ) : (
-            <Link href={`/products/${product.slug}`} className="inline-flex min-h-11 items-center justify-center rounded-lg bg-sky-700 px-3 py-2.5 text-center text-sm font-bold text-white transition hover:bg-sky-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700">রকমারিতে কিনুন</Link>
+            <Link href={`/products/${product.slug}`} className="inline-flex min-h-11 items-center justify-center rounded-lg bg-sky-700 px-3 py-2.5 text-center text-sm font-bold text-white transition hover:bg-sky-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700">বিস্তারিত ও কেনার লিংক</Link>
           )}
           <div className="[&>div>button]:min-h-10 [&>div>button]:w-full [&>div>button]:rounded-lg [&>div>button]:border-slate-200 [&>div>button]:text-slate-700">
             <WishlistButton slug={product.slug} />
