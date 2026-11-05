@@ -7,6 +7,7 @@ import { formatBDT } from "@/lib/money";
 import { getCheckoutOptions } from "@/lib/supabase/checkout";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { isNoActiveSessionError } from "@/lib/supabase/auth-errors";
+import { SubmitButton } from "@/components/submit-button";
 
 export const metadata: Metadata = {
   title: "অর্ডার | শিক্ষা নগরী",
@@ -301,12 +302,12 @@ async function CheckoutContent({
               গ্রহণ করা হয় না।
             </p>
 
-            <button
-              type="submit"
+            <SubmitButton
+              pendingLabel="অর্ডার জমা হচ্ছে…"
               className="min-h-12 rounded-xl bg-emerald-700 px-5 py-3 font-bold text-white hover:bg-emerald-800"
             >
               অর্ডার জমা দিন
-            </button>
+            </SubmitButton>
           </form>
         )}
 
