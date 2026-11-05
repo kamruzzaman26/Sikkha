@@ -36,7 +36,7 @@ export default function BookFeedback({ productId }: { productId: string }) {
     setLoading(false);
   }, [productId]);
 
-  useEffect(() => { void load(); }, [load]);
+  // Load server-backed feedback after mount; state updates occur when the request resolves.\n  // eslint-disable-next-line react-hooks/set-state-in-effect\n  useEffect(() => { void load(); }, [load]);
 
   async function submitReview(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
