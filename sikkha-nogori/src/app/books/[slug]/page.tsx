@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import BookCover from "@/components/book-cover";
 import BookTabs, { type BookSpecRow } from "@/components/book-tabs";
-import { WishlistButton } from "@/components/wishlist-button";
+import { WishlistButton } from "@/components/wishlist-button";\nimport { AddToCartButton } from "@/components/add-to-cart-button";
 import { getActiveAffiliateLinks } from "@/lib/supabase/affiliate-links";
 import { getBookBySlug, formatPrice, getSavings } from "@/lib/books";
 import {
@@ -135,8 +135,8 @@ async function BookDetails({
           <span>{book.title}</span>
         </nav>
 
-        <article className="mt-6 grid gap-8 rounded-3xl border border-emerald-100 bg-white p-5 shadow-sm sm:gap-10 sm:p-8 md:grid-cols-[minmax(15rem,0.8fr)_minmax(0,1.2fr)] md:p-10">
-          <div className="flex min-h-72 items-center justify-center rounded-2xl bg-emerald-50 p-8 sm:min-h-96">
+        <article className="mt-6 grid gap-7 rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:gap-10 sm:p-7 md:grid-cols-[minmax(15rem,0.85fr)_minmax(0,1.15fr)] md:p-9">
+          <div className="relative flex min-h-72 items-center justify-center rounded-2xl border border-slate-100 bg-slate-50 p-6 sm:min-h-[30rem] sm:p-8">
             {book.imageUrl ? (
               <Image
                 src={book.imageUrl}
@@ -160,7 +160,7 @@ async function BookDetails({
           </div>
 
           <div className="flex flex-col justify-center">
-            <h1 className="text-3xl font-extrabold leading-tight sm:text-4xl">
+            <h1 className="text-2xl font-extrabold leading-tight text-slate-950 sm:text-4xl">
               {book.title}
             </h1>
             {book.edition && (
@@ -206,7 +206,7 @@ async function BookDetails({
                     {formatPrice(book.listPrice)}
                   </span>
                 ) : null}
-                <span className="text-3xl font-extrabold text-slate-900">
+                <span className="text-3xl font-extrabold text-slate-950 sm:text-4xl">
                   {formatPrice(book.price)}
                 </span>
                 {savings && (
@@ -278,7 +278,7 @@ async function BookDetails({
             <div className="mt-5 max-w-xs">
               <WishlistButton slug={book.slug} />
             </div>
-            <BookTabs summary={book.description ?? ""} specs={specRows} />
+            <BookTabs summary={book.description ?? ""} specs={specRows} author={book.author} />
 
             {!book.productId && (
               <p className="mt-6 rounded-xl bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-900">
@@ -296,14 +296,19 @@ async function BookDetails({
         </article>
 
         {(isDirectProduct || primaryAffiliateLink) && (
-          <div className="fixed inset-x-0 bottom-0 z-30 border-t border-slate-200 bg-white p-3 shadow-[0_-4px_12px_rgba(15,23,42,0.08)] sm:hidden">
+          <div className="fixed inset-x-0 bottom-0 z-30 border-t border-slate-200 bg-white/95 p-3 shadow-[0_-6px_20px_rgba(15,23,42,0.12)] backdrop-blur sm:hidden">
             {isDirectProduct && book.productId ? (
-              <Link
-                href={`/checkout?product=${encodeURIComponent(book.productId)}`}
-                className={`${buyButtonClass} w-full`}
-              >
-                এখনই কিনুন · Buy Now
-              </Link>
+              <div className="grid grid-cols-2 gap-2">
+                <Link
+                  href={`/checkout?product=${encodeURIComponent(book.productId)}`}
+                  className={`${buyButtonClass} min-h-12 px-2 text-sm`}
+                >
+                  এখনই কিনুন
+                </Link>
+                <div className="[&>div>button]:min-h-12 [&>div>button]:rounded-lg [&>div>button]:bg-blue-700 [&>div>button]:text-sm [&>div>button]:text-white [&>div>button]:hover:bg-blue-800">
+                  <AddToCartButton productId={book.productId} />
+                </div>
+              </div>
             ) : primaryAffiliateLink ? (
               <a
                 href={primaryAffiliateLink.url}
