@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { CatalogProductCard } from "@/components/catalog-product-card";
 import Link from "next/link";
 import BookCard from "@/components/book-card";
 import { bookCategories, getSavings, type Book } from "@/lib/books";
@@ -21,7 +21,7 @@ const slides = [
 
 type HomeConfig = { show_categories?: boolean; show_new_arrivals?: boolean; show_deals?: boolean; categories_title?: string; new_arrivals_title?: string; deals_title?: string };
 type Banner = { title: string; text: string; cta: string; href: string; tone: string; active: boolean };
-type HomeCategory = { id: string; name: string; category_group: "books" | "products"; sort_order: number | null };
+type HomeCategory = { id: string; name: string; category_group: "books" | "products" | "electronics"; sort_order: number | null };
 
 const categoryIcons: { test: RegExp; icon: string }[] = [
   { test: /book|বই|ebook|ই-বুক/i, icon: "📚" },
@@ -75,7 +75,7 @@ async function loadCategoryTiles(): Promise<HomeCategory[]> {
       .select("id, name, category_group, sort_order")
       .eq("is_active", true)
       .is("parent_id", null)
-      .in("category_group", ["books", "products"])
+      .in("category_group", ["books", "products", "electronics"])
       .order("sort_order")
       .limit(40);
     if (error || !data || data.length === 0) {
@@ -138,29 +138,17 @@ function ProductRow({ products }: { products: CatalogProduct[] }) {
   return (
     <section className="py-6 sm:py-8">
       <div className="mb-4 flex items-end justify-between gap-3">
-        <div><h2 className="text-xl font-extrabold tracking-tight text-slate-900 sm:text-2xl">Featured Products · প্রয়োজনীয় পণ্য</h2><p className="mt-1 text-sm text-slate-600">বাছাই করা প্রয়োজনীয় পণ্য</p></div>
+        <div>
+          <h2 className="text-xl font-extrabold tracking-tight text-slate-900 sm:text-2xl">Featured Products · প্রয়োজনীয় পণ্য</h2>
+          <p className="mt-1 text-sm text-slate-600">বাছাই করা প্রয়োজনীয় পণ্য</p>
+        </div>
         <Link href="/products" className="inline-flex min-h-10 items-center rounded-xl px-3 text-sm font-bold text-emerald-800 hover:bg-emerald-50">সব দেখুন →</Link>
       </div>
-      <div className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-3 [scrollbar-width:none] sm:mx-0 sm:px-0">
+      <div className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-3 [scrollbar-width:none] sm:mx-0 sm:px-0 sm:gap-4">
         {products.slice(0, 12).map((product) => (
-          <article key={product.id} className="flex w-36 shrink-0 snap-start flex-col overflow-hidden rounded-2xl border border-slate-100 bg-white p-3 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md sm:w-40">
-            <Link href={`/products/${product.slug}`} className="block">
-              <div className="flex h-32 items-center justify-center rounded-xl bg-slate-50">
-                {product.image_url ? <Image src={product.image_url} alt={product.title} width={140} height={140} unoptimized className="h-full w-full object-contain" /> : <span className="text-4xl" aria-hidden="true">🛍️</span>}
-              </div>
-              <p className="mt-3 line-clamp-2 min-h-10 text-sm font-bold leading-5 text-slate-800">{product.title}</p>
-            </Link>
-            <p className="mt-2 text-sm font-extrabold text-emerald-800">{product.price !== null ? `৳${new Intl.NumberFormat("en-BD").format(product.price)}` : "বিস্তারিত দেখুন"}</p>
-            {product.commerce_mode === "direct" && product.price !== null ? (
-              <Link href={`/checkout?product=${encodeURIComponent(product.id)}`} className="mt-3 inline-flex min-h-10 items-center justify-center rounded-lg bg-emerald-700 px-2 py-2 text-center text-xs font-bold text-white hover:bg-emerald-800">
-                অর্ডার করুন
-              </Link>
-            ) : (
-              <Link href={`/products/${product.slug}`} className="mt-3 inline-flex min-h-10 items-center justify-center rounded-lg border border-emerald-700 px-2 py-2 text-center text-xs font-semibold text-emerald-800 hover:bg-emerald-50">
-                বিস্তারিত
-              </Link>
-            )}
-          </article>
+          <div key={product.id} className="w-[82%] max-w-[18rem] shrink-0 snap-start sm:w-[46%] lg:w-[28%]">
+            <CatalogProductCard product={product} />
+          </div>
         ))}
       </div>
     </section>
