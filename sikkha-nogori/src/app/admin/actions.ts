@@ -54,6 +54,10 @@ function finishAction(status: string): never {
   revalidatePath("/books/[slug]", "page");
   revalidatePath("/courses");
   revalidatePath("/courses/[slug]", "page");
+  revalidatePath("/products");
+  revalidatePath("/products/[slug]", "page");
+  revalidatePath("/cart");
+  revalidatePath("/checkout");
   revalidatePath("/wishlist");
   redirect(`/admin?status=${status}`);
 }
