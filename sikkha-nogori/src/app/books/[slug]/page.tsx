@@ -95,20 +95,20 @@ async function BookDetails({
     : { data: null, error: null };
   const stockQuantity = inventory.data?.stock_quantity ?? null;
   const specRows: BookSpecRow[] = [
-    { label: "Name", value: book.title },
-    { label: "Category", value: book.category },
-    { label: "Author", value: book.author },
-    { label: "Edition", value: book.edition ?? "" },
+    { label: "নাম", value: book.title },
+    { label: "বিভাগ", value: book.category },
+    { label: "লেখক", value: book.author },
+    { label: "সংস্করণ", value: book.edition ?? "" },
     { label: "ISBN", value: book.isbn ?? "" },
     {
-      label: "No of Page",
+      label: "পৃষ্ঠা সংখ্যা",
       value: book.pageCount ? String(book.pageCount) : "",
     },
-    { label: "Language", value: book.language ?? "" },
-    { label: "Publisher", value: book.publisher },
-    { label: "Country", value: book.country ?? "" },
+    { label: "ভাষা", value: book.language ?? "" },
+    { label: "প্রকাশনী", value: book.publisher },
+    { label: "প্রকাশের দেশ", value: book.country ?? "" },
     {
-      label: "Weight",
+      label: "ওজন",
       value: book.weightKg ? `${book.weightKg} Kg` : "",
     },
   ].filter((row) => row.value.trim() !== "");
@@ -185,7 +185,7 @@ async function BookDetails({
               </div>
 
               <div className="flex flex-wrap items-center gap-2">
-                <Link href="#book-information" className="inline-flex min-h-10 items-center rounded-lg border border-slate-200 px-3 text-sm font-semibold text-slate-700 hover:border-emerald-300 hover:bg-emerald-50">বিস্তারিত তথ্য</Link>
+                <Link href="#book-information" className="inline-flex min-h-10 items-center rounded-lg border border-slate-200 px-3 text-sm font-semibold text-slate-700 hover:border-emerald-300 hover:bg-emerald-50">একটু পড়ে দেখুন ↴</Link>
                 <div className="min-w-36"><WishlistButton slug={book.slug} /></div>
               </div>
 
