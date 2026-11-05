@@ -979,14 +979,12 @@ async function AdminContent({
                                 name="archive"
                                 value={product.archived_at ? "false" : "true"}
                               />
-                              <button
-                                type="submit"
+                              <AdminSubmitButton
+                                pendingLabel={product.archived_at ? "Restoring…" : "Archiving…"}
                                 className="min-h-11 rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
                               >
-                                {product.archived_at
-                                  ? "Restore from Archive"
-                                  : "Archive Product"}
-                              </button>
+                                {product.archived_at ? "Restore from Archive" : "Archive Product"}
+                              </AdminSubmitButton>
                             </form>
                           </>
                         )}
