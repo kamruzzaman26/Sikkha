@@ -39,14 +39,33 @@ async function getSiteIdentity(): Promise<SiteIdentity> {
   const metadataName = user.user_metadata?.display_name;
   const emailName = user.email?.split("@")[0];
 
+  const [{ data: adminMembership, error: adminError }, { count: orderCount, error: ordersError }] = await Promise.all([
+    supabase
+      .from("admin_users")
+      .select("role")
+      .eq("user_id", user.id)
+      .maybeSingle(),
+    supabase
+      .from("orders")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user.id),
+  ]);
+
+  if (adminError) {
+    throw new Error("Unable to load the account's admin membership.", { cause: adminError });
+  }
+  if (ordersError) {
+    throw new Error("Unable to load the account's order status.", { cause: ordersError });
+  }
+
   return {
     displayName:
       (typeof metadataName === "string" ? metadataName.trim() : "") ||
       emailName ||
       "গ্রাহক",
     email: user.email ?? "",
-    hasOrders: false,
-    isAdmin: false,
+    hasOrders: (orderCount ?? 0) > 0,
+    isAdmin: adminMembership?.role === "admin",
   };
 }
 
