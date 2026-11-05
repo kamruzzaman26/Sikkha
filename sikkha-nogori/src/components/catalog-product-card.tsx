@@ -3,6 +3,7 @@ import Link from "next/link";
 import { formatBDT } from "@/lib/money";
 import type { CatalogProduct, PublishedProductType } from "@/lib/catalog";
 import { WishlistButton } from "@/components/wishlist-button";
+import { AddToCartButton } from "@/components/add-to-cart-button";
 
 export function CatalogProductCard({
   product,
@@ -78,12 +79,15 @@ export function CatalogProductCard({
           বিস্তারিত দেখুন
         </Link>
         {product.commerce_mode === "direct" && product.price !== null && (
-          <Link
-            href={`/checkout?product=${encodeURIComponent(product.id)}`}
-            className="mt-2 inline-flex min-h-11 items-center justify-center rounded-lg bg-emerald-700 px-3 py-2.5 text-center text-sm font-bold text-white transition hover:bg-emerald-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700"
-          >
-            এখনই অর্ডার করুন
-          </Link>
+          <>
+            <Link
+              href={`/checkout?product=${encodeURIComponent(product.id)}`}
+              className="mt-2 inline-flex min-h-11 items-center justify-center rounded-lg bg-emerald-700 px-3 py-2.5 text-center text-sm font-bold text-white transition hover:bg-emerald-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700"
+            >
+              অর্ডার করুন
+            </Link>
+            <AddToCartButton productId={product.id} />
+          </>
         )}
         <div className="mt-2">
           <WishlistButton slug={product.slug} />
