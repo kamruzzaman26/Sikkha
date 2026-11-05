@@ -51,7 +51,7 @@ export default async function ForgotPasswordPage({ searchParams }: PageProps) {
                 <label htmlFor="reset-email" className="mb-2 block text-sm font-bold">Enter your email address</label>
                 <input id="reset-email" name="email" type="email" autoComplete="email" required maxLength={254} placeholder="name@example.com" className="min-h-12 w-full rounded-xl border border-slate-300 px-4 outline-none transition focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100" />
               </div>
-              <button type="submit" className="min-h-12 rounded-xl bg-emerald-700 px-5 font-bold text-white transition hover:bg-emerald-800">Send Reset Link</button>
+              <button type="submit" className="min-h-12 rounded-xl bg-emerald-700 px-5 font-bold text-white transition hover:bg-emerald-800">Send Reset Code</button>
             </form>
           )}
 
