@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
+import { connection } from "next/server";
 import { signOutCustomer } from "@/app/login/actions";
 import { formatBDT } from "@/lib/money";
 import { submitManualPayment } from "./actions";
@@ -59,6 +60,7 @@ type CustomerOrder = {
 async function AccountOrdersContent({
   searchParams,
 }: Pick<PageProps<"/account/orders">, "searchParams">) {
+  await connection();
   const { supabase, user } = await requireCustomer();
 
   const { data: orders, error: ordersError } = await supabase
