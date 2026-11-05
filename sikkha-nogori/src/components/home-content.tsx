@@ -146,7 +146,7 @@ function ProductRow({ products }: { products: CatalogProduct[] }) {
       </div>
       <div className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-3 [scrollbar-width:none] sm:mx-0 sm:px-0 sm:gap-4">
         {products.slice(0, 12).map((product) => (
-          <div key={product.id} className="w-[82%] max-w-[18rem] shrink-0 snap-start sm:w-[46%] lg:w-[28%]">
+          <div key={product.id} className="w-[46%] min-w-[9.5rem] max-w-[14rem] shrink-0 snap-start sm:w-[30%] lg:w-[22%]">
             <CatalogProductCard product={product} />
           </div>
         ))}
