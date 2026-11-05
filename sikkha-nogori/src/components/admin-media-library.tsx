@@ -5,7 +5,7 @@ type Media={name:string;id?:string;created_at?:string;metadata?:{mimetype?:strin
 export function AdminMediaLibrary({initialFiles}:{initialFiles:Media[]}){
  const [files,setFiles]=useState(initialFiles);const [busy,setBusy]=useState(false);const [message,setMessage]=useState("");
  async function reload(){const supabase=createSupabaseBrowserClient();const {data,error}=await supabase.storage.from("product-images").list("catalog",{limit:200,sortBy:{column:"created_at",order:"desc"}});if(error){setMessage(error.message);return;}setFiles((data??[]).filter(x=>x.name&&!x.name.endsWith("/")) as Media[]);}
- useEffect(()=>{void reload()},[]);
+ useEffect(()=>{void Promise.resolve().then(reload)},[]);
  async function upload(file?:File){if(!file)return;if(!["image/jpeg","image/png","image/webp"].includes(file.type)||file.size>5*1024*1024){setMessage("JPG, PNG বা WebP ছবি দিন; সর্বোচ্চ ৫ MB।");return;}setBusy(true);setMessage("");const ext=file.type==="image/png"?"png":file.type==="image/webp"?"webp":"jpg";const path=`catalog/${crypto.randomUUID()}.${ext}`;const supabase=createSupabaseBrowserClient();const {error}=await supabase.storage.from("product-images").upload(path,file,{upsert:false,contentType:file.type,cacheControl:"31536000"});if(error)setMessage(error.message);else{setMessage("ছবি আপলোড হয়েছে।");await reload()}setBusy(false);}
  async function remove(name:string){if(!window.confirm("এই ছবিটি স্থায়ীভাবে মুছে ফেলবেন?"))return;const supabase=createSupabaseBrowserClient();const {error}=await supabase.storage.from("product-images").remove([`catalog/${name}`]);if(error)setMessage(error.message);else{setMessage("ছবি মুছে ফেলা হয়েছে।");await reload()}}
  const supabase=createSupabaseBrowserClient();
