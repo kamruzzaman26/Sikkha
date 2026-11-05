@@ -43,7 +43,7 @@ export default async function LibraryPartnershipPage({ params, searchParams }: {
   } else if (section === "books") {
     const { data, error } = await supabase.from("library_book_offers").select("id,title,author,publisher,isbn,edition,cost_price,selling_price,stock_quantity,availability,is_active,library_partners(library_name)").order("created_at", { ascending: false }).limit(200);
     if (error) throw new Error("পার্টনার বই লোড করা যায়নি।", { cause: error });
-    content = <Rows rows={(data ?? []).map((x: any) => [x.title, x.library_partners?.library_name ?? "Library", x.publisher ?? "—", x.edition ?? "—", money(x.cost_price), money(x.selling_price), String(x.stock_quantity), x.availability])} headers={["বই","লাইব্রেরি","প্রকাশক","সংস্করণ","ক্রয়মূল্য","বিক্রয়মূল্য","স্টক","অবস্থা"]}/>;
+    content = <Rows rows={(data ?? []).map((x) => [x.title, x.library_partners?.library_name ?? "Library", x.publisher ?? "—", x.edition ?? "—", money(x.cost_price), money(x.selling_price), String(x.stock_quantity), x.availability])} headers={["বই","লাইব্রেরি","প্রকাশক","সংস্করণ","ক্রয়মূল্য","বিক্রয়মূল্য","স্টক","অবস্থা"]}/>;
   } else if (section === "assignments") {
     const { data, error } = await supabase.from("library_order_assignments").select("id,order_id,status,assigned_at,library_partners(library_name)").order("assigned_at", { ascending: false }).limit(200);
     if (error) throw new Error("অর্ডার বরাদ্দ লোড করা যায়নি।", { cause: error });
