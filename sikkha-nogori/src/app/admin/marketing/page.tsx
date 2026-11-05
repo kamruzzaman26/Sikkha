@@ -8,8 +8,9 @@ export default async function MarketingAdmin({searchParams}:{searchParams:Promis
  await connection(); const {supabase}=await requirePermission("manage_marketing","/admin/dashboard");
  const [{data,error},{status}]=await Promise.all([supabase.from("site_settings").select("value").eq("key","marketing").maybeSingle(),searchParams]);
  if(error) throw new Error("Unable to load marketing campaigns.",{cause:error});
- const campaigns=Array.isArray(data?.value)?data.value:[];
- const counts={draft:campaigns.filter((c:any)=>c.status==="draft").length,ready:campaigns.filter((c:any)=>c.status==="ready").length,archived:campaigns.filter((c:any)=>c.status==="archived").length};
+ type Campaign = { status?: string };
+ const campaigns = (Array.isArray(data?.value) ? data.value : []) as Campaign[];
+ const counts={draft:campaigns.filter((c)=>c.status==="draft").length,ready:campaigns.filter((c:any)=>c.status==="ready").length,archived:campaigns.filter((c:any)=>c.status==="archived").length};
  return <main lang="en" className="min-h-screen px-4 py-7 text-slate-900 sm:px-8"><div className="mx-auto max-w-5xl">
  <header className="rounded-3xl bg-[#082f29] p-7 text-white"><p className="text-xs font-bold uppercase tracking-[.2em] text-emerald-200">Growth workspace</p><h1 className="mt-2 text-3xl font-black">Marketing Campaigns</h1><p className="mt-2 text-sm text-emerald-50/75">Plan and organize campaign copy for website, social and email channels.</p></header>
  {status&&<p role="status" className="mt-4 rounded-xl bg-emerald-50 p-3 text-sm font-semibold text-emerald-900">{status==="saved"?"Campaigns saved.":"Please check the campaign data and try again."}</p>}
