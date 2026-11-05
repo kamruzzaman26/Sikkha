@@ -351,28 +351,18 @@ export function SiteHeader({
                         )}
                       </div>
                       <nav aria-label="Account menu" className="mt-2 grid">
-                        <AccountLink href="/dashboard/profile" onClick={() => setAccountOpen(false)}>
-                          My Account
-                        </AccountLink>
-                        <AccountLink href="/account/orders" onClick={() => setAccountOpen(false)}>
-                          My Orders & Tracking
-                        </AccountLink>
-                        {identity.hasOrders && (
-                          <AccountLink href="/account/orders" onClick={() => setAccountOpen(false)}>
-                            Order History
-                          </AccountLink>
-                        )}
-                        <AccountLink href="/wishlist" onClick={() => setAccountOpen(false)}>
-                          Wishlist
-                        </AccountLink>
-                        <AccountLink href="/affiliate" onClick={() => setAccountOpen(false)}>
-                          Affiliate Dashboard
-                        </AccountLink>
-                        {identity.isAdmin && (
-                          <AccountLink href="/admin" onClick={() => setAccountOpen(false)}>
-                            Admin Dashboard
-                          </AccountLink>
-                        )}
+                        <AccountLink href="/dashboard/profile" onClick={() => setAccountOpen(false)}>Account Info</AccountLink>
+                        <AccountLink href="/account/orders" onClick={() => setAccountOpen(false)}>Orders &amp; Tracking</AccountLink>
+                        <AccountPlaceholder>Rating &amp; Reviews</AccountPlaceholder>
+                        <AccountPlaceholder>My Interests</AccountPlaceholder>
+                        <AccountPlaceholder>Following Authors</AccountPlaceholder>
+                        <AccountLink href="/wishlist" onClick={() => setAccountOpen(false)}>Wishlist</AccountLink>
+                        <AccountPlaceholder>Saved List</AccountPlaceholder>
+                        <AccountLink href="/e-library" onClick={() => setAccountOpen(false)}>eBook Library</AccountLink>
+                        <AccountPlaceholder>Bookshelf</AccountPlaceholder>
+                        <AccountPlaceholder>Bhash Account</AccountPlaceholder>
+                        <AccountPlaceholder>Rokomari Balance</AccountPlaceholder>
+                        <AccountPlaceholder>Rokomari Points</AccountPlaceholder>
                       </nav>
                       <form action={signOutCustomer} className="mt-2 border-t border-slate-100 pt-2">
                         <button
@@ -471,6 +461,22 @@ export function SiteHeader({
                 "Diaper & Potty", "Feeding", "Kids Toys", "Lotions & Creams", "Teethers & Pacifier",
                 "Grooming", "Oral & Health", "Body Wash", "Mum Pot & Cups", "Bathing"
               ]} basePath="/products" />
+
+              <div className="mt-5 border-t border-slate-200 pt-3">
+                <p className="px-3 pb-2 text-xs font-extrabold uppercase tracking-wider text-emerald-800">সহায়তা ও অন্যান্য</p>
+                <DrawerLink icon="article" href="/affiliate" onClick={closeDrawer}>ঘরে বসে আয় করুন</DrawerLink>
+                <DrawerLink icon="article" href="/books?category=বেস্টসেলার%20অ্যাওয়ার্ড" onClick={closeDrawer}>বেস্টসেলার অ্যাওয়ার্ড, ২৫</DrawerLink>
+                <DrawerLink icon="article" href="/affiliate" onClick={closeDrawer}>শিক্ষা নগরী উদ্যোক্তা</DrawerLink>
+                <DrawerPlaceholder>Bulk Order</DrawerPlaceholder>
+                <DrawerLink icon="orders" href="/account/orders" onClick={closeDrawer}>Orders &amp; Tracking</DrawerLink>
+                <DrawerPlaceholder>Writer/Publisher Request</DrawerPlaceholder>
+                <DrawerPlaceholder>Retailer Request</DrawerPlaceholder>
+                <DrawerLink icon="contact" href="/contact" onClick={closeDrawer}>Contact Us</DrawerLink>
+                <DrawerLink icon="about" href="/about" onClick={closeDrawer}>About Us</DrawerLink>
+                <DrawerLink icon="article" href="/blog" onClick={closeDrawer}>Blog</DrawerLink>
+                <DrawerPlaceholder>Career</DrawerPlaceholder>
+                <DrawerLink icon="disclosure" href="/terms" onClick={closeDrawer}>Terms and Conditions</DrawerLink>
+              </div>
             </nav>
 
             <div className="border-t border-slate-100 p-3">
@@ -574,6 +580,22 @@ function BottomNavItem({ href, icon, label, disabled = false }: { href?: string;
   const baseClass = "flex min-h-14 flex-col items-center justify-center gap-0.5 rounded-xl px-1 text-[10px] font-bold text-slate-600 transition-colors hover:bg-emerald-50 hover:text-emerald-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700";
   if (disabled || !href) return <span aria-disabled="true" title={label+" পৃষ্ঠা এখনো চালু হয়নি"} className={baseClass+" text-slate-400 opacity-60"}><span aria-hidden="true" className="text-lg leading-5">{icon}</span>{label}</span>;
   return <Link href={href} aria-label={label+" পৃষ্ঠায় যান"} className={baseClass}><span aria-hidden="true" className="text-lg leading-5">{icon}</span><span>{label}</span></Link>;
+}
+
+function AccountPlaceholder({ children }: { children: React.ReactNode }) {
+  return (
+    <span aria-disabled="true" title="এই সুবিধাটি শিগগিরই চালু হবে" className="flex min-h-10 items-center rounded-lg px-3 text-sm font-medium text-slate-400">
+      {children}<span className="ml-auto text-[10px] font-semibold">শীঘ্রই</span>
+    </span>
+  );
+}
+
+function DrawerPlaceholder({ children }: { children: React.ReactNode }) {
+  return (
+    <span aria-disabled="true" title="এই সুবিধাটি শিগগিরই চালু হবে" className="flex min-h-11 items-center gap-3 border-b border-slate-100 px-3 text-sm font-medium text-slate-400">
+      <span aria-hidden="true" className="size-5 shrink-0" />{children}<span className="ml-auto text-[10px] font-semibold">শীঘ্রই</span>
+    </span>
+  );
 }
 
 function AccountLink({
