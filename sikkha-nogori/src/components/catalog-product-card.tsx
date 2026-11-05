@@ -77,6 +77,14 @@ export function CatalogProductCard({
         >
           বিস্তারিত দেখুন
         </Link>
+        {product.commerce_mode === "direct" && product.price !== null && (
+          <Link
+            href={`/checkout?product=${encodeURIComponent(product.id)}`}
+            className="mt-2 inline-flex min-h-11 items-center justify-center rounded-lg bg-emerald-700 px-3 py-2.5 text-center text-sm font-bold text-white transition hover:bg-emerald-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700"
+          >
+            এখনই অর্ডার করুন
+          </Link>
+        )}
         <div className="mt-2">
           <WishlistButton slug={product.slug} />
         </div>
