@@ -155,7 +155,9 @@ function ProductRow({ products }: { products: CatalogProduct[] }) {
   );
 }
 
-export default async function HomeContent() {
+export default async function HomeContent({ searchParams }: { searchParams: Promise<{ source?: string }> }) {
+  const { source } = await searchParams;
+  const activeSource = source === "inhouse" || source === "partner" ? source : "all";
   const [books, products, categories, homeSettings] = await Promise.all([
     loadBooks(), loadProducts(), loadCategoryTiles(), loadHomeConfig(),
   ]);
