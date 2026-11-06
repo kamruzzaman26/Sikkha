@@ -10,6 +10,13 @@ type Filters = {
   languages: string[];
 };
 
+const filterParamNames: Record<keyof Filters, string> = {
+  categories: "category",
+  authors: "author",
+  publishers: "publisher",
+  languages: "language",
+};
+
 const sortOptions = [
   ["name-asc", "নাম: ক থেকে হ"],
   ["name-desc", "নাম: হ থেকে ক"],
@@ -56,7 +63,7 @@ export default function BooksShopControls({
             <label key={option.value} className="flex min-h-10 cursor-pointer items-center gap-3 rounded-lg px-2 py-2 text-sm text-slate-700 hover:bg-emerald-50">
               <input
                 type="checkbox"
-                name={key}
+                name={filterParamNames[key]}
                 value={option.value}
                 defaultChecked={filters[key].includes(option.value)}
                 className="h-4 w-4 rounded border-slate-300 accent-emerald-700"
@@ -93,7 +100,7 @@ export default function BooksShopControls({
         </button>
         <form action="/books" method="get">
           {query && <input type="hidden" name="q" value={query} />}
-          {Object.entries(filters).flatMap(([key, values]) => values.map((value) => <input key={key + value} type="hidden" name={key} value={value} />))}
+          {Object.entries(filters).flatMap(([key, values]) => values.map((value) => <input key={key + value} type="hidden" name={filterParamNames[key as keyof Filters]} value={value} />))}
           <input type="hidden" name="sort" value="newest" />
           <button type="submit" className={sort === "newest" ? "min-h-11 rounded-xl bg-emerald-700 px-4 text-sm font-bold text-white" : "min-h-11 rounded-xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 hover:bg-emerald-50"}>
             New Released
