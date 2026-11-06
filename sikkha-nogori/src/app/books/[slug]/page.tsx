@@ -90,10 +90,11 @@ async function BookDetails({
   }
 
   const savings = getSavings(book.price, book.listPrice);
+  // Public view: capped copy count (max 50), never raw quantities.
   const inventory = book.productId
-    ? await createSupabasePublicServerClient().from("product_inventory").select("stock_quantity").eq("product_id", book.productId).maybeSingle()
+    ? await createSupabasePublicServerClient().from("public_product_stock").select("available_copies").eq("product_id", book.productId).maybeSingle()
     : { data: null, error: null };
-  const stockQuantity = inventory.data?.stock_quantity ?? null;
+  const stockQuantity: number | null = typeof inventory.data?.available_copies === "number" ? inventory.data.available_copies : null;
   const specRows: BookSpecRow[] = [
     { label: "Name", value: book.title },
     { label: "Category", value: book.category },
@@ -181,7 +182,7 @@ async function BookDetails({
                   </>
                 ) : <p className="text-sm text-slate-500">মূল্য জানতে বিক্রেতার সঙ্গে যোগাযোগ করুন</p>}
                 <p className="mt-3 text-xs leading-5 text-slate-500">মূল্য ও প্রাপ্যতা অর্ডার নিশ্চিত করার সময় যাচাই করুন।</p>
-                {book.commerceMode === "direct" && (stockQuantity === null ? <p className="mt-2 text-sm text-slate-500">স্টকের তথ্য পাওয়া যায়নি।</p> : stockQuantity > 0 ? <p className="mt-2 text-sm font-semibold text-emerald-700">স্টকে আছে · {stockQuantity}টি</p> : <p className="mt-2 text-sm font-semibold text-rose-700">স্টক শেষ</p>)}
+                {book.commerceMode === "direct" && (stockQuantity === null ? <p className="mt-2 text-sm text-slate-500">স্টকের তথ্য পাওয়া যায়নি।</p> : stockQuantity > 0 ? <p className="mt-2 text-sm font-semibold text-emerald-700">স্টকে আছে · {stockQuantity >= 50 ? "৫০+" : stockQuantity.toLocaleString("bn-BD")} কপি</p> : <p className="mt-2 text-sm font-semibold text-rose-700">স্টক শেষ</p>)}
               </div>
 
               <div className="flex flex-wrap items-center gap-2">
