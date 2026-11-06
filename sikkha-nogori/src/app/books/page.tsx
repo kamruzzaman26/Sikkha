@@ -53,9 +53,10 @@ async function BookResults({
     Number.isSafeInteger(pageValue) && pageValue > 0 && pageValue <= 100000
       ? pageValue
       : 1;
-  const [bookPage, databaseCategories] = await Promise.all([
-    getPublishedBooks({ page, query, category: category || undefined, sort }),
+  const [bookPage, databaseCategories, facets] = await Promise.all([
+    getPublishedBooks({ page, query, filters, sort }),
     getPublishedBookCategories(),
+    getPublishedBookFacets(),
   ]);
   const availableBooks =
     bookPage === null ? books : bookPage.products.map(toCatalogBook);
@@ -71,7 +72,11 @@ async function BookResults({
             book.category.toLocaleLowerCase("bn").includes(normalizedQuery) ||
             book.description.toLocaleLowerCase("bn").includes(normalizedQuery);
 
-          return matchesQuery && (!category || book.category === category);
+          return matchesQuery &&
+            (!filters.categories.length || filters.categories.includes(book.category)) &&
+            (!filters.authors.length || filters.authors.includes(book.author)) &&
+            (!filters.publishers.length || filters.publishers.includes(book.publisher)) &&
+            (!filters.languages.length || filters.languages.includes(book.language ?? ""));
         })
       : availableBooks;
   const matchingBooks =
@@ -94,9 +99,11 @@ async function BookResults({
   );
   const total = bookPage?.total ?? matchingBooks.length;
   const pageCount = Math.max(1, Math.ceil(total / 24));
-  const categoryNames = databaseCategories ?? [
-    ...new Set(books.map((book) => book.category)),
-  ];
+  const categoryNames = [...new Set([
+    ...(databaseCategories ?? []),
+    ...facets.categories,
+    ...books.map((book) => book.category),
+  ])];
   const knownCategories = bookCategories
     .map((item) => {
       const sampleName = books.find(
