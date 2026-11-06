@@ -2,13 +2,14 @@ import Link from "next/link";
 import { Suspense } from "react";
 import BookCard from "@/components/book-card";
 import { getActiveAffiliateLinkMap } from "@/lib/supabase/affiliate-links";
-import MobileCatalogFilters from "@/components/mobile-catalog-filters";
+import BooksShopControls from "@/components/books-shop-controls";
 import {
   bookCategories,
   books,
 } from "@/lib/books";
 import {
   getPublishedBookCategories,
+  getPublishedBookFacets,
   getPublishedBooks,
   toCatalogBook,
 } from "@/lib/catalog";
@@ -16,6 +17,9 @@ import {
 type BookSearchParams = Promise<{
   q?: string | string[];
   category?: string | string[];
+  author?: string | string[];
+  publisher?: string | string[];
+  language?: string | string[];
   page?: string | string[];
   sort?: string | string[];
 }>;
