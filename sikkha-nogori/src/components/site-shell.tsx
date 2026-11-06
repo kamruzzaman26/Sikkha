@@ -89,13 +89,28 @@ async function getCategoryMenu() {
   }
 }
 
+async function getTopBar() {
+  try {
+    const supabase = createSupabasePublicServerClient();
+    const { data } = await supabase.from("site_settings").select("value").eq("key", "general").maybeSingle();
+    const value = (data?.value ?? {}) as { helpline?: unknown; delivery_note?: unknown };
+    return {
+      helpline: typeof value.helpline === "string" ? value.helpline : "",
+      note: typeof value.delivery_note === "string" ? value.delivery_note : "",
+    };
+  } catch {
+    return { helpline: "", note: "" };
+  }
+}
+
 async function AuthenticatedSiteHeader() {
   await connection();
-  const [identity, categoryMenu] = await Promise.all([
+  const [identity, categoryMenu, topBar] = await Promise.all([
     getSiteIdentity(),
     getCategoryMenu(),
+    getTopBar(),
   ]);
-  return <SiteHeader identity={identity} categoryMenu={categoryMenu} />;
+  return <SiteHeader identity={identity} categoryMenu={categoryMenu} topBar={topBar} />;
 }
 
 export function SiteShell({ children }: { children: ReactNode }) {

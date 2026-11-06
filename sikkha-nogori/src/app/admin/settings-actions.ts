@@ -33,13 +33,16 @@ export async function saveGeneralSettings(form: FormData) {
   const email = field(form, "contactEmail");
   const phone = field(form, "contactPhone");
   const address = field(form, "address");
+  const helpline = field(form, "helpline");
+  const deliveryNote = field(form, "deliveryNote");
   const currency = field(form, "currency");
   const facebook = field(form, "facebook");
   const instagram = field(form, "instagram");
   const youtube = field(form, "youtube");
   if (siteName.length < 2 || siteName.length > 100 || tagline.length > 200 || email.length > 160 || phone.length > 40 || address.length > 300 || !["BDT","USD"].includes(currency) || ![facebook,instagram,youtube].every(safeUrl)) redirect("/admin/settings?status=invalid");
+  if (helpline.length > 40 || deliveryNote.length > 120) redirect("/admin/settings?status=invalid");
   if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) redirect("/admin/settings?status=invalid");
-  await save("general", "manage_settings", { site_name: siteName, tagline, contact_email: email, contact_phone: phone, address, currency, social: { facebook, instagram, youtube } });
+  await save("general", "manage_settings", { site_name: siteName, tagline, contact_email: email, contact_phone: phone, helpline, delivery_note: deliveryNote, address, currency, social: { facebook, instagram, youtube } });
 }
 
 export async function saveSeoSettings(form: FormData) {

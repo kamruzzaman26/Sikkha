@@ -21,6 +21,7 @@ export type Book = {
   productId?: string;
   imageUrl?: string | null;
   commerceMode?: "affiliate" | "direct" | null;
+  inStock?: boolean | null;
 };
 
 export const bookCategories = [

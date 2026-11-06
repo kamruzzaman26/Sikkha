@@ -5,6 +5,7 @@ import type { CatalogProduct, PublishedProductType } from "@/lib/catalog";
 import { WishlistButton } from "@/components/wishlist-button";
 import { AddToCartButton } from "@/components/add-to-cart-button";
 import { RatingStars } from "@/components/rating-stars";
+import { StockLabel } from "@/components/stock-label";
 
 export function CatalogProductCard({
   product,
@@ -98,6 +99,7 @@ export function CatalogProductCard({
             বাইরের বিক্রেতার কাছে উপলভ্য
           </p>
         )}
+        {product.commerce_mode === "direct" && <StockLabel inStock={product.in_stock} />}
         <Link
           href={`/products/${product.slug}`}
           className="mt-4 inline-flex min-h-11 items-center justify-center rounded-lg border border-emerald-700 px-3 py-2.5 text-center text-sm font-semibold text-emerald-800 transition hover:bg-emerald-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700"

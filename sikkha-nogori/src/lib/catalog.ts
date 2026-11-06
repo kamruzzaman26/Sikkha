@@ -24,12 +24,37 @@ export type CatalogProduct = {
   image_url: string | null;
   commerce_mode: "affiliate" | "direct" | null;
   created_at: string;
+  /** true/false only for in-house items with tracked stock; absent otherwise. */
+  in_stock?: boolean | null;
 };
 
 function isMissingCatalogSchema(error: { code?: string }): boolean {
   return ["42P01", "42703", "PGRST204", "PGRST205"].includes(
     error.code ?? "",
   );
+}
+
+/**
+ * Adds an in-stock flag from the public `public_product_stock` view (id + boolean only,
+ * never quantities). If the view is missing or fails, products are returned unchanged.
+ */
+async function withStockFlags(products: CatalogProduct[]): Promise<CatalogProduct[]> {
+  const ids = products.filter((product) => product.commerce_mode === "direct").map((product) => product.id);
+  if (ids.length === 0) return products;
+  try {
+    const supabase = createSupabasePublicServerClient();
+    const { data, error } = await supabase
+      .from("public_product_stock")
+      .select("product_id, in_stock")
+      .in("product_id", ids);
+    if (error || !data) return products;
+    const flags = new Map(data.map((row) => [row.product_id as string, Boolean(row.in_stock)]));
+    return products.map((product) =>
+      flags.has(product.id) ? { ...product, in_stock: flags.get(product.id) } : product,
+    );
+  } catch {
+    return products;
+  }
 }
 
 const bookPageSize = 24;
@@ -225,7 +250,7 @@ export async function getPublishedBooks({
     throw new Error("Unable to load the book catalog.", { cause: error });
   }
 
-  return { products: data, total: count ?? 0 };
+  return { products: await withStockFlags(data), total: count ?? 0 };
 }
 
 async function getProductCategoryProductIds(
@@ -327,7 +352,7 @@ export async function getPublishedProducts({
     throw new Error("Unable to load the products catalog.", { cause: error });
   }
 
-  return { products: data, total: count ?? 0 };
+  return { products: await withStockFlags(data), total: count ?? 0 };
 }
 
 export async function getPublishedProductBySlug(
@@ -573,6 +598,7 @@ export function toCatalogBook(product: CatalogProduct): Book {
     productId: product.id,
     imageUrl: product.image_url,
     commerceMode: product.commerce_mode,
+    inStock: product.in_stock ?? null,
   };
 }
 

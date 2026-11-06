@@ -152,9 +152,11 @@ const iconButtonClass =
 export function SiteHeader({
   identity,
   categoryMenu = { books: [], products: [] },
+  topBar = { helpline: "", note: "" },
 }: {
   identity: SiteIdentity;
   categoryMenu?: CategoryMenu;
+  topBar?: { helpline: string; note: string };
 }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
@@ -252,7 +254,13 @@ export function SiteHeader({
         {/* Slim top bar (desktop): only links to pages that exist; no unverified claims. */}
         <div className="hidden bg-emerald-800 text-[11px] text-white sm:block">
           <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-1 lg:px-8">
-            <span className="font-medium text-emerald-50">বই ও শেখার উপকরণের ক্যাটালগ</span>
+            <span className="flex items-center gap-4 font-medium text-emerald-50">
+              {topBar.note && <span>{topBar.note}</span>}
+              {topBar.helpline && (
+                <a href={`tel:${topBar.helpline.replace(/[^+\d]/g, "")}`} className="hover:underline">হেল্পলাইন: {topBar.helpline}</a>
+              )}
+              {!topBar.note && !topBar.helpline && <span>বই ও শেখার উপকরণের ক্যাটালগ</span>}
+            </span>
             <nav aria-label="Top links" className="flex items-center gap-3">
               <Link href="/about" className="hover:underline">আমাদের সম্পর্কে</Link>
               <span aria-hidden="true" className="text-emerald-300">|</span>

@@ -6,6 +6,7 @@ import BookCover from "@/components/book-cover";
 import { WishlistButton } from "@/components/wishlist-button";
 import { AddToCartButton } from "@/components/add-to-cart-button";
 import { RatingStars } from "@/components/rating-stars";
+import { StockLabel } from "@/components/stock-label";
 
 function partnerLabel(partner: string | null): string {
   if (partner === "rokomari") return "রকমারিতে কিনুন";
@@ -108,6 +109,7 @@ export default function BookCard({
           ) : (
             <p className="text-xs text-slate-500">মূল্য জানতে বিস্তারিত দেখুন</p>
           )}
+          {isDirect && <StockLabel inStock={book.inStock} />}
           {!isDirect && book.productId && hasPrice && (
             <p className="mt-0.5 text-[10px] text-slate-400">পার্টনারের প্রদর্শিত মূল্য; পরিবর্তন হতে পারে</p>
           )}

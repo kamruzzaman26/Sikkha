@@ -7,7 +7,7 @@ import { AdminSubmitButton } from "@/components/admin-submit-button";
 export const metadata: Metadata = { title: "Website Settings | Sikkha Nogori Admin", robots: { index: false, follow: false } };
 const input = "min-h-11 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 outline-none transition focus:border-emerald-600 focus:ring-4 focus:ring-emerald-600/10";
 const label = "mb-1.5 block text-xs font-bold uppercase tracking-wide text-slate-600";
-type General = { site_name?: string; tagline?: string; contact_email?: string; contact_phone?: string; address?: string; currency?: string; social?: { facebook?: string; instagram?: string; youtube?: string } };
+type General = { site_name?: string; tagline?: string; contact_email?: string; contact_phone?: string; helpline?: string; delivery_note?: string; address?: string; currency?: string; social?: { facebook?: string; instagram?: string; youtube?: string } };
 export default async function WebsiteSettingsPage({ searchParams }: { searchParams: Promise<Record<string,string|string[]|undefined>> }) {
   await connection();
   const { supabase } = await requirePermission("manage_settings", "/admin/dashboard");
@@ -27,6 +27,8 @@ export default async function WebsiteSettingsPage({ searchParams }: { searchPara
     <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7"><div className="mb-5"><p className="text-[10px] font-extrabold uppercase tracking-[.18em] text-emerald-700">Customer support</p><h2 className="mt-1 text-xl font-extrabold">Contact information</h2></div><div className="grid gap-4 sm:grid-cols-2">
       <div><label className={label} htmlFor="contactEmail">Support email</label><input className={input} id="contactEmail" name="contactEmail" type="email" maxLength={160} defaultValue={s.contact_email ?? ""} /></div>
       <div><label className={label} htmlFor="contactPhone">Contact phone</label><input className={input} id="contactPhone" name="contactPhone" maxLength={40} defaultValue={s.contact_phone ?? ""} /></div>
+      <div><label className={label} htmlFor="helpline">Helpline (shown in site top bar)</label><input className={input} id="helpline" name="helpline" maxLength={40} defaultValue={s.helpline ?? ""} placeholder="01XXXXXXXXX" /></div>
+      <div><label className={label} htmlFor="deliveryNote">Top bar notice (e.g. delivery / payment note)</label><input className={input} id="deliveryNote" name="deliveryNote" maxLength={120} defaultValue={s.delivery_note ?? ""} placeholder="Leave empty to hide" /></div>
       <div className="sm:col-span-2"><label className={label} htmlFor="address">Business address</label><textarea className={input+" min-h-24"} id="address" name="address" maxLength={300} defaultValue={s.address ?? ""} /></div>
     </div></section>
     <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7"><div className="mb-5"><p className="text-[10px] font-extrabold uppercase tracking-[.18em] text-emerald-700">Social presence</p><h2 className="mt-1 text-xl font-extrabold">Official social links</h2><p className="mt-1 text-sm text-slate-500">Only HTTPS links are accepted.</p></div><div className="grid gap-4 sm:grid-cols-2">
