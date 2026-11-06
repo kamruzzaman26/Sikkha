@@ -146,7 +146,7 @@ export default function BooksShopControls({
             </div>
             <form action="/books" method="get" className="p-5">
               {query && <input type="hidden" name="q" value={query} />}
-              {Object.entries(filters).flatMap(([key, values]) => values.map((value) => <input key={key + value} type="hidden" name={key} value={value} />))}
+              {Object.entries(filters).flatMap(([key, values]) => values.map((value) => <input key={key + value} type="hidden" name={filterParamNames[key as keyof Filters]} value={value} />))}
               <div className="space-y-1">
                 {sortOptions.map(([value, label]) => (
                   <label key={value} className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-3 text-sm text-slate-700 hover:bg-emerald-50">
