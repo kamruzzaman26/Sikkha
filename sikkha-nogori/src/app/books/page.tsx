@@ -161,6 +161,12 @@ async function BookResults({
 
         <section className="mt-6 space-y-5">
           <div className="rounded-xl border border-slate-100 bg-white p-3 shadow-sm sm:p-4">
+            <nav aria-label="সাজানোর দ্রুত অপশন" className="mb-3 flex items-center gap-2 overflow-x-auto pb-1 text-xs [scrollbar-width:none]">
+              <a href="#book-query" className="whitespace-nowrap rounded-lg border border-slate-200 px-3.5 py-2 font-semibold text-slate-700 hover:bg-slate-50">ফিল্টার</a>
+              {([["newest", "নতুন"], ["price-low", "দাম: কম"], ["price-high", "দাম: বেশি"], ["name-asc", "নাম: ক–হ"]] as const).map(([value, label]) => (
+                <Link key={value} href={`/books?${new URLSearchParams({ ...(query ? { q: query } : {}), ...(category ? { category } : {}), sort: value }).toString()}`} aria-current={sort === value ? "true" : undefined} className={`whitespace-nowrap rounded-lg border px-3.5 py-2 font-semibold transition ${sort === value ? "border-blue-600 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-700 hover:bg-slate-50"}`}>{label}</Link>
+              ))}
+            </nav>
             <form action="/books" method="get" className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_minmax(9rem,0.45fr)_minmax(9rem,0.45fr)_auto]">
               <div className="sm:col-span-1">
                 <label htmlFor="book-query" className="sr-only">বই, লেখক বা প্রকাশক খুঁজুন</label>

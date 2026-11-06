@@ -11,6 +11,7 @@ import BookFeedback from "@/components/book-feedback";
 import { createSupabasePublicServerClient } from "@/lib/supabase/server";
 import { getActiveAffiliateLinks } from "@/lib/supabase/affiliate-links";
 import { getBookBySlug, formatPrice, getSavings } from "@/lib/books";
+import { estimateDeliveryDate, formatDeliveryDate, normalizeDeliveryDays } from "@/lib/delivery-estimate.mjs";
 import {
   getPublishedBookBySlug,
   toCatalogBook,
@@ -94,6 +95,9 @@ async function BookDetails({
   const inventory = book.productId
     ? await createSupabasePublicServerClient().from("public_product_stock").select("available_copies").eq("product_id", book.productId).maybeSingle()
     : { data: null, error: null };
+  const { data: generalSettings } = await createSupabasePublicServerClient().from("site_settings").select("value").eq("key", "general").maybeSingle();
+  const deliveryDays = normalizeDeliveryDays((generalSettings?.value as { delivery_days?: unknown } | null)?.delivery_days);
+  const deliveryText = deliveryDays > 0 ? formatDeliveryDate(estimateDeliveryDate(new Date(), deliveryDays)) : null;
   const stockQuantity: number | null = typeof inventory.data?.available_copies === "number" ? inventory.data.available_copies : null;
   const specRows: BookSpecRow[] = [
     { label: "Name", value: book.title },
@@ -184,6 +188,13 @@ async function BookDetails({
                 <p className="mt-3 text-xs leading-5 text-slate-500">মূল্য ও প্রাপ্যতা অর্ডার নিশ্চিত করার সময় যাচাই করুন।</p>
                 {book.commerceMode === "direct" && (stockQuantity === null ? <p className="mt-2 text-sm text-slate-500">স্টকের তথ্য পাওয়া যায়নি।</p> : stockQuantity > 0 ? <p className="mt-2 text-sm font-semibold text-emerald-700">স্টকে আছে · {stockQuantity >= 50 ? "৫০+" : stockQuantity.toLocaleString("bn-BD")} কপি</p> : <p className="mt-2 text-sm font-semibold text-rose-700">স্টক শেষ</p>)}
               </div>
+
+              {isDirectProduct && deliveryText && stockQuantity !== 0 && (
+                <div className="mb-4 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+                  <p className="text-sm font-bold text-blue-700">সম্ভাব্য ডেলিভারি</p>
+                  <p className="mt-0.5 text-sm text-slate-700">{deliveryText}-এর মধ্যে পৌঁছাবে</p>
+                </div>
+              )}
 
               <div className="flex flex-wrap items-center gap-2">
                 <Link href="#book-information" className="inline-flex min-h-10 items-center rounded-lg border border-slate-200 px-3 text-sm font-semibold text-slate-700 hover:border-emerald-300 hover:bg-emerald-50">বিস্তারিত তথ্য</Link>
