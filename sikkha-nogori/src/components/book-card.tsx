@@ -77,7 +77,7 @@ export default function BookCard({
         {book.author && (
           <p className="mt-0.5 line-clamp-1 text-xs text-slate-500">{book.author}</p>
         )}
-        <RatingStars />
+        <RatingStars rating={book.rating} count={book.ratingCount} />
         {isDirect && <StockLabel inStock={book.inStock} />}
 
         <div className="mt-1.5 min-h-7">

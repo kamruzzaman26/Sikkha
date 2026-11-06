@@ -79,7 +79,7 @@ export function CatalogProductCard({
             {[product.author, product.publisher].filter(Boolean).join(" · ")}
           </p>
         )}
-        <RatingStars />
+        <RatingStars rating={product.rating_average} count={product.rating_count} />
         <p className="mt-2 line-clamp-3 flex-1 text-sm leading-6 text-slate-600">
           {product.description}
         </p>

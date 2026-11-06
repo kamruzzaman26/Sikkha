@@ -66,7 +66,7 @@ export default function BookFeedback({ productId }: { productId: string }) {
   }
 
   return (
-    <section className="mt-6 grid gap-5 lg:grid-cols-2" aria-label="ক্রেতাদের মতামত ও প্রশ্ন">
+    <section id="book-feedback" className="mt-6 grid scroll-mt-24 gap-5 lg:grid-cols-2" aria-label="ক্রেতাদের মতামত ও প্রশ্ন">
       <div className="rounded-2xl border border-slate-200 bg-white p-5">
         <div className="flex items-center justify-between gap-3">
           <h2 className="text-lg font-extrabold text-slate-950">ক্রেতাদের রিভিউ</h2>

@@ -13,7 +13,7 @@ export function RatingStars({ rating, count }: { rating?: number | null; count?:
         ))}
       </span>
       <span className="text-[10px] font-semibold text-slate-500">
-        {has ? `(${rating}${count ? ` · ${count}` : ""})` : "রেটিং নেই"}
+        {has ? `${rating}${count ? ` (${count})` : ""}` : "রেটিং নেই"}
       </span>
     </div>
   );

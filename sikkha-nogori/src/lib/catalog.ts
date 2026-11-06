@@ -26,6 +26,9 @@ export type CatalogProduct = {
   created_at: string;
   /** true/false only for in-house items with tracked stock; absent otherwise. */
   in_stock?: boolean | null;
+  /** Average of approved reviews; absent when there are none. */
+  rating_average?: number | null;
+  rating_count?: number | null;
 };
 
 function isMissingCatalogSchema(error: { code?: string }): boolean {
@@ -52,6 +55,36 @@ async function withStockFlags(products: CatalogProduct[]): Promise<CatalogProduc
     return products.map((product) =>
       flags.has(product.id) ? { ...product, in_stock: flags.get(product.id) } : product,
     );
+  } catch {
+    return products;
+  }
+}
+
+/** Adds average rating/count from approved reviews (public RLS). Failures leave products unchanged. */
+async function withReviewStats(products: CatalogProduct[]): Promise<CatalogProduct[]> {
+  const ids = products.map((product) => product.id);
+  if (ids.length === 0) return products;
+  try {
+    const supabase = createSupabasePublicServerClient();
+    const { data, error } = await supabase
+      .from("product_reviews")
+      .select("product_id, rating")
+      .eq("status", "approved")
+      .in("product_id", ids);
+    if (error || !data || data.length === 0) return products;
+    const totals = new Map<string, { sum: number; count: number }>();
+    for (const row of data) {
+      const entry = totals.get(row.product_id as string) ?? { sum: 0, count: 0 };
+      entry.sum += Number(row.rating) || 0;
+      entry.count += 1;
+      totals.set(row.product_id as string, entry);
+    }
+    return products.map((product) => {
+      const entry = totals.get(product.id);
+      return entry
+        ? { ...product, rating_average: Math.round((entry.sum / entry.count) * 10) / 10, rating_count: entry.count }
+        : product;
+    });
   } catch {
     return products;
   }
@@ -250,7 +283,7 @@ export async function getPublishedBooks({
     throw new Error("Unable to load the book catalog.", { cause: error });
   }
 
-  return { products: await withStockFlags(data), total: count ?? 0 };
+  return { products: await withReviewStats(await withStockFlags(data)), total: count ?? 0 };
 }
 
 async function getProductCategoryProductIds(
@@ -352,7 +385,7 @@ export async function getPublishedProducts({
     throw new Error("Unable to load the products catalog.", { cause: error });
   }
 
-  return { products: await withStockFlags(data), total: count ?? 0 };
+  return { products: await withReviewStats(await withStockFlags(data)), total: count ?? 0 };
 }
 
 export async function getPublishedProductBySlug(
@@ -599,6 +632,8 @@ export function toCatalogBook(product: CatalogProduct): Book {
     imageUrl: product.image_url,
     commerceMode: product.commerce_mode,
     inStock: product.in_stock ?? null,
+    rating: product.rating_average ?? null,
+    ratingCount: product.rating_count ?? null,
   };
 }
 

@@ -7,6 +7,8 @@ import BookCover from "@/components/book-cover";
 import BookTabs, { type BookSpecRow } from "@/components/book-tabs";
 import { WishlistButton } from "@/components/wishlist-button";
 import { AddToCartButton } from "@/components/add-to-cart-button";
+import { ShareButton } from "@/components/share-button";
+import { RatingStars } from "@/components/rating-stars";
 import BookFeedback from "@/components/book-feedback";
 import { createSupabasePublicServerClient } from "@/lib/supabase/server";
 import { getActiveAffiliateLinks } from "@/lib/supabase/affiliate-links";
@@ -41,6 +43,9 @@ function CartIcon() {
     </svg>
   );
 }
+
+const buyNowClass =
+  "inline-flex min-h-12 items-center justify-center rounded-lg border border-slate-300 bg-slate-100 px-3 text-base font-bold text-slate-800 transition hover:bg-slate-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-500";
 
 const buyButtonClass =
   "inline-flex min-h-12 items-center justify-center gap-2 rounded-lg bg-emerald-700 px-6 py-3 text-base font-bold text-white transition hover:bg-emerald-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700";
@@ -98,6 +103,12 @@ async function BookDetails({
   const { data: generalSettings } = await createSupabasePublicServerClient().from("site_settings").select("value").eq("key", "general").maybeSingle();
   const deliveryDays = normalizeDeliveryDays((generalSettings?.value as { delivery_days?: unknown } | null)?.delivery_days);
   const deliveryText = deliveryDays > 0 ? formatDeliveryDate(estimateDeliveryDate(new Date(), deliveryDays)) : null;
+  const ratingSummary = book.productId
+    ? await createSupabasePublicServerClient().rpc("get_product_review_summary", { p_product_id: book.productId })
+    : { data: null };
+  const ratingRow = Array.isArray(ratingSummary.data) ? ratingSummary.data[0] : null;
+  const ratingCount = Number(ratingRow?.review_count) || 0;
+  const ratingAverage = ratingCount > 0 ? Math.round((Number(ratingRow?.average_rating) || 0) * 10) / 10 : null;
   const stockQuantity: number | null = typeof inventory.data?.available_copies === "number" ? inventory.data.available_copies : null;
   const specRows: BookSpecRow[] = [
     { label: "Name", value: book.title },
@@ -147,82 +158,95 @@ async function BookDetails({
           <span>{book.title}</span>
         </nav>
 
-        <article className="mt-5 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-          <div className="grid grid-cols-1 gap-0 md:grid-cols-[minmax(17rem,0.82fr)_minmax(0,1.18fr)]">
-            <section className="flex flex-col items-center border-b border-slate-100 bg-[#f8faf9] px-5 py-7 md:border-b-0 md:border-r md:px-8 md:py-9">
-              <span className="mb-3 text-xs font-bold tracking-wide text-emerald-800">বইয়ের প্রচ্ছদ</span>
-              <div className="flex min-h-[20rem] w-full max-w-[19rem] items-center justify-center rounded-xl bg-white p-4 shadow-[0_8px_30px_rgba(15,23,42,0.08)] ring-1 ring-slate-200 sm:min-h-[26rem]">
+        <article className="mt-4 rounded-xl border border-slate-200 bg-white p-3 shadow-sm sm:p-6">
+          <div className="grid grid-cols-[38%_minmax(0,1fr)] gap-3 sm:grid-cols-[minmax(14rem,0.55fr)_minmax(0,1fr)] sm:gap-8">
+            <section aria-label="বইয়ের প্রচ্ছদ" className="min-w-0">
+              <div className="flex aspect-[3/4] w-full items-center justify-center overflow-hidden rounded-lg bg-slate-50 p-1.5 ring-1 ring-slate-100">
                 {book.imageUrl ? (
-                  <Image src={book.imageUrl} alt={`${book.title} বইয়ের প্রচ্ছদ`} width={360} height={500} unoptimized className="max-h-[25rem] w-auto max-w-full object-contain drop-shadow-lg" />
+                  <Image src={book.imageUrl} alt={`${book.title} বইয়ের প্রচ্ছদ`} width={360} height={500} unoptimized className="h-full w-full object-contain" />
                 ) : book.productId ? (
-                  <p role="img" aria-label={`${book.title} বইয়ের ছবি নেই`} className="flex aspect-[3/4] w-44 items-center justify-center rounded-lg bg-slate-50 px-4 text-center text-sm text-slate-500">প্রচ্ছদের ছবি যোগ করা হয়নি</p>
+                  <p role="img" aria-label={`${book.title} বইয়ের ছবি নেই`} className="px-2 text-center text-xs text-slate-500">প্রচ্ছদের ছবি নেই</p>
                 ) : (
-                  <BookCover book={book} className="w-48 sm:w-56" />
+                  <BookCover book={book} className="w-full" />
                 )}
               </div>
-              <p className="mt-4 text-center text-xs text-slate-500">প্রচ্ছদের ছবি ও সংস্করণ প্রকাশকের তথ্য অনুযায়ী</p>
             </section>
 
-            <section className="flex flex-col p-5 sm:p-7 lg:p-9">
-              <div className="flex flex-wrap items-center gap-2">
-                {book.category && <span className="rounded-md bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-800">{book.category}</span>}
-                {book.edition && <span className="rounded-md bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600">{book.edition}</span>}
+            <section className="min-w-0">
+              <h1 className="text-lg font-extrabold leading-snug text-slate-950 sm:text-3xl">{book.title}</h1>
+              {book.edition && <p className="mt-1 text-sm text-slate-500">{book.edition}</p>}
+              <div className="mt-2 space-y-1 text-sm text-slate-600">
+                {book.author && <p>লেখক: <span className="font-semibold text-blue-700">{book.author}</span></p>}
+                {book.publisher && <p>প্রকাশনী: <span className="font-medium text-slate-800">{book.publisher}</span></p>}
+                {book.category && <p>বিভাগ: <span className="font-semibold text-blue-700">{book.category}</span></p>}
               </div>
-              <h1 className="mt-3 text-2xl font-extrabold leading-snug text-slate-950 sm:text-3xl">{book.title}</h1>
-              <div className="mt-3 space-y-1.5 text-sm text-slate-600">
-                {book.author && <p>লেখক: <span className="font-bold text-emerald-800">{book.author}</span></p>}
-                {book.publisher && <p>প্রকাশনী: <span className="font-semibold text-slate-800">{book.publisher}</span></p>}
-              </div>
+              <RatingStars rating={ratingAverage} count={ratingCount} />
 
-              <div className="my-5 border-y border-slate-100 py-5">
+              <div className="mt-3 rounded-lg bg-slate-100 px-3 py-2.5">
                 {book.price !== null ? (
-                  <>
-                    <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                      <span className="text-3xl font-extrabold tracking-tight text-slate-950 sm:text-4xl">{formatPrice(book.price)}</span>
-                      {savings && book.listPrice && <span className="text-base text-slate-400 line-through">{formatPrice(book.listPrice)}</span>}
-                      {savings && <span className="rounded-md bg-rose-50 px-2 py-1 text-xs font-extrabold text-rose-700">-{savings.percent}%</span>}
-                    </div>
-                    {savings && <p className="mt-2 text-sm font-semibold text-emerald-700">আপনি সাশ্রয় করছেন {formatPrice(savings.amount)} ({savings.percent}%)</p>}
-                  </>
-                ) : <p className="text-sm text-slate-500">মূল্য জানতে বিক্রেতার সঙ্গে যোগাযোগ করুন</p>}
-                <p className="mt-3 text-xs leading-5 text-slate-500">মূল্য ও প্রাপ্যতা অর্ডার নিশ্চিত করার সময় যাচাই করুন।</p>
-                {book.commerceMode === "direct" && (stockQuantity === null ? <p className="mt-2 text-sm text-slate-500">স্টকের তথ্য পাওয়া যায়নি।</p> : stockQuantity > 0 ? <p className="mt-2 text-sm font-semibold text-emerald-700">স্টকে আছে · {stockQuantity >= 50 ? "৫০+" : stockQuantity.toLocaleString("bn-BD")} কপি</p> : <p className="mt-2 text-sm font-semibold text-rose-700">স্টক শেষ</p>)}
-              </div>
-
-              {isDirectProduct && deliveryText && stockQuantity !== 0 && (
-                <div className="mb-4 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
-                  <p className="text-sm font-bold text-blue-700">সম্ভাব্য ডেলিভারি</p>
-                  <p className="mt-0.5 text-sm text-slate-700">{deliveryText}-এর মধ্যে পৌঁছাবে</p>
-                </div>
-              )}
-
-              <div className="flex flex-wrap items-center gap-2">
-                <Link href="#book-information" className="inline-flex min-h-10 items-center rounded-lg border border-slate-200 px-3 text-sm font-semibold text-slate-700 hover:border-emerald-300 hover:bg-emerald-50">বিস্তারিত তথ্য</Link>
-                <div className="min-w-36"><WishlistButton slug={book.slug} /></div>
-              </div>
-
-              {isDirectProduct && book.productId ? (
-                <section aria-label="কেনার অপশন" className="mt-5">
-                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                    <Link href={`/checkout?product=${encodeURIComponent(book.productId)}`} className={`${buyButtonClass} w-full`}>এখনই কিনুন</Link>
-                    <div className="[&>div>button]:min-h-12 [&>div>button]:w-full [&>div>button]:rounded-lg [&>div>button]:bg-emerald-50 [&>div>button]:text-emerald-800 [&>div>button]:border [&>div>button]:border-emerald-200 [&>div>button]:hover:bg-emerald-100"><AddToCartButton productId={book.productId} /></div>
+                  <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-0.5">
+                    <span className="text-2xl font-extrabold tracking-tight text-slate-950 sm:text-4xl">{formatPrice(book.price)}</span>
+                    {savings && book.listPrice && <span className="text-sm font-semibold text-slate-500 line-through sm:text-base">{formatPrice(book.listPrice)}</span>}
                   </div>
-                  <p className="mt-3 text-xs leading-5 text-slate-500">এটি শিক্ষা নগরীর নিজস্ব বিক্রির পণ্য; অর্ডার ও ডেলিভারি checkout-এ সম্পন্ন হবে।</p>
-                </section>
-              ) : book.commerceMode === "affiliate" && affiliateLinksUnavailable ? (
-                <p className="mt-5 rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-950">পার্টনার লিংক এখনো ডেটাবেসে চালু হয়নি।</p>
-              ) : book.commerceMode === "affiliate" && availableAffiliateLinks.length > 0 ? (
-                <section aria-label="কেনার অপশন" className="mt-5 space-y-2">
-                  {availableAffiliateLinks.map((affiliateLink) => <a key={affiliateLink.id} href={affiliateLink.url} target="_blank" rel="sponsored nofollow noopener noreferrer" className={`${buyButtonClass} w-full`}><CartIcon />{partnerBuyLabel(affiliateLink.partner)}</a>)}
-                  <p className="text-xs leading-5 text-slate-500">এই বাটন affiliate link; মূল্য বিক্রেতার সাইটে যাচাই করুন। <Link href="/affiliate-disclosure" className="font-semibold text-emerald-800 underline">বিস্তারিত</Link></p>
-                </section>
-              ) : (
-                <p className="mt-5 rounded-lg bg-slate-50 px-4 py-3 text-sm text-slate-600">{book.productId ? "এই পণ্যের জন্য বর্তমানে কোনো যাচাইকৃত কেনার লিংক নেই।" : "এটি নমুনা বই; বর্তমানে সরাসরি অর্ডার করা যাচ্ছে না।"}</p>
-              )}
-
-              {!book.productId && <p className="mt-4 rounded-lg bg-amber-50 px-3 py-2 text-xs leading-5 text-amber-900">প্রদর্শিত বইয়ের বিবরণ নমুনা কনটেন্ট।</p>}
+                ) : <p className="text-sm text-slate-500">মূল্য জানতে বিক্রেতার সঙ্গে যোগাযোগ করুন</p>}
+              </div>
+              {savings && <p className="mt-2 text-sm font-semibold text-emerald-700">আপনি সাশ্রয় করছেন {formatPrice(savings.amount)} ({savings.percent}%)</p>}
+              <p className="mt-2 text-xs leading-5 text-slate-500">মূল্য ও প্রাপ্যতা অর্ডার নিশ্চিত করার সময় যাচাই করুন।</p>
             </section>
           </div>
+
+          {isDirectProduct && deliveryText && stockQuantity !== 0 && (
+            <div className="mt-4 flex items-start gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+              <svg aria-hidden="true" viewBox="0 0 24 24" className="mt-0.5 size-6 shrink-0 text-blue-700" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6.5h11v9H3zM14 9.5h4l3 3v3h-7z" /><circle cx="7" cy="17.5" r="1.6" /><circle cx="17" cy="17.5" r="1.6" /></svg>
+              <div>
+                <p className="text-sm font-bold text-blue-700">সম্ভাব্য ডেলিভারি</p>
+                <p className="mt-0.5 text-sm text-slate-700">{deliveryText}ের মধ্যে পৌঁছাবে</p>
+              </div>
+            </div>
+          )}
+
+          <div className="mt-4 grid grid-cols-3 items-stretch">
+            <a href="#book-feedback" className="flex min-h-12 flex-col items-center justify-center gap-0.5 px-2 text-sm font-medium text-slate-700 hover:text-emerald-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700">
+              <svg aria-hidden="true" className="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round"><path d="M4 5h16v11H9l-5 4z" /><path d="M8 9h8M8 12h5" strokeLinecap="round" /></svg>
+              রিভিউ
+            </a>
+            <WishlistButton slug={book.slug} variant="icon" />
+            <ShareButton title={book.title} />
+          </div>
+
+          {book.commerceMode === "direct" && typeof stockQuantity === "number" && (
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              {stockQuantity > 0 ? (
+                <>
+                  <span className="rounded-full border border-emerald-200 bg-emerald-50 px-4 py-1.5 text-sm font-semibold text-emerald-700">স্টকে আছে</span>
+                  <span className="text-sm text-slate-600">({stockQuantity >= 50 ? "৫০+" : stockQuantity.toLocaleString("bn-BD")} কপি আছে)</span>
+                </>
+              ) : (
+                <span className="rounded-full border border-rose-200 bg-rose-50 px-4 py-1.5 text-sm font-semibold text-rose-700">স্টক শেষ</span>
+              )}
+            </div>
+          )}
+
+          {isDirectProduct && book.productId ? (
+            <section aria-label="কেনার অপশন" className="mt-4 hidden sm:block">
+              <div className="grid grid-cols-2 gap-3">
+                <Link href={`/checkout?product=${encodeURIComponent(book.productId)}`} className={buyNowClass}>এখনই কিনুন</Link>
+                <AddToCartButton productId={book.productId} variant="bar" />
+              </div>
+              <p className="mt-3 text-xs leading-5 text-slate-500">এটি শিক্ষা নগরীর নিজস্ব বিক্রির পণ্য; অর্ডার ও ডেলিভারি checkout-এ সম্পন্ন হবে।</p>
+            </section>
+          ) : book.commerceMode === "affiliate" && affiliateLinksUnavailable ? (
+            <p className="mt-4 rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-950">পার্টনার লিংক এখনো ডেটাবেসে চালু হয়নি।</p>
+          ) : book.commerceMode === "affiliate" && availableAffiliateLinks.length > 0 ? (
+            <section aria-label="কেনার অপশন" className="mt-4 space-y-2">
+              {availableAffiliateLinks.map((affiliateLink) => <a key={affiliateLink.id} href={affiliateLink.url} target="_blank" rel="sponsored nofollow noopener noreferrer" className={`${buyButtonClass} w-full`}><CartIcon />{partnerBuyLabel(affiliateLink.partner)}</a>)}
+              <p className="text-xs leading-5 text-slate-500">এই বাটন affiliate link; মূল্য বিক্রেতার সাইটে যাচাই করুন। <Link href="/affiliate-disclosure" className="font-semibold text-emerald-800 underline">বিস্তারিত</Link></p>
+            </section>
+          ) : (
+            <p className="mt-4 rounded-lg bg-slate-50 px-4 py-3 text-sm text-slate-600">{book.productId ? "এই পণ্যের জন্য বর্তমানে কোনো যাচাইকৃত কেনার লিংক নেই।" : "এটি নমুনা বই; বর্তমানে সরাসরি অর্ডার করা যাচ্ছে না।"}</p>
+          )}
+
+          {!book.productId && <p className="mt-4 rounded-lg bg-amber-50 px-3 py-2 text-xs leading-5 text-amber-900">প্রদর্শিত বইয়ের বিবরণ নমুনা কনটেন্ট।</p>}
         </article>
 
         <section id="book-information" className="mt-6">
@@ -240,18 +264,13 @@ async function BookDetails({
         </Link>
 
         {((isDirectProduct && stockQuantity !== 0) || primaryAffiliateLink) && (
-          <div className="fixed inset-x-0 bottom-0 z-30 border-t border-slate-200 bg-white/95 p-3 shadow-[0_-6px_20px_rgba(15,23,42,0.12)] backdrop-blur sm:hidden">
+          <div className="fixed inset-x-0 bottom-[calc(3.75rem+env(safe-area-inset-bottom))] z-30 border-t border-slate-200 bg-white p-2.5 shadow-[0_-6px_20px_rgba(15,23,42,0.12)] sm:hidden">
             {isDirectProduct && book.productId ? (
-              <div className="grid grid-cols-2 gap-2">
-                <Link
-                  href={`/checkout?product=${encodeURIComponent(book.productId)}`}
-                  className={`${buyButtonClass} min-h-12 px-2 text-sm`}
-                >
+              <div className="grid grid-cols-2 gap-2.5">
+                <Link href={`/checkout?product=${encodeURIComponent(book.productId)}`} className={buyNowClass}>
                   এখনই কিনুন
                 </Link>
-                <div className="[&>div>button]:min-h-12 [&>div>button]:rounded-lg [&>div>button]:bg-emerald-700 [&>div>button]:text-sm [&>div>button]:text-white [&>div>button]:hover:bg-emerald-800">
-                  <AddToCartButton productId={book.productId} />
-                </div>
+                <AddToCartButton productId={book.productId} variant="bar" />
               </div>
             ) : primaryAffiliateLink ? (
               <a
@@ -274,7 +293,7 @@ export default function BookDetailsPage({
   params,
 }: PageProps<"/books/[slug]">) {
   return (
-    <main className="min-h-screen bg-[#f7faf8] px-4 py-8 pb-28 text-slate-900 sm:px-6 sm:py-12 sm:pb-12 lg:px-8">
+    <main className="min-h-screen bg-[#f7faf8] px-4 py-8 pb-44 text-slate-900 sm:px-6 sm:py-12 sm:pb-12 lg:px-8">
       <Suspense
         fallback={
           <div className="mx-auto max-w-6xl animate-pulse rounded-3xl bg-white p-8">

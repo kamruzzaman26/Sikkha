@@ -7,7 +7,7 @@ import {
   writeWishlist,
 } from "@/lib/wishlist";
 
-export function WishlistButton({ slug }: { slug: string }) {
+export function WishlistButton({ slug, variant = "button" }: { slug: string; variant?: "button" | "icon" }) {
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
 
@@ -42,6 +42,20 @@ export function WishlistButton({ slug }: { slug: string }) {
     } catch {
       setError("উইশলিস্ট সংরক্ষণ করা যায়নি। ব্রাউজারের storage অনুমতি পরীক্ষা করুন।");
     }
+  }
+
+  if (variant === "icon") {
+    return (
+      <div>
+        <button type="button" onClick={toggleSaved} aria-pressed={saved} className="flex min-h-12 w-full flex-col items-center justify-center gap-0.5 px-2 text-sm font-medium text-slate-700 hover:text-rose-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700">
+          <svg aria-hidden="true" className={`size-6 ${saved ? "text-rose-600" : ""}`} viewBox="0 0 24 24" fill={saved ? "currentColor" : "none"} stroke="currentColor" strokeWidth="1.6">
+            <path d="M20.2 8.8c0 4.2-8.2 10-8.2 10s-8.2-5.8-8.2-10a4.4 4.4 0 0 1 8.2-2.2 4.4 4.4 0 0 1 8.2 2.2Z" />
+          </svg>
+          {saved ? "সংরক্ষিত" : "সংরক্ষণ"}
+        </button>
+        {error && <p role="status" className="text-center text-xs text-rose-700">{error}</p>}
+      </div>
+    );
   }
 
   return (
