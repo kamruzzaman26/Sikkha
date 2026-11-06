@@ -28,6 +28,11 @@ function firstValue(value: string | string[] | undefined): string {
   return Array.isArray(value) ? (value[0] ?? "") : (value ?? "");
 }
 
+function allValues(value: string | string[] | undefined): string[] {
+  const values = Array.isArray(value) ? value : value ? [value] : [];
+  return [...new Set(values.map((item) => item.trim()).filter(Boolean))].slice(0, 100);
+}
+
 async function BookResults({
   searchParams,
 }: {
