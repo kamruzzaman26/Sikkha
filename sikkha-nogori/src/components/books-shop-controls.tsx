@@ -4,10 +4,10 @@ import { useState } from "react";
 
 type Option = { label: string; value: string };
 type Filters = {
-  category: string[];
-  author: string[];
-  publisher: string[];
-  language: string[];
+  categories: string[];
+  authors: string[];
+  publishers: string[];
+  languages: string[];
 };
 
 const sortOptions = [
@@ -115,10 +115,10 @@ export default function BooksShopControls({
             <form action="/books" method="get" className="flex min-h-0 flex-1 flex-col">
               {query && <input type="hidden" name="q" value={query} />}
               <div className="min-h-0 flex-1 overflow-y-auto px-5">
-                {group("Shop By Categories", "category", filterOptions.categories, 8)}
-                {group("Authors", "author", filterOptions.authors, 5)}
-                {group("Publishers", "publisher", filterOptions.publishers, 5)}
-                {group("Languages", "language", filterOptions.languages, 5)}
+                {group("Shop By Categories", "categories", filterOptions.categories, 8)}
+                {group("Authors", "authors", filterOptions.authors, 5)}
+                {group("Publishers", "publishers", filterOptions.publishers, 5)}
+                {group("Languages", "languages", filterOptions.languages, 5)}
               </div>
               <div className="flex gap-3 border-t border-slate-100 p-4">
                 <a href="/books" className="flex-1 rounded-full border border-slate-200 px-4 py-3 text-center text-sm font-bold text-slate-700 hover:bg-slate-50">Reset</a>
