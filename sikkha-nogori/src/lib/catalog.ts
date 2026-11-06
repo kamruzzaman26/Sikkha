@@ -147,16 +147,25 @@ async function getBookCategoryProductIds(
   return [...new Set(links.map((link) => link.product_id as string))];
 }
 
+export type PublishedBookFilters = {
+  categories?: string[];
+  authors?: string[];
+  publishers?: string[];
+  languages?: string[];
+};
+
 export async function getPublishedBooks({
   page,
   query,
   category,
+  filters,
   sort,
   pageSize = bookPageSize,
 }: {
   page: number;
   query: string;
   category?: string;
+  filters?: PublishedBookFilters;
   sort: "name-asc" | "name-desc" | "newest" | "price-low" | "price-high";
   pageSize?: number;
 }): Promise<PublishedBookPage | null> {
@@ -183,24 +192,40 @@ export async function getPublishedBooks({
       .join(",");
     request = request.or(searchFilters);
   }
-  if (category) {
-    const linkedIds = await getBookCategoryProductIds(supabase, category);
-    if (linkedIds === null) {
-      request = request.eq("category", category);
+  const selectedCategories = filters?.categories?.length
+    ? filters.categories
+    : category
+      ? [category]
+      : [];
+  if (selectedCategories.length > 0) {
+    const categoryIds = await Promise.all(
+      selectedCategories.map((name) => getBookCategoryProductIds(supabase, name)),
+    );
+    if (categoryIds.some((ids) => ids === null)) {
+      request = request.in("category", selectedCategories);
     } else {
       const { data: legacyRows } = await supabase
         .from("products")
         .select("id")
-        .eq("category", category)
+        .in("category", selectedCategories)
         .limit(1000);
       const ids = [
         ...new Set([
-          ...linkedIds,
+          ...categoryIds.flatMap((ids) => ids ?? []),
           ...(legacyRows ?? []).map((row) => row.id as string),
         ]),
       ];
       request = request.in("id", ids.length > 0 ? ids : [emptyUuid]);
     }
+  }
+  if (filters?.authors?.length) {
+    request = request.in("author", filters.authors);
+  }
+  if (filters?.publishers?.length) {
+    request = request.in("publisher", filters.publishers);
+  }
+  if (filters?.languages?.length) {
+    request = request.in("language", filters.languages);
   }
 
   if (sort === "newest") {
@@ -481,6 +506,41 @@ async function getTaxonomyBookCategoryNames(
   const publishedIds = new Set(productsResult.data.map((row) => row.id as string));
   const links = linksResult.data.filter((link) => publishedIds.has(link.product_id));
   return rootCategoryCounts(categoriesResult.data, links).map(({ name }) => name);
+}
+
+export type PublishedBookFacets = {
+  categories: string[];
+  authors: string[];
+  publishers: string[];
+  languages: string[];
+};
+
+export async function getPublishedBookFacets(): Promise<PublishedBookFacets> {
+  const supabase = createSupabasePublicServerClient();
+  const { data, error } = await supabase
+    .from("products")
+    .select("category, author, publisher, language")
+    .eq("product_type", "book")
+    .eq("is_published", true)
+    .is("archived_at", null)
+    .not("commerce_mode", "is", null)
+    .limit(5000);
+
+  if (error || !data) {
+    console.error("Unable to load book filter options.", error);
+    return { categories: [], authors: [], publishers: [], languages: [] };
+  }
+
+  const unique = (values: (string | null)[]) =>
+    [...new Set(values.map((value) => value?.trim()).filter((value): value is string => Boolean(value)))]
+      .sort((left, right) => left.localeCompare(right, "bn", { sensitivity: "base" }));
+
+  return {
+    categories: unique(data.map((item) => item.category)),
+    authors: unique(data.map((item) => item.author)),
+    publishers: unique(data.map((item) => item.publisher)),
+    languages: unique(data.map((item) => item.language)),
+  };
 }
 
 export async function getPublishedBookCategories(): Promise<string[] | null> {
