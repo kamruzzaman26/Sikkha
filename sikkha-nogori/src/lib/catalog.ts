@@ -532,7 +532,7 @@ export async function getPublishedBookFacets(): Promise<PublishedBookFacets> {
   }
 
   const unique = (values: (string | null)[]) =>
-    [...new Set(values.map((value) => value?.trim()).filter((value): value is string => Boolean(value)))]
+    [...new Set(values.filter((value): value is string => Boolean(value?.trim())).map((value) => value.trim()))]
       .sort((left, right) => left.localeCompare(right, "bn", { sensitivity: "base" }));
 
   return {
