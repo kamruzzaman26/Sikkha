@@ -58,26 +58,32 @@ export function CatalogProductCard({
 
       <div className="flex flex-1 flex-col p-3 pt-4 sm:p-4">
         <div className="flex flex-wrap items-center gap-2 text-xs font-semibold">
+          <span className={product.commerce_mode === "affiliate"
+            ? "rounded-full bg-orange-50 px-2.5 py-1 text-orange-800"
+            : "rounded-full bg-emerald-50 px-2.5 py-1 text-emerald-800"}>
+            {product.commerce_mode === "affiliate" ? "রকমারি / পার্টনার স্টোর" : "শিক্ষা নগরীর স্টক"}
+          </span>
           {productType && (
-            <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-emerald-800">
+            <span className="rounded-full bg-slate-100 px-2.5 py-1 text-slate-700">
               {productType.label}
             </span>
           )}
           {product.category && (
-            <span className="text-slate-500">{product.category}</span>
+            <span className="max-w-full truncate text-slate-500">{product.category}</span>
           )}
         </div>
         <Link href={`/products/${product.slug}`} className="group/title">
-          <h2 className="mt-2 line-clamp-2 min-h-12 font-bold leading-6 text-slate-900 group-hover/title:text-emerald-800">
+          <h2 className="mt-2 line-clamp-2 min-h-12 break-words font-bold leading-6 text-slate-900 group-hover/title:text-emerald-800">
             {product.title}
           </h2>
         </Link>
         {(product.author || product.publisher) && (
-          <p className="mt-1 text-sm text-slate-500">
-            {[product.author, product.publisher].filter(Boolean).join(" · ")}
-          </p>
+          <div className="mt-1 space-y-0.5 text-sm text-slate-500">
+            {product.author && <p className="line-clamp-1">লেখক: {product.author}</p>}
+            {product.publisher && <p className="line-clamp-1">প্রকাশনী: {product.publisher}</p>}
+          </div>
         )}
-        <p className="mt-2 line-clamp-3 flex-1 text-sm leading-6 text-slate-600">
+        <p className="mt-2 line-clamp-3 min-w-0 flex-1 break-words text-sm leading-6 text-slate-600">
           {product.description}
         </p>
         {product.commerce_mode === "direct" && product.price !== null ? (
