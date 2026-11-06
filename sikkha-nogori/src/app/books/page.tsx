@@ -185,6 +185,10 @@ async function BookResults({
         <section className="mt-6 space-y-5">
           <div className="rounded-2xl border border-slate-100 bg-white p-3 shadow-sm sm:p-4">
             <form action="/books" method="get" className="flex flex-col gap-2 sm:flex-row">
+              {filters.categories.map((value) => <input key={value} type="hidden" name="category" value={value} />)}
+              {filters.authors.map((value) => <input key={value} type="hidden" name="author" value={value} />)}
+              {filters.publishers.map((value) => <input key={value} type="hidden" name="publisher" value={value} />)}
+              {filters.languages.map((value) => <input key={value} type="hidden" name="language" value={value} />)}
               <label htmlFor="book-query" className="sr-only">বই, লেখক বা প্রকাশক খুঁজুন</label>
               <input id="book-query" name="q" type="search" defaultValue={query} placeholder="বই, লেখক বা প্রকাশনীর নাম খুঁজুন..." className="min-h-11 min-w-0 flex-1 rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm outline-none transition placeholder:text-slate-400 focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-100" />
               <button type="submit" className="min-h-11 rounded-xl bg-emerald-700 px-6 text-sm font-bold text-white transition hover:bg-emerald-800">খুঁজুন</button>
