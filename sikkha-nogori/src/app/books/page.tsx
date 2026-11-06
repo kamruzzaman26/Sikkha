@@ -35,15 +35,19 @@ async function BookResults({
 }) {
   const params = await searchParams;
   const query = firstValue(params.q).trim().slice(0, 100);
-  const categoryParam = firstValue(params.category).slice(0, 120);
-  const legacyCategory = bookCategories.find(
-    (item) => item.slug === categoryParam,
-  );
-  const category =
-    legacyCategory && !books.some((book) => book.category === categoryParam)
-      ? books.find((book) => book.categorySlug === categoryParam)?.category ??
-        legacyCategory.title
+  const categoryParams = allValues(params.category).map((categoryParam) => {
+    const legacyCategory = bookCategories.find((item) => item.slug === categoryParam);
+    return legacyCategory && !books.some((book) => book.category === categoryParam)
+      ? books.find((book) => book.categorySlug === categoryParam)?.category ?? legacyCategory.title
       : categoryParam;
+  });
+  const filters = {
+    categories: categoryParams,
+    authors: allValues(params.author),
+    publishers: allValues(params.publisher),
+    languages: allValues(params.language),
+  };
+  const category = categoryParams[0] ?? "";
   const sortValue = firstValue(params.sort);
   const sort = ["name-desc", "newest", "price-low", "price-high"].includes(sortValue)
     ? (sortValue as "name-desc" | "newest" | "price-low" | "price-high")
