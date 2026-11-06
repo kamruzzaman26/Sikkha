@@ -35,8 +35,16 @@ export default function BookCard({
             -{savings.percent}%
           </span>
         )}
-        <span className="absolute right-2 top-2 z-10 rounded-full border border-slate-200 bg-white/95 px-2 py-1 text-[10px] font-semibold text-slate-500">
-          {book.productId ? "যাচাইকৃত ক্যাটালগ" : "নমুনা"}
+        <span
+          className={`absolute right-2 top-2 z-10 rounded-full border px-2 py-1 text-[10px] font-bold ${
+            buyLink
+              ? "border-blue-200 bg-blue-50 text-blue-700"
+              : isDirect
+                ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+                : "border-slate-200 bg-white/95 text-slate-500"
+          }`}
+        >
+          {buyLink ? "পার্টনার" : isDirect ? "শিক্ষা নগরী" : book.productId ? "ক্যাটালগ" : "নমুনা"}
         </span>
         {book.imageUrl ? (
           <Image
