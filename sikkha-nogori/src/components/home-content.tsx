@@ -162,6 +162,9 @@ export default async function HomeContent() {
   const { config } = homeSettings;
   const linkMap = await getActiveAffiliateLinkMap(books.filter((book) => book.commerceMode === "affiliate").map((book) => book.slug));
   const newArrivals = books.slice(0, 12);
+  const shownBooks = books
+    .filter((book) => activeSource === "inhouse" ? book.commerceMode === "direct" : activeSource === "partner" ? book.commerceMode === "affiliate" : true)
+    .slice(0, 12);
   const deals = books
     .map((book) => ({ book, savings: getSavings(book.price, book.listPrice) }))
     .filter((item) => item.savings !== null)
@@ -248,7 +251,27 @@ export default async function HomeContent() {
         )}
 
         {/* Curated book row: catalog records, not a claimed popularity ranking. */}
-        <BookRow title="Explore Books · বইয়ের সংগ্রহ" subtitle="ক্যাটালগে প্রকাশিত বই থেকে বেছে নিন" href="/books" books={books.slice(0, 12)} linkMap={linkMap} />
+        {/* Source filter pills + 4-column grid (design). Filter is URL-driven so it works without client JS. */}
+        {books.length > 0 && (
+          <section id="latest-books" aria-labelledby="latest-books-title" className="mt-5">
+            <div className="flex items-center gap-2 overflow-x-auto rounded-xl border border-slate-100 bg-white p-3 shadow-sm [scrollbar-width:none]">
+              {([["all", "সব বই", "/#latest-books"], ["inhouse", "শিক্ষা নগরী স্টক", "/?source=inhouse#latest-books"], ["partner", "পার্টনার", "/?source=partner#latest-books"]] as const).map(([key, label, href]) => (
+                <Link key={key} href={href} scroll={false} aria-current={activeSource === key ? "true" : undefined} className={`whitespace-nowrap rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors ${activeSource === key ? "bg-emerald-600 text-white" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}>{label}</Link>
+              ))}
+            </div>
+            <div className="mb-4 mt-5 flex items-center justify-between">
+              <h2 id="latest-books-title" className="text-lg font-bold text-slate-800">সদ্য সংযোজিত বইসমূহ</h2>
+              <Link href="/books?sort=newest" className="text-xs font-semibold text-emerald-600 hover:underline">সব দেখুন →</Link>
+            </div>
+            {shownBooks.length > 0 ? (
+              <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
+                {shownBooks.map((book) => <BookCard key={book.slug} book={book} buyLink={linkMap[book.slug] ?? null} />)}
+              </div>
+            ) : (
+              <p className="rounded-xl bg-white p-5 text-center text-sm text-slate-600">এই বিভাগে এখন কোনো বই নেই।</p>
+            )}
+          </section>
+        )}
         <ProductRow products={products} />
 
         {config.show_new_arrivals !== false && <BookRow id="new-arrivals" title={config.new_arrivals_title || "New Arrivals · নতুন বই"} subtitle="সদ্য যোগ হওয়া বই" href="/books?sort=newest" books={newArrivals} linkMap={linkMap} />}

@@ -4,6 +4,7 @@ import { formatBDT } from "@/lib/money";
 import type { CatalogProduct, PublishedProductType } from "@/lib/catalog";
 import { WishlistButton } from "@/components/wishlist-button";
 import { AddToCartButton } from "@/components/add-to-cart-button";
+import { RatingStars } from "@/components/rating-stars";
 
 export function CatalogProductCard({
   product,
@@ -77,6 +78,7 @@ export function CatalogProductCard({
             {[product.author, product.publisher].filter(Boolean).join(" · ")}
           </p>
         )}
+        <RatingStars />
         <p className="mt-2 line-clamp-3 flex-1 text-sm leading-6 text-slate-600">
           {product.description}
         </p>

@@ -5,6 +5,7 @@ import type { PublicAffiliateLink } from "@/lib/supabase/affiliate-links";
 import BookCover from "@/components/book-cover";
 import { WishlistButton } from "@/components/wishlist-button";
 import { AddToCartButton } from "@/components/add-to-cart-button";
+import { RatingStars } from "@/components/rating-stars";
 
 function partnerLabel(partner: string | null): string {
   if (partner === "rokomari") return "রকমারিতে কিনুন";
@@ -85,7 +86,9 @@ export default function BookCard({
           </p>
         )}
 
-        <div className="mt-3 min-h-[3.5rem]">
+        <RatingStars />
+
+        <div className="mt-2 min-h-[3.5rem]">
           {hasPrice ? (
             <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
               <p className="text-base font-extrabold text-slate-900 sm:text-lg">
