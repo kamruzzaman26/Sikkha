@@ -8,8 +8,10 @@ import {
   books,
 } from "@/lib/books";
 import {
+  getBookFacets,
   getPublishedBookCategories,
   getPublishedBooks,
+  type BookSort,
   toCatalogBook,
 } from "@/lib/catalog";
 
@@ -18,7 +20,16 @@ type BookSearchParams = Promise<{
   category?: string | string[];
   page?: string | string[];
   sort?: string | string[];
+  instock?: string | string[];
+  author?: string | string[];
+  publisher?: string | string[];
+  language?: string | string[];
 }>;
+
+function listValue(value: string | string[] | undefined): string[] {
+  const values = Array.isArray(value) ? value : value ? [value] : [];
+  return [...new Set(values.map((item) => item.trim().slice(0, 160)).filter(Boolean))].slice(0, 50);
+}
 
 function firstValue(value: string | string[] | undefined): string {
   return Array.isArray(value) ? (value[0] ?? "") : (value ?? "");
@@ -41,17 +52,23 @@ async function BookResults({
         legacyCategory.title
       : categoryParam;
   const sortValue = firstValue(params.sort);
-  const sort = ["name-desc", "newest", "price-low", "price-high"].includes(sortValue)
-    ? (sortValue as "name-desc" | "newest" | "price-low" | "price-high")
+  const sort: BookSort = ["name-desc", "newest", "best-seller", "price-low", "price-high", "discount-high", "discount-low"].includes(sortValue)
+    ? (sortValue as BookSort)
     : "name-asc";
+  const inStock = firstValue(params.instock) === "1";
+  const authors = listValue(params.author);
+  const publishers = listValue(params.publisher);
+  const languages = listValue(params.language);
+  const filterCount = (category ? 1 : 0) + (inStock ? 1 : 0) + authors.length + publishers.length + languages.length;
   const pageValue = Number.parseInt(firstValue(params.page), 10);
   const page =
     Number.isSafeInteger(pageValue) && pageValue > 0 && pageValue <= 100000
       ? pageValue
       : 1;
-  const [bookPage, databaseCategories] = await Promise.all([
-    getPublishedBooks({ page, query, category: category || undefined, sort }),
+  const [bookPage, databaseCategories, facets] = await Promise.all([
+    getPublishedBooks({ page, query, category: category || undefined, sort, inStock, authors, publishers, languages }),
     getPublishedBookCategories(),
+    getBookFacets(),
   ]);
   const availableBooks =
     bookPage === null ? books : bookPage.products.map(toCatalogBook);
@@ -123,6 +140,10 @@ async function BookResults({
     if (query) search.set("q", query);
     if (category) search.set("category", category);
     if (sort !== "name-asc") search.set("sort", sort);
+    if (inStock) search.set("instock", "1");
+    authors.forEach((value) => search.append("author", value));
+    publishers.forEach((value) => search.append("publisher", value));
+    languages.forEach((value) => search.append("language", value));
     if (nextPage > 1) search.set("page", String(nextPage));
     const suffix = search.toString();
     return suffix ? `/books?${suffix}` : "/books";
@@ -161,30 +182,26 @@ async function BookResults({
 
         <section className="mt-6 space-y-5">
           <div className="rounded-xl border border-slate-100 bg-white p-3 shadow-sm sm:p-4">
-            <form action="/books" method="get" className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_minmax(9rem,0.45fr)_minmax(9rem,0.45fr)_auto]">
+            <form action="/books" method="get" className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto]">
+              {category && <input type="hidden" name="category" value={category} />}
+              {sort !== "name-asc" && <input type="hidden" name="sort" value={sort} />}
+              {inStock && <input type="hidden" name="instock" value="1" />}
+              {authors.map((value) => <input key={`a-${value}`} type="hidden" name="author" value={value} />)}
+              {publishers.map((value) => <input key={`p-${value}`} type="hidden" name="publisher" value={value} />)}
+              {languages.map((value) => <input key={`l-${value}`} type="hidden" name="language" value={value} />)}
               <div className="sm:col-span-1">
                 <label htmlFor="book-query" className="sr-only">বই, লেখক বা প্রকাশক খুঁজুন</label>
                 <input id="book-query" name="q" type="search" defaultValue={query} placeholder="বই, লেখক বা প্রকাশনীর নাম খুঁজুন..." className="min-h-11 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-100" />
               </div>
-              <div>
-                <label htmlFor="book-category" className="sr-only">বিভাগ নির্বাচন</label>
-                <select id="book-category" name="category" defaultValue={category} className="min-h-11 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm outline-none focus:border-emerald-500">
-                  <option value="">সব বিভাগ</option>
-                  {categoryOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
-                </select>
-              </div>
-              <div>
-                <label htmlFor="book-sort" className="sr-only">বই সাজান</label>
-                <select id="book-sort" name="sort" defaultValue={sort} className="min-h-11 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm outline-none focus:border-emerald-500">
-                  <option value="name-asc">নাম: ক থেকে হ</option>
-                  <option value="name-desc">নাম: হ থেকে ক</option>
-                  <option value="newest">New Released</option>
-                  <option value="price-low">দাম: কম থেকে বেশি</option>
-                  <option value="price-high">দাম: বেশি থেকে কম</option>
-                </select>
-              </div>
               <button type="submit" className="min-h-11 rounded-lg bg-emerald-700 px-5 text-sm font-bold text-white transition hover:bg-emerald-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700">খুঁজুন</button>
             </form>
+            <div className="mt-3">
+              <MobileCatalogFilters
+                categories={categoryOptions}
+                state={{ query, category, sort, inStock, authors, publishers, languages }}
+                facets={facets}
+              />
+            </div>
             <nav aria-label="দ্রুত বই বিভাগ" className="mt-3 flex items-center gap-2 overflow-x-auto pb-1 text-xs">
               <Link href="/books" className={`whitespace-nowrap rounded-full px-4 py-2 font-semibold transition ${!category ? "bg-emerald-700 text-white shadow-sm" : "bg-slate-100 text-slate-700 hover:bg-emerald-50 hover:text-emerald-800"}`}>সব বই</Link>
               {categoryOptions.slice(0, 8).map((option) => (
@@ -200,7 +217,7 @@ async function BookResults({
               দেখাচ্ছে <span className="font-bold text-slate-900">{total}টি</span> {bookPage === null ? "নমুনা " : ""}বই
               {query ? ` · “${query}”` : ""}
             </p>
-            {(query || category || sort !== "name-asc") && (
+            {(query || filterCount > 0 || sort !== "name-asc") && (
               <Link href="/books" className="text-sm font-semibold text-emerald-800 hover:underline">ফিল্টার মুছুন</Link>
             )}
           </div>

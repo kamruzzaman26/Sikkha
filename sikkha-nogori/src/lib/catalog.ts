@@ -90,6 +90,16 @@ async function withReviewStats(products: CatalogProduct[]): Promise<CatalogProdu
   }
 }
 
+export type BookSort =
+  | "name-asc"
+  | "name-desc"
+  | "newest"
+  | "best-seller"
+  | "price-low"
+  | "price-high"
+  | "discount-high"
+  | "discount-low";
+
 const bookPageSize = 24;
 const catalogProductSelection =
   "id, title, slug, description, price, list_price, edition, isbn, page_count, language, country, weight_kg, product_type, category, author, publisher, image_url, commerce_mode, archived_at, created_at";
@@ -211,12 +221,20 @@ export async function getPublishedBooks({
   category,
   sort,
   pageSize = bookPageSize,
+  inStock = false,
+  authors = [],
+  publishers = [],
+  languages = [],
 }: {
   page: number;
   query: string;
   category?: string;
-  sort: "name-asc" | "name-desc" | "newest" | "price-low" | "price-high";
+  sort: BookSort;
   pageSize?: number;
+  inStock?: boolean;
+  authors?: string[];
+  publishers?: string[];
+  languages?: string[];
 }): Promise<PublishedBookPage | null> {
   const supabase = createSupabasePublicServerClient();
   const searchTerm = normalizeCatalogQuery(query);
@@ -261,16 +279,38 @@ export async function getPublishedBooks({
     }
   }
 
-  if (sort === "newest") {
+  if (authors.length > 0) request = request.in("author", authors.slice(0, 50));
+  if (publishers.length > 0) request = request.in("publisher", publishers.slice(0, 50));
+  if (languages.length > 0) request = request.in("language", languages.slice(0, 20));
+  if (inStock) {
+    const { data: stockRows } = await supabase
+      .from("public_product_stock")
+      .select("product_id")
+      .eq("in_stock", true)
+      .limit(5000);
+    const stockIds = (stockRows ?? []).map((row) => row.product_id as string);
+    request = request.in("id", stockIds.length > 0 ? stockIds : [emptyUuid]);
+  }
+
+  // Best sellers: rank by units in verified-payment orders. With no sales yet, fall back to newest.
+  let salesUnits: Map<string, number> | null = null;
+  if (sort === "best-seller") {
+    const { data: ranked } = await supabase.rpc("best_selling_product_ids", { p_limit: 1000 });
+    salesUnits = new Map((ranked ?? []).map((row: { product_id: string; units: number }) => [row.product_id, Number(row.units)]));
+    request = request.order("created_at", { ascending: false });
+  } else if (sort === "newest") {
     request = request.order("created_at", { ascending: false });
   } else if (sort === "price-low" || sort === "price-high") {
     request = request.order("price", { ascending: sort === "price-low", nullsFirst: false });
+  } else if (sort === "discount-high" || sort === "discount-low") {
+    request = request.order("discount_percent", { ascending: sort === "discount-low" }).order("created_at", { ascending: false });
   } else {
     request = request.order("title", { ascending: sort === "name-asc" });
   }
 
-  const { data, count, error } = await request
-    .range((page - 1) * safePageSize, page * safePageSize - 1);
+  const { data, count, error } = await (salesUnits
+    ? request.limit(1000)
+    : request.range((page - 1) * safePageSize, page * safePageSize - 1));
 
   if (error) {
     if (isMissingCatalogSchema(error)) {
@@ -283,7 +323,50 @@ export async function getPublishedBooks({
     throw new Error("Unable to load the book catalog.", { cause: error });
   }
 
+  if (salesUnits) {
+    const units = salesUnits;
+    const ordered = [...data].sort((left, right) => (units.get(right.id) ?? 0) - (units.get(left.id) ?? 0));
+    const pageRows = ordered.slice((page - 1) * safePageSize, page * safePageSize);
+    return { products: await withReviewStats(await withStockFlags(pageRows)), total: ordered.length };
+  }
+
   return { products: await withReviewStats(await withStockFlags(data)), total: count ?? 0 };
+}
+
+export type BookFacets = { authors: string[]; publishers: string[]; languages: string[] };
+
+/** Distinct authors, publishers and languages of published books, most common first. */
+export async function getBookFacets(): Promise<BookFacets> {
+  const empty: BookFacets = { authors: [], publishers: [], languages: [] };
+  try {
+    const supabase = createSupabasePublicServerClient();
+    const { data, error } = await supabase
+      .from("products")
+      .select("author, publisher, language")
+      .eq("product_type", "book")
+      .eq("is_published", true)
+      .is("archived_at", null)
+      .limit(5000);
+    if (error || !data) return empty;
+    const rank = (values: unknown[]) => {
+      const counts = new Map<string, number>();
+      for (const value of values) {
+        if (typeof value !== "string") continue;
+        const name = value.trim();
+        if (name) counts.set(name, (counts.get(name) ?? 0) + 1);
+      }
+      return [...counts.entries()]
+        .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], "bn"))
+        .map(([name]) => name);
+    };
+    return {
+      authors: rank(data.map((row) => row.author)),
+      publishers: rank(data.map((row) => row.publisher)),
+      languages: rank(data.map((row) => row.language)),
+    };
+  } catch {
+    return empty;
+  }
 }
 
 async function getProductCategoryProductIds(

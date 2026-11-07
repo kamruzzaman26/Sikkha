@@ -33,7 +33,7 @@ export default function BookCard({
       <Link
         href={`/books/${book.slug}`}
         aria-label={`বইয়ের বিস্তারিত: ${book.title}`}
-        className="relative flex aspect-[3/4] items-center justify-center overflow-hidden bg-slate-50 p-2"
+        className="relative flex h-32 items-center justify-center overflow-hidden bg-slate-50 p-1.5 sm:h-48"
       >
         <span
           className={`absolute right-1.5 top-1.5 z-10 rounded-full border px-2 py-0.5 text-[10px] font-bold ${
@@ -59,12 +59,12 @@ export default function BookCard({
           <span
             role="img"
             aria-label={`${book.title} বইয়ের ছবি নেই`}
-            className="flex aspect-[3/4] max-h-full w-28 items-center justify-center rounded-lg border border-slate-200 bg-white px-3 text-center text-sm font-semibold text-slate-400"
+            className="flex h-full max-h-full w-24 items-center justify-center rounded-lg border border-slate-200 bg-white px-3 text-center text-sm font-semibold text-slate-400"
           >
             প্রচ্ছদের ছবি নেই
           </span>
         ) : (
-          <BookCover book={book} className="max-h-52" />
+          <BookCover book={book} className="max-h-32 sm:max-h-44" />
         )}
       </Link>
 
