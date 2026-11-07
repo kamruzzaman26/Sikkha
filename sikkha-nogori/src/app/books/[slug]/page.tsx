@@ -252,7 +252,7 @@ async function BookDetails({
         <section id="book-information" className="mt-6">
           <div className="mb-3">
             <h2 className="text-xl font-extrabold text-slate-950">বই সম্পর্কে বিস্তারিত</h2>
-            <p className="mt-1 text-sm text-slate-500">বইয়ের সারসংক্ষেপ, প্রকাশনা ও অন্যান্য তথ্য</p>
+            <p className="mt-1 text-sm text-slate-500">বইয়ের সারসংক্ষেপ, লেখক, প্রকাশনী, স্পেসিফিকেশন ও অন্যান্য তথ্য</p>
           </div>
           <BookTabs summary={book.description ?? ""} specs={specRows} author={book.author} />
         </section>
