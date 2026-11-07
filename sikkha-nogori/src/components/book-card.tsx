@@ -8,9 +8,9 @@ import { RatingStars } from "@/components/rating-stars";
 import { StockLabel } from "@/components/stock-label";
 
 function partnerLabel(partner: string | null): string {
-  if (partner === "rokomari") return "Buy on Rokomari";
-  if (partner === "10_minute_school") return "Buy on 10 Minute School";
-  return "Buy from partner";
+  if (partner === "rokomari") return "রকমারিতে কিনুন";
+  if (partner === "10_minute_school") return "10 Minute School-এ কিনুন";
+  return "পার্টনারের সাইটে কিনুন";
 }
 
 const ctaClass =
