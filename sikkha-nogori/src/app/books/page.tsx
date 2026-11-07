@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import BookCard from "@/components/book-card";
 import BookFilterSort from "@/components/book-filter-sort";
 import { getActiveAffiliateLinkMap } from "@/lib/supabase/affiliate-links";
-import { bookCategories, books, getSavings, type Book } from "@/lib/books";
+import { bookCategories, books, getSavings } from "@/lib/books";
 import { getPublishedBookCategories, getPublishedBooks, toCatalogBook } from "@/lib/catalog";
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
@@ -28,8 +28,6 @@ async function BookResults({ searchParams }: { searchParams: SearchParams }) {
   const requestedPage = Number.parseInt(first(params.page), 10);
   const page = Number.isSafeInteger(requestedPage) && requestedPage > 0 && requestedPage <= 100000 ? requestedPage : 1;
 
-  // Load a bounded catalog batch so author/publisher/language filters work across pages,
-  // not just against the current 24 visible cards. The database helper caps this at 1,000.
   const [bookPage, databaseCategories] = await Promise.all([
     getPublishedBooks({ page: 1, pageSize: 1000, query, category: category || undefined, sort: sort === "name-desc" || sort === "price-low" || sort === "price-high" || sort === "newest" ? sort : "name-asc" }),
     getPublishedBookCategories(),
@@ -69,7 +67,7 @@ async function BookResults({ searchParams }: { searchParams: SearchParams }) {
   const categoryOptions = [...new Map([
     ...bookCategories.map((item) => {
       const book = books.find((entry) => entry.categorySlug === item.slug);
-      const value = book?.category ?? (categoryNames.includes(item.title) ? item.title : item.title);
+      const value = book?.category ?? item.title;
       return [value, { label: item.title, value }] as const;
     }),
     ...categoryNames.map((value) => [value, { label: value, value }] as const),
@@ -98,19 +96,19 @@ async function BookResults({ searchParams }: { searchParams: SearchParams }) {
   return (
     <div className="mx-auto max-w-7xl">
       <nav aria-label="পথনির্দেশ" className="text-sm text-slate-500"><Link href="/" className="font-semibold text-emerald-800 hover:underline">হোম</Link><span className="px-2" aria-hidden="true">/</span><span>{currentLabel}</span></nav>
-      <header className="mt-6"><p className="text-sm font-bold text-emerald-700">শিক্ষা নগরী</p><h1 className="mt-2 text-3xl font-extrabold sm:text-4xl">বইয়ের সংগ্রহ</h1><p className="mt-3 max-w-2xl leading-7 text-slate-600">নাম, লেখক, প্রকাশক, বিভাগ বা বিবরণ দিয়ে বই খুঁজুন এবং পছন্দমতো সাজান।</p></header>
-      {!databaseMode && <p role="status" className="mt-5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-950">ডেটাবেস ক্যাটালগ চালু না থাকায় নিচে কেবল নমুনা বই দেখানো হচ্ছে।</p>}
-      <section className="mt-6 space-y-5">
-        <div className="rounded-xl border border-slate-100 bg-white p-3 shadow-sm sm:p-4">
-          <form action="/books" method="get" className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto]">
-            <label htmlFor="book-query" className="sr-only">বই, লেখক বা প্রকাশক খুঁজুন</label><input id="book-query" name="q" type="search" defaultValue={query} placeholder="বই, লেখক বা প্রকাশনীর নাম খুঁজুন..." className="min-h-11 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 text-sm outline-none focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-100" />
-            <button type="submit" className="min-h-11 rounded-lg bg-emerald-700 px-5 text-sm font-bold text-white hover:bg-emerald-800">খুঁজুন</button>
+      <header className="mt-5"><p className="text-sm font-bold text-emerald-700">শিক্ষা নগরী</p><h1 className="mt-1 text-2xl font-extrabold sm:text-4xl">{currentLabel}</h1></header>
+      {!databaseMode && <p role="status" className="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-950">ডেটাবেস ক্যাটালগ চালু না থাকায় নিচে কেবল নমুনা বই দেখানো হচ্ছে।</p>}
+      <section className="mt-4 space-y-4">
+        <div className="sticky top-[4.25rem] z-20 rounded-xl border border-slate-100 bg-white/95 p-3 shadow-sm backdrop-blur sm:p-4">
+          <form action="/books" method="get" role="search" className="flex gap-2">
+            <label htmlFor="book-query" className="sr-only">বই, লেখক বা প্রকাশক খুঁজুন</label><input id="book-query" name="q" type="search" defaultValue={query} placeholder="বই, লেখক বা প্রকাশনীর নাম খুঁজুন..." className="min-h-11 min-w-0 flex-1 rounded-lg border border-slate-200 bg-slate-50 px-3 text-sm outline-none focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-100" />
+            <button type="submit" className="min-h-11 rounded-lg bg-emerald-700 px-4 text-sm font-bold text-white hover:bg-emerald-800">খুঁজুন</button>
           </form>
-          <div className="mt-3"><BookFilterSort categories={categoryOptions} authors={authors} publishers={publishers} languages={languages} selectedCategory={category} selectedAuthors={authorsFilter} selectedPublishers={publishersFilter} selectedLanguages={languagesFilter} query={query} sort={sort} showBestSeller={!databaseMode} /></div>
+          <div className="mt-2"><BookFilterSort categories={categoryOptions} authors={authors} publishers={publishers} languages={languages} selectedCategory={category} selectedAuthors={authorsFilter} selectedPublishers={publishersFilter} selectedLanguages={languagesFilter} query={query} sort={sort} showBestSeller={!databaseMode} /></div>
         </div>
-        <div className="flex flex-wrap items-center justify-between gap-3"><p aria-live="polite" className="text-sm font-medium text-slate-600">দেখাচ্ছে <span className="font-bold text-slate-900">{total}টি</span> {databaseMode ? "বই" : "নমুনা বই"}{query ? ` · “${query}”` : ""}</p>{(query || category || authorsFilter.length || publishersFilter.length || languagesFilter.length || sort !== "name-asc") && <Link href="/books" className="text-sm font-semibold text-emerald-800 hover:underline">সব ফিল্টার মুছুন</Link>}</div>
+        <div className="flex flex-wrap items-center justify-between gap-2"><p aria-live="polite" className="text-sm text-slate-600">দেখাচ্ছে {total === 0 ? 0 : (page - 1) * pageSize + 1}–{Math.min(page * pageSize, total)} / {total}টি {databaseMode ? "বই" : "নমুনা বই"}</p>{(query || category || authorsFilter.length || publishersFilter.length || languagesFilter.length || sort !== "name-asc") && <Link href="/books" className="text-sm font-semibold text-emerald-800 hover:underline">সব ফিল্টার মুছুন</Link>}</div>
         {pageBooks.length ? <>
-          <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 xl:grid-cols-4">{pageBooks.map((book) => <BookCard key={book.slug} book={book} buyLink={affiliateLinkMap[book.slug] ?? null} />)}</div>
+          <div className="grid grid-cols-2 gap-2.5 sm:gap-4 md:grid-cols-3 xl:grid-cols-4">{pageBooks.map((book) => <BookCard key={book.slug} book={book} buyLink={affiliateLinkMap[book.slug] ?? null} compact />)}</div>
           {pageCount > 1 && <nav aria-label="বইয়ের পৃষ্ঠা" className="mt-8 flex items-center justify-center gap-3">{page > 1 && <Link href={pageHref(page - 1)} className="inline-flex min-h-11 items-center rounded-lg border border-emerald-700 px-4 py-2 font-semibold text-emerald-800 hover:bg-emerald-50">আগের পৃষ্ঠা</Link>}<span aria-current="page" className="text-sm text-slate-600">{page} / {pageCount}</span>{page < pageCount && <Link href={pageHref(page + 1)} className="inline-flex min-h-11 items-center rounded-lg border border-emerald-700 px-4 py-2 font-semibold text-emerald-800 hover:bg-emerald-50">পরের পৃষ্ঠা</Link>}</nav>}
         </> : <div className="rounded-2xl border border-dashed border-slate-300 bg-white px-5 py-12 text-center"><h2 className="text-xl font-bold">কোনো বই পাওয়া যায়নি</h2><p className="mt-2 text-sm text-slate-600">ফিল্টার বা বানান পরিবর্তন করে আবার চেষ্টা করুন।</p><Link href="/books" className="mt-5 inline-flex rounded-lg bg-emerald-700 px-4 py-2.5 text-sm font-bold text-white hover:bg-emerald-800">সব বই দেখুন</Link></div>}
       </section>
@@ -119,5 +117,5 @@ async function BookResults({ searchParams }: { searchParams: SearchParams }) {
 }
 
 export default function BooksPage({ searchParams }: { searchParams: SearchParams }) {
-  return <main className="min-h-screen bg-[#f7faf8] px-4 py-8 text-slate-900 sm:px-6 sm:py-12 lg:px-8"><Suspense fallback={<div className="mx-auto max-w-7xl" aria-label="বই লোড হচ্ছে"><div className="h-8 w-56 animate-pulse rounded bg-emerald-100" /><div className="mt-6 h-28 animate-pulse rounded-2xl bg-white" /><div className="mt-8 h-72 animate-pulse rounded-2xl bg-white" /></div>}><BookResults searchParams={searchParams} /></Suspense></main>;
+  return <main className="min-h-screen bg-[#f7faf8] px-4 py-5 pb-24 text-slate-900 sm:px-6 sm:py-10 lg:px-8"><Suspense fallback={<div className="mx-auto max-w-7xl" aria-label="বই লোড হচ্ছে"><div className="h-8 w-56 animate-pulse rounded bg-emerald-100" /><div className="mt-6 h-28 animate-pulse rounded-2xl bg-white" /><div className="mt-8 h-72 animate-pulse rounded-2xl bg-white" /></div>}><BookResults searchParams={searchParams} /></Suspense></main>;
 }
