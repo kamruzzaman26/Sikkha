@@ -4,7 +4,7 @@ export function RatingStars({ rating, count }: { rating?: number | null; count?:
   const has = typeof rating === "number" && rating > 0;
   const filled = has ? Math.floor(rating) : 0;
   return (
-    <div className="mt-1 flex items-center gap-1" aria-label={has ? `রেটিং ${rating}` : "এখনও রেটিং নেই"}>
+    <div className="mt-1 flex items-center gap-1" aria-label={has ? `Rating ${rating}` : "No ratings yet"}>
       <span className="flex" aria-hidden="true">
         {[0, 1, 2, 3, 4].map((i) => (
           <svg key={i} viewBox="0 0 20 20" className={`size-3 ${i < filled ? "fill-amber-400" : "fill-slate-200"}`}>
@@ -13,7 +13,7 @@ export function RatingStars({ rating, count }: { rating?: number | null; count?:
         ))}
       </span>
       <span className="text-[10px] font-semibold text-slate-500">
-        {has ? `${rating}${count ? ` (${count})` : ""}` : "রেটিং নেই"}
+        {has ? `${rating}${count ? ` (${count})` : ""}` : "No ratings"}
       </span>
     </div>
   );

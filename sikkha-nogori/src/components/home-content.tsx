@@ -139,10 +139,9 @@ function ProductRow({ products }: { products: CatalogProduct[] }) {
     <section className="py-6 sm:py-8">
       <div className="mb-4 flex items-end justify-between gap-3">
         <div>
-          <h2 className="text-xl font-extrabold tracking-tight text-slate-900 sm:text-2xl">Featured Products · প্রয়োজনীয় পণ্য</h2>
-          <p className="mt-1 text-sm text-slate-600">বাছাই করা প্রয়োজনীয় পণ্য</p>
+          <h2 className="text-xl font-extrabold tracking-tight text-slate-900 sm:text-2xl">Featured Products</h2>
         </div>
-        <Link href="/products" className="inline-flex min-h-10 items-center rounded-xl px-3 text-sm font-bold text-emerald-800 hover:bg-emerald-50">সব দেখুন →</Link>
+        <Link href="/products" className="inline-flex min-h-10 items-center rounded-xl px-3 text-sm font-bold text-emerald-800 hover:bg-emerald-50">View All →</Link>
       </div>
       <div className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-3 [scrollbar-width:none] sm:mx-0 sm:px-0 sm:gap-4">
         {products.slice(0, 12).map((product) => (

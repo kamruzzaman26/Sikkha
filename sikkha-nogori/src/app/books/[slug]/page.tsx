@@ -20,9 +20,9 @@ import {
 } from "@/lib/catalog";
 
 function partnerBuyLabel(partner: string | null): string {
-  if (partner === "rokomari") return "রকমারিতে কিনুন";
-  if (partner === "10_minute_school") return "10 Minute School-এ কিনুন";
-  return "পার্টনারের সাইটে কিনুন";
+  if (partner === "rokomari") return "Buy on Rokomari";
+  if (partner === "10_minute_school") return "Buy on 10 Minute School";
+  return "Buy from partner";
 }
 
 function CartIcon() {
@@ -102,7 +102,7 @@ async function BookDetails({
     : { data: null, error: null };
   const { data: generalSettings } = await createSupabasePublicServerClient().from("site_settings").select("value").eq("key", "general").maybeSingle();
   const deliveryDays = normalizeDeliveryDays((generalSettings?.value as { delivery_days?: unknown } | null)?.delivery_days);
-  const deliveryText = deliveryDays > 0 ? formatDeliveryDate(estimateDeliveryDate(new Date(), deliveryDays)) : null;
+  const deliveryText = deliveryDays > 0 ? formatDeliveryDate(estimateDeliveryDate(new Date(), deliveryDays), "en-GB") : null;
   const ratingSummary = book.productId
     ? await createSupabasePublicServerClient().rpc("get_product_review_summary", { p_product_id: book.productId })
     : { data: null };
@@ -141,7 +141,7 @@ async function BookDetails({
     <div className="mx-auto max-w-6xl">
         <nav aria-label="breadcrumb" className="text-sm text-slate-500">
           <Link href="/" className="font-semibold text-emerald-800 hover:underline">
-            হোম
+            Home
           </Link>
           <span className="px-2" aria-hidden="true">
             /
@@ -150,7 +150,7 @@ async function BookDetails({
             href="/books"
             className="font-semibold text-emerald-800 hover:underline"
           >
-            সব বই
+            All Books
           </Link>
           <span className="px-2" aria-hidden="true">
             /
@@ -160,12 +160,12 @@ async function BookDetails({
 
         <article className="mt-4 rounded-xl border border-slate-200 bg-white p-3 shadow-sm sm:p-6">
           <div className="grid grid-cols-[38%_minmax(0,1fr)] gap-3 sm:grid-cols-[minmax(14rem,0.55fr)_minmax(0,1fr)] sm:gap-8">
-            <section aria-label="বইয়ের প্রচ্ছদ" className="min-w-0">
+            <section aria-label="Book cover" className="min-w-0">
               <div className="flex aspect-[3/4] w-full items-center justify-center overflow-hidden rounded-lg bg-slate-50 p-1.5 ring-1 ring-slate-100">
                 {book.imageUrl ? (
-                  <Image src={book.imageUrl} alt={`${book.title} বইয়ের প্রচ্ছদ`} width={360} height={500} unoptimized className="h-full w-full object-contain" />
+                  <Image src={book.imageUrl} alt={`${book.title} book cover`} width={360} height={500} unoptimized className="h-full w-full object-contain" />
                 ) : book.productId ? (
-                  <p role="img" aria-label={`${book.title} বইয়ের ছবি নেই`} className="px-2 text-center text-xs text-slate-500">প্রচ্ছদের ছবি নেই</p>
+                  <p role="img" aria-label={`${book.title} has no cover image`} className="px-2 text-center text-xs text-slate-500">No cover image</p>
                 ) : (
                   <BookCover book={book} className="w-full" />
                 )}
@@ -176,9 +176,9 @@ async function BookDetails({
               <h1 className="text-lg font-extrabold leading-snug text-slate-950 sm:text-3xl">{book.title}</h1>
               {book.edition && <p className="mt-1 text-sm text-slate-500">{book.edition}</p>}
               <div className="mt-2 space-y-1 text-sm text-slate-600">
-                {book.author && <p>লেখক: <span className="font-semibold text-blue-700">{book.author}</span></p>}
-                {book.publisher && <p>প্রকাশনী: <span className="font-medium text-slate-800">{book.publisher}</span></p>}
-                {book.category && <p>বিভাগ: <span className="font-semibold text-blue-700">{book.category}</span></p>}
+                {book.author && <p>Author: <span className="font-semibold text-blue-700">{book.author}</span></p>}
+                {book.publisher && <p>Publisher: <span className="font-medium text-slate-800">{book.publisher}</span></p>}
+                {book.category && <p>Category: <span className="font-semibold text-blue-700">{book.category}</span></p>}
               </div>
               <RatingStars rating={ratingAverage} count={ratingCount} />
 
@@ -188,10 +188,10 @@ async function BookDetails({
                     <span className="text-2xl font-extrabold tracking-tight text-slate-950 sm:text-4xl">{formatPrice(book.price)}</span>
                     {savings && book.listPrice && <span className="text-sm font-semibold text-slate-500 line-through sm:text-base">{formatPrice(book.listPrice)}</span>}
                   </div>
-                ) : <p className="text-sm text-slate-500">মূল্য জানতে বিক্রেতার সঙ্গে যোগাযোগ করুন</p>}
+                ) : <p className="text-sm text-slate-500">Contact the seller for the price</p>}
               </div>
-              {savings && <p className="mt-2 text-sm font-semibold text-emerald-700">আপনি সাশ্রয় করছেন {formatPrice(savings.amount)} ({savings.percent}%)</p>}
-              <p className="mt-2 text-xs leading-5 text-slate-500">মূল্য ও প্রাপ্যতা অর্ডার নিশ্চিত করার সময় যাচাই করুন।</p>
+              {savings && <p className="mt-2 text-sm font-semibold text-emerald-700">You save {formatPrice(savings.amount)} ({savings.percent}%)</p>}
+              <p className="mt-2 text-xs leading-5 text-slate-500">Price and availability are confirmed when you place the order.</p>
             </section>
           </div>
 
@@ -199,8 +199,8 @@ async function BookDetails({
             <div className="mt-4 flex items-start gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
               <svg aria-hidden="true" viewBox="0 0 24 24" className="mt-0.5 size-6 shrink-0 text-blue-700" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6.5h11v9H3zM14 9.5h4l3 3v3h-7z" /><circle cx="7" cy="17.5" r="1.6" /><circle cx="17" cy="17.5" r="1.6" /></svg>
               <div>
-                <p className="text-sm font-bold text-blue-700">সম্ভাব্য ডেলিভারি</p>
-                <p className="mt-0.5 text-sm text-slate-700">{deliveryText}ের মধ্যে পৌঁছাবে</p>
+                <p className="text-sm font-bold text-blue-700">Estimated Delivery</p>
+                <p className="mt-0.5 text-sm text-slate-700">Arrives by {deliveryText}</p>
               </div>
             </div>
           )}
@@ -208,7 +208,7 @@ async function BookDetails({
           <div className="mt-4 grid grid-cols-3 items-stretch">
             <a href="#book-feedback" className="flex min-h-12 flex-col items-center justify-center gap-0.5 px-2 text-sm font-medium text-slate-700 hover:text-emerald-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700">
               <svg aria-hidden="true" className="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round"><path d="M4 5h16v11H9l-5 4z" /><path d="M8 9h8M8 12h5" strokeLinecap="round" /></svg>
-              রিভিউ
+              Reviews
             </a>
             <WishlistButton slug={book.slug} variant="icon" />
             <ShareButton title={book.title} />
@@ -218,29 +218,29 @@ async function BookDetails({
             <div className="mt-3 flex flex-wrap items-center gap-2">
               {stockQuantity > 0 ? (
                 <>
-                  <span className="rounded-full border border-emerald-200 bg-emerald-50 px-4 py-1.5 text-sm font-semibold text-emerald-700">স্টকে আছে</span>
-                  <span className="text-sm text-slate-600">({stockQuantity >= 50 ? "৫০+" : stockQuantity.toLocaleString("bn-BD")} কপি আছে)</span>
+                  <span className="rounded-full border border-emerald-200 bg-emerald-50 px-4 py-1.5 text-sm font-semibold text-emerald-700">In Stock</span>
+                  <span className="text-sm text-slate-600">({stockQuantity >= 50 ? "50+" : stockQuantity} copies available)</span>
                 </>
               ) : (
-                <span className="rounded-full border border-rose-200 bg-rose-50 px-4 py-1.5 text-sm font-semibold text-rose-700">স্টক শেষ</span>
+                <span className="rounded-full border border-rose-200 bg-rose-50 px-4 py-1.5 text-sm font-semibold text-rose-700">Out of Stock</span>
               )}
             </div>
           )}
 
           {isDirectProduct && book.productId ? (
-            <section aria-label="কেনার অপশন" className="mt-4 hidden sm:block">
+            <section aria-label="Purchase options" className="mt-4 hidden sm:block">
               <div className="grid grid-cols-2 gap-3">
-                <Link href={`/checkout?product=${encodeURIComponent(book.productId)}`} className={buyNowClass}>এখনই কিনুন</Link>
+                <Link href={`/checkout?product=${encodeURIComponent(book.productId)}`} className={buyNowClass}>Buy Now</Link>
                 <AddToCartButton productId={book.productId} variant="bar" />
               </div>
-              <p className="mt-3 text-xs leading-5 text-slate-500">এটি শিক্ষা নগরীর নিজস্ব বিক্রির পণ্য; অর্ডার ও ডেলিভারি checkout-এ সম্পন্ন হবে।</p>
+              <p className="mt-3 text-xs leading-5 text-slate-500">Sold directly by Sikkha Nogori; order and delivery are completed at checkout.</p>
             </section>
           ) : book.commerceMode === "affiliate" && affiliateLinksUnavailable ? (
-            <p className="mt-4 rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-950">পার্টনার লিংক এখনো ডেটাবেসে চালু হয়নি।</p>
+            <p className="mt-4 rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-950">The partner link is not active yet.</p>
           ) : book.commerceMode === "affiliate" && availableAffiliateLinks.length > 0 ? (
-            <section aria-label="কেনার অপশন" className="mt-4 space-y-2">
+            <section aria-label="Purchase options" className="mt-4 space-y-2">
               {availableAffiliateLinks.map((affiliateLink) => <a key={affiliateLink.id} href={affiliateLink.url} target="_blank" rel="sponsored nofollow noopener noreferrer" className={`${buyButtonClass} w-full`}><CartIcon />{partnerBuyLabel(affiliateLink.partner)}</a>)}
-              <p className="text-xs leading-5 text-slate-500">এই বাটন affiliate link; মূল্য বিক্রেতার সাইটে যাচাই করুন। <Link href="/affiliate-disclosure" className="font-semibold text-emerald-800 underline">বিস্তারিত</Link></p>
+              <p className="text-xs leading-5 text-slate-500">This is an affiliate link; check the price on the seller's site. <Link href="/affiliate-disclosure" className="font-semibold text-emerald-800 underline">Details</Link></p>
             </section>
           ) : (
             <p className="mt-4 rounded-lg bg-slate-50 px-4 py-3 text-sm text-slate-600">{book.productId ? "এই পণ্যের জন্য বর্তমানে কোনো যাচাইকৃত কেনার লিংক নেই।" : "এটি নমুনা বই; বর্তমানে সরাসরি অর্ডার করা যাচ্ছে না।"}</p>
@@ -260,7 +260,7 @@ async function BookDetails({
         {book.productId && <BookFeedback productId={book.productId} />}
 
         <Link href="/books" className="mt-6 inline-flex min-h-10 items-center gap-2 rounded-lg border border-emerald-700 px-4 py-2.5 text-sm font-bold text-emerald-800 transition hover:bg-emerald-50">
-          <span aria-hidden="true">←</span> বইয়ের সংগ্রহে ফিরুন
+          <span aria-hidden="true">←</span> Back to all books
         </Link>
 
         {((isDirectProduct && stockQuantity !== 0) || primaryAffiliateLink) && (
@@ -268,7 +268,7 @@ async function BookDetails({
             {isDirectProduct && book.productId ? (
               <div className="grid grid-cols-2 gap-2.5">
                 <Link href={`/checkout?product=${encodeURIComponent(book.productId)}`} className={buyNowClass}>
-                  এখনই কিনুন
+                  Buy Now
                 </Link>
                 <AddToCartButton productId={book.productId} variant="bar" />
               </div>

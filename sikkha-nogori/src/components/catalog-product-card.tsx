@@ -2,14 +2,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { formatBDT } from "@/lib/money";
 import type { CatalogProduct, PublishedProductType } from "@/lib/catalog";
-import { WishlistButton } from "@/components/wishlist-button";
 import { AddToCartButton } from "@/components/add-to-cart-button";
 import { RatingStars } from "@/components/rating-stars";
 import { StockLabel } from "@/components/stock-label";
 
+/** Compact catalog card: cover, title, brand/author, rating, stock, price + discount, one CTA. */
 export function CatalogProductCard({
   product,
-  productType,
 }: {
   product: CatalogProduct;
   productType?: PublishedProductType;
@@ -20,111 +19,87 @@ export function CatalogProductCard({
     product.list_price > product.price
       ? Math.round(((product.list_price - product.price) / product.list_price) * 100)
       : null;
+  const isDirect = product.commerce_mode === "direct";
+  const byline = product.author || product.publisher;
 
   return (
-    <article className="flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-emerald-200 hover:shadow-lg">
+    <article className="group flex h-full min-w-0 flex-col overflow-hidden rounded-xl border border-slate-100 bg-white shadow-sm transition duration-200 hover:border-emerald-200 hover:shadow-md">
       <Link
         href={`/products/${product.slug}`}
-        aria-label={`পণ্যের বিস্তারিত: ${product.title}`}
-        className="relative flex min-h-52 items-center justify-center overflow-hidden bg-gradient-to-br from-emerald-50 to-slate-50 p-5"
+        aria-label={`Product details: ${product.title}`}
+        className="relative flex h-32 items-center justify-center overflow-hidden bg-slate-50 p-1.5 sm:h-48"
       >
         {product.slug.startsWith("demo-") && (
-          <span className="absolute left-3 top-3 z-10 rounded-full bg-amber-100 px-2.5 py-1 text-[10px] font-extrabold text-amber-900">
+          <span className="absolute left-1.5 top-1.5 z-10 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-extrabold text-amber-900">
             DEMO
           </span>
         )}
-        {discountPercent !== null && (
-          <span className="absolute right-3 top-3 z-10 rounded-full bg-rose-600 px-2.5 py-1 text-xs font-extrabold text-white">
-            -{discountPercent}%
-          </span>
-        )}
+        <span
+          className={`absolute right-1.5 top-1.5 z-10 rounded-full border px-2 py-0.5 text-[10px] font-bold ${
+            isDirect
+              ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+              : "border-blue-200 bg-blue-50 text-blue-700"
+          }`}
+        >
+          {isDirect ? "Sikkha Nogori" : "Partner"}
+        </span>
         {product.image_url ? (
           <Image
             src={product.image_url}
-            alt={`${product.title} পণ্যের ছবি`}
+            alt={`${product.title} product image`}
             width={240}
             height={320}
             unoptimized
-            className="aspect-[3/4] max-h-56 w-auto max-w-full rounded-lg object-contain"
+            className="h-full w-full max-h-full max-w-full object-contain transition duration-300 group-hover:scale-[1.03]"
           />
         ) : (
           <span
             role="img"
-            aria-label={`${product.title} পণ্যের ছবি নেই`}
-            className="flex aspect-[3/4] w-36 items-center justify-center rounded-lg border border-emerald-100 bg-white px-3 text-center text-sm font-semibold text-slate-500"
+            aria-label={`${product.title} has no image`}
+            className="flex h-full w-24 items-center justify-center rounded-lg border border-slate-200 bg-white px-2 text-center text-xs font-semibold text-slate-400"
           >
-            ছবি নেই
+            No image
           </span>
         )}
       </Link>
 
-      <div className="flex flex-1 flex-col p-3 pt-4 sm:p-4">
-        <div className="flex flex-wrap items-center gap-2 text-xs font-semibold">
-          <span className={product.commerce_mode === "affiliate"
-            ? "rounded-full bg-orange-50 px-2.5 py-1 text-orange-800"
-            : "rounded-full bg-emerald-50 px-2.5 py-1 text-emerald-800"}>
-            {product.commerce_mode === "affiliate" ? "রকমারি / পার্টনার স্টোর" : "শিক্ষা নগরীর স্টক"}
-          </span>
-          {productType && (
-            <span className="rounded-full bg-slate-100 px-2.5 py-1 text-slate-700">
-              {productType.label}
-            </span>
-          )}
-          {product.category && (
-            <span className="max-w-full truncate text-slate-500">{product.category}</span>
+      <div className="flex flex-1 flex-col p-2.5 sm:p-3">
+        <Link href={`/products/${product.slug}`} className="group/title">
+          <h3 className="line-clamp-2 min-h-10 break-words text-sm font-bold leading-5 text-slate-900 group-hover/title:text-emerald-700 sm:text-[15px]">
+            {product.title}
+          </h3>
+        </Link>
+        {byline && <p className="mt-0.5 line-clamp-1 text-xs text-slate-500">{byline}</p>}
+        <RatingStars rating={product.rating_average} count={product.rating_count} />
+        {isDirect && <StockLabel inStock={product.in_stock} />}
+
+        <div className="mt-1.5 min-h-7">
+          {isDirect && product.price !== null ? (
+            <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5">
+              <p className="text-base font-extrabold text-slate-900">{formatBDT(product.price)}</p>
+              {discountPercent !== null && product.list_price !== null && (
+                <p className="text-xs font-medium text-slate-400 line-through">{formatBDT(product.list_price)}</p>
+              )}
+              {discountPercent !== null && (
+                <span className="rounded-md bg-rose-500 px-1.5 py-0.5 text-[10px] font-extrabold text-white">-{discountPercent}%</span>
+              )}
+            </div>
+          ) : (
+            <p className="text-xs font-semibold text-slate-500">Available from partner store</p>
           )}
         </div>
-        <Link href={`/products/${product.slug}`} className="group/title">
-          <h2 className="mt-2 line-clamp-2 min-h-12 break-words font-bold leading-6 text-slate-900 group-hover/title:text-emerald-800">
-            {product.title}
-          </h2>
-        </Link>
-        {(product.author || product.publisher) && (
-          <div className="mt-1 space-y-0.5 text-sm text-slate-500">
-            {product.author && <p className="line-clamp-1">লেখক: {product.author}</p>}
-            {product.publisher && <p className="line-clamp-1">প্রকাশনী: {product.publisher}</p>}
-          </div>
-        )}
-        <RatingStars rating={product.rating_average} count={product.rating_count} />
-        <p className="mt-2 line-clamp-3 min-w-0 flex-1 break-words text-sm leading-6 text-slate-600">
-          {product.description}
-        </p>
-        {product.commerce_mode === "direct" && product.price !== null ? (
-          <div className="mt-4 flex flex-wrap items-baseline gap-2">
-            <p className="font-extrabold text-emerald-800">
-              {formatBDT(product.price)}
-            </p>
-            {product.list_price !== null && product.list_price > product.price && (
-              <p className="text-xs text-slate-400 line-through">
-                {formatBDT(product.list_price)}
-              </p>
-            )}
-          </div>
-        ) : (
-          <p className="mt-4 text-sm font-semibold text-slate-600">
-            বাইরের বিক্রেতার কাছে উপলভ্য
-          </p>
-        )}
-        {product.commerce_mode === "direct" && <StockLabel inStock={product.in_stock} />}
-        <Link
-          href={`/products/${product.slug}`}
-          className="mt-4 inline-flex min-h-11 items-center justify-center rounded-lg border border-emerald-700 px-3 py-2.5 text-center text-sm font-semibold text-emerald-800 transition hover:bg-emerald-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700"
-        >
-          বিস্তারিত দেখুন
-        </Link>
-        {product.commerce_mode === "direct" && product.price !== null && (
-          <>
-            <Link
-              href={`/checkout?product=${encodeURIComponent(product.id)}`}
-              className="mt-2 inline-flex min-h-11 items-center justify-center rounded-lg bg-emerald-700 px-3 py-2.5 text-center text-sm font-bold text-white transition hover:bg-emerald-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700"
-            >
-              অর্ডার করুন
-            </Link>
+
+        <div className="mt-auto pt-2.5">
+          {isDirect && product.price !== null ? (
             <AddToCartButton productId={product.id} />
-          </>
-        )}
-        <div className="mt-2">
-          <WishlistButton slug={product.slug} />
+          ) : (
+            <Link
+              href={`/products/${product.slug}`}
+              className="inline-flex min-h-10 w-full items-center justify-center rounded-full bg-sky-50 px-3 py-2 text-center text-sm font-bold text-blue-700 transition hover:bg-blue-700 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700"
+            >
+              View Details
+            </Link>
+          )}
         </div>
       </div>
     </article>

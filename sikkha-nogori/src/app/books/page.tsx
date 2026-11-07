@@ -132,9 +132,6 @@ async function BookResults({
       .filter((name) => !knownCategoryValues.has(name))
       .map((name) => ({ label: name, value: name })),
   ];
-  const currentCategoryLabel =
-    categoryOptions.find((item) => item.value === category)?.label ??
-    "বইয়ের সংগ্রহ";
   const pageHref = (nextPage: number) => {
     const search = new URLSearchParams();
     if (query) search.set("q", query);
@@ -151,26 +148,6 @@ async function BookResults({
 
   return (
     <div className="mx-auto max-w-7xl">
-        <nav aria-label="পথনির্দেশ" className="text-sm text-slate-500">
-          <Link href="/" className="font-semibold text-emerald-800 hover:underline">
-            হোম
-          </Link>
-          <span className="px-2" aria-hidden="true">
-            /
-          </span>
-          <span>{currentCategoryLabel}</span>
-        </nav>
-
-        <header className="mt-6">
-          <p className="text-sm font-bold text-emerald-700">শিক্ষা নগরী</p>
-          <h1 className="mt-2 text-3xl font-extrabold sm:text-4xl">
-            বইয়ের সংগ্রহ
-          </h1>
-          <p className="mt-3 max-w-2xl leading-7 text-slate-600">
-            নাম, লেখক/ব্র্যান্ড, প্রকাশক, বিভাগ বা বিবরণ দিয়ে খুঁজুন।
-          </p>
-        </header>
-
         {bookPage === null && (
           <p
             role="status"
@@ -180,30 +157,17 @@ async function BookResults({
           </p>
         )}
 
-        <section className="mt-6 space-y-5">
+        <section className="mt-2 space-y-5">
           <div className="rounded-xl border border-slate-100 bg-white p-3 shadow-sm sm:p-4">
-            <form action="/books" method="get" className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto]">
-              {category && <input type="hidden" name="category" value={category} />}
-              {sort !== "name-asc" && <input type="hidden" name="sort" value={sort} />}
-              {inStock && <input type="hidden" name="instock" value="1" />}
-              {authors.map((value) => <input key={`a-${value}`} type="hidden" name="author" value={value} />)}
-              {publishers.map((value) => <input key={`p-${value}`} type="hidden" name="publisher" value={value} />)}
-              {languages.map((value) => <input key={`l-${value}`} type="hidden" name="language" value={value} />)}
-              <div className="sm:col-span-1">
-                <label htmlFor="book-query" className="sr-only">বই, লেখক বা প্রকাশক খুঁজুন</label>
-                <input id="book-query" name="q" type="search" defaultValue={query} placeholder="বই, লেখক বা প্রকাশনীর নাম খুঁজুন..." className="min-h-11 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-100" />
-              </div>
-              <button type="submit" className="min-h-11 rounded-lg bg-emerald-700 px-5 text-sm font-bold text-white transition hover:bg-emerald-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700">খুঁজুন</button>
-            </form>
-            <div className="mt-3">
+            <div>
               <MobileCatalogFilters
                 categories={categoryOptions}
                 state={{ query, category, sort, inStock, authors, publishers, languages }}
                 facets={facets}
               />
             </div>
-            <nav aria-label="দ্রুত বই বিভাগ" className="mt-3 flex items-center gap-2 overflow-x-auto pb-1 text-xs">
-              <Link href="/books" className={`whitespace-nowrap rounded-full px-4 py-2 font-semibold transition ${!category ? "bg-emerald-700 text-white shadow-sm" : "bg-slate-100 text-slate-700 hover:bg-emerald-50 hover:text-emerald-800"}`}>সব বই</Link>
+            <nav aria-label="Quick book categories" className="mt-3 flex items-center gap-2 overflow-x-auto pb-1 text-xs">
+              <Link href="/books" className={`whitespace-nowrap rounded-full px-4 py-2 font-semibold transition ${!category ? "bg-emerald-700 text-white shadow-sm" : "bg-slate-100 text-slate-700 hover:bg-emerald-50 hover:text-emerald-800"}`}>All Books</Link>
               {categoryOptions.slice(0, 8).map((option) => (
                 <Link key={option.value} href={`/books?${new URLSearchParams({ ...(query ? { q: query } : {}), category: option.value }).toString()}`} aria-current={category === option.value ? "page" : undefined} className={`whitespace-nowrap rounded-full px-4 py-2 font-semibold transition ${category === option.value ? "bg-emerald-700 text-white shadow-sm" : "bg-slate-100 text-slate-700 hover:bg-emerald-50 hover:text-emerald-800"}`}>
                   {option.label}
@@ -214,11 +178,11 @@ async function BookResults({
 
           <div className="flex flex-wrap items-center justify-between gap-3">
             <p aria-live="polite" className="text-sm font-medium text-slate-600">
-              দেখাচ্ছে <span className="font-bold text-slate-900">{total}টি</span> {bookPage === null ? "নমুনা " : ""}বই
+              Showing <span className="font-bold text-slate-900">{total}</span> {bookPage === null ? "sample " : ""}{total === 1 ? "book" : "books"}
               {query ? ` · “${query}”` : ""}
             </p>
             {(query || filterCount > 0 || sort !== "name-asc") && (
-              <Link href="/books" className="text-sm font-semibold text-emerald-800 hover:underline">ফিল্টার মুছুন</Link>
+              <Link href="/books" className="text-sm font-semibold text-emerald-800 hover:underline">Clear filters</Link>
             )}
           </div>
 

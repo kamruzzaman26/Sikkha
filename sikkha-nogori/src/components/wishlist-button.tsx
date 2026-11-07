@@ -40,7 +40,7 @@ export function WishlistButton({ slug, variant = "button" }: { slug: string; var
       setSaved(!saved);
       setError("");
     } catch {
-      setError("উইশলিস্ট সংরক্ষণ করা যায়নি। ব্রাউজারের storage অনুমতি পরীক্ষা করুন।");
+      setError("Could not update wishlist. Check your browser storage permission.");
     }
   }
 
@@ -51,7 +51,7 @@ export function WishlistButton({ slug, variant = "button" }: { slug: string; var
           <svg aria-hidden="true" className={`size-6 ${saved ? "text-rose-600" : ""}`} viewBox="0 0 24 24" fill={saved ? "currentColor" : "none"} stroke="currentColor" strokeWidth="1.6">
             <path d="M20.2 8.8c0 4.2-8.2 10-8.2 10s-8.2-5.8-8.2-10a4.4 4.4 0 0 1 8.2-2.2 4.4 4.4 0 0 1 8.2 2.2Z" />
           </svg>
-          {saved ? "সংরক্ষিত" : "সংরক্ষণ"}
+          {saved ? "Saved" : "Save"}
         </button>
         {error && <p role="status" className="text-center text-xs text-rose-700">{error}</p>}
       </div>
@@ -76,7 +76,7 @@ export function WishlistButton({ slug, variant = "button" }: { slug: string; var
         >
           <path d="M20.2 8.8c0 4.2-8.2 10-8.2 10s-8.2-5.8-8.2-10a4.4 4.4 0 0 1 8.2-2.2 4.4 4.4 0 0 1 8.2 2.2Z" />
         </svg>
-        {saved ? "উইশলিস্টে আছে" : "উইশলিস্টে রাখুন"}
+        {saved ? "In Wishlist" : "Add to Wishlist"}
       </button>
       {error && (
         <p role="status" className="mt-1 text-xs text-rose-700">

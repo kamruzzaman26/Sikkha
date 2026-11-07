@@ -22,8 +22,8 @@ export function estimateDeliveryDate(now, days) {
 }
 
 /** e.g. "১২ নভেম্বর, বৃহস্পতিবার" */
-export function formatDeliveryDate(date) {
-  const formatter = new Intl.DateTimeFormat("bn-BD", { day: "numeric", month: "long", weekday: "long", timeZone: "UTC" });
+export function formatDeliveryDate(date, locale = "bn-BD") {
+  const formatter = new Intl.DateTimeFormat(locale, { day: "numeric", month: "long", weekday: "long", timeZone: "UTC" });
   const parts = Object.fromEntries(formatter.formatToParts(date).map((part) => [part.type, part.value]));
   return `${parts.day} ${parts.month}, ${parts.weekday}`;
 }

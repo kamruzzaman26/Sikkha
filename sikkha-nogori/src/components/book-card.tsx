@@ -8,9 +8,9 @@ import { RatingStars } from "@/components/rating-stars";
 import { StockLabel } from "@/components/stock-label";
 
 function partnerLabel(partner: string | null): string {
-  if (partner === "rokomari") return "রকমারিতে কিনুন";
-  if (partner === "10_minute_school") return "10 Minute School-এ কিনুন";
-  return "পার্টনারের সাইটে কিনুন";
+  if (partner === "rokomari") return "Buy on Rokomari";
+  if (partner === "10_minute_school") return "Buy on 10 Minute School";
+  return "Buy from partner";
 }
 
 const ctaClass =
@@ -32,7 +32,7 @@ export default function BookCard({
     <article className="group flex h-full min-w-0 flex-col overflow-hidden rounded-xl border border-slate-100 bg-white shadow-sm transition duration-200 hover:border-emerald-200 hover:shadow-md">
       <Link
         href={`/books/${book.slug}`}
-        aria-label={`বইয়ের বিস্তারিত: ${book.title}`}
+        aria-label={`Book details: ${book.title}`}
         className="relative flex h-32 items-center justify-center overflow-hidden bg-slate-50 p-1.5 sm:h-48"
       >
         <span
@@ -44,12 +44,12 @@ export default function BookCard({
                 : "border-slate-200 bg-white/95 text-slate-500"
           }`}
         >
-          {buyLink ? "পার্টনার" : isDirect ? "শিক্ষা নগরী" : book.productId ? "ক্যাটালগ" : "নমুনা"}
+          {buyLink ? "Partner" : isDirect ? "Sikkha Nogori" : book.productId ? "Catalog" : "Sample"}
         </span>
         {book.imageUrl ? (
           <Image
             src={book.imageUrl}
-            alt={`${book.title} বইয়ের প্রচ্ছদ`}
+            alt={`${book.title} book cover`}
             width={240}
             height={320}
             unoptimized
@@ -58,10 +58,10 @@ export default function BookCard({
         ) : book.productId ? (
           <span
             role="img"
-            aria-label={`${book.title} বইয়ের ছবি নেই`}
+            aria-label={`${book.title} has no cover image`}
             className="flex h-full max-h-full w-24 items-center justify-center rounded-lg border border-slate-200 bg-white px-3 text-center text-sm font-semibold text-slate-400"
           >
-            প্রচ্ছদের ছবি নেই
+            No cover
           </span>
         ) : (
           <BookCover book={book} className="max-h-32 sm:max-h-44" />
@@ -92,10 +92,10 @@ export default function BookCard({
               )}
             </div>
           ) : (
-            <p className="text-xs text-slate-500">মূল্য জানতে বিস্তারিত দেখুন</p>
+            <p className="text-xs text-slate-500">See details for price</p>
           )}
           {!isDirect && book.productId && hasPrice && (
-            <p className="mt-0.5 text-[10px] text-slate-400">পার্টনারের প্রদর্শিত মূল্য; পরিবর্তন হতে পারে</p>
+            <p className="mt-0.5 text-[10px] text-slate-400">Partner-listed price; may change</p>
           )}
         </div>
 
@@ -113,7 +113,7 @@ export default function BookCard({
             <AddToCartButton productId={book.productId} />
           ) : (
             <Link href={`/books/${book.slug}`} className={ctaClass}>
-              বিস্তারিত দেখুন
+              View Details
             </Link>
           )}
         </div>
