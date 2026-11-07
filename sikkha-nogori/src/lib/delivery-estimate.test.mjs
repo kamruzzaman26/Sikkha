@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { estimateDeliveryDate, formatDeliveryDate, normalizeDeliveryDays } from "./delivery-estimate.mjs";
+import { describeDeliveryDay, estimateDeliveryDate, formatDeliveryDate, normalizeDeliveryDays, normalizeZoneDays } from "./delivery-estimate.mjs";
 
 const day = (date) => date.toISOString().slice(0, 10);
 
@@ -33,4 +33,17 @@ test("days setting: default 7, 0 hides, bad values fall back", () => {
   assert.equal(normalizeDeliveryDays(-2), 7);
   assert.equal(normalizeDeliveryDays(99), 7);
   assert.equal(normalizeDeliveryDays(2.5), 7);
+});
+
+test("Dhaka-inside is tomorrow and outside is the day after, in Bengali", () => {
+  const now = new Date("2026-11-07T06:00:00Z"); // Saturday 7 Nov in Dhaka
+  assert.equal(describeDeliveryDay(now, 2), "আগামীকাল ৮ নভেম্বর, রবিবার");
+  assert.equal(describeDeliveryDay(now, 3), "আগামী পরশুদিন ৯ নভেম্বর, সোমবার");
+  assert.equal(describeDeliveryDay(now, 5), "১১ নভেম্বর, বুধবার");
+});
+
+test("zone days fall back when invalid", () => {
+  assert.equal(normalizeZoneDays("", 2), 2);
+  assert.equal(normalizeZoneDays(0, 2), 2);
+  assert.equal(normalizeZoneDays("4", 2), 4);
 });

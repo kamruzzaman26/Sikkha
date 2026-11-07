@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { showToast } from "@/lib/toast";
 
 export function ShareButton({ title }: { title: string }) {
   const [message, setMessage] = useState("");
@@ -14,9 +15,11 @@ export function ShareButton({ title }: { title: string }) {
       }
       await navigator.clipboard.writeText(url);
       setMessage("Link copied");
+      showToast({ message: "লিংক কপি হয়েছে" });
     } catch (error) {
       if ((error as Error)?.name === "AbortError") return;
       setMessage("Could not share");
+      showToast({ message: "Share করা যায়নি", tone: "error" });
     }
     window.setTimeout(() => setMessage(""), 2500);
   }

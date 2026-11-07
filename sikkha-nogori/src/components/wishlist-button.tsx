@@ -6,6 +6,7 @@ import {
   WISHLIST_CHANGE_EVENT,
   writeWishlist,
 } from "@/lib/wishlist";
+import { showToast } from "@/lib/toast";
 
 export function WishlistButton({ slug, variant = "button" }: { slug: string; variant?: "button" | "icon" }) {
   const [saved, setSaved] = useState(false);
@@ -39,8 +40,10 @@ export function WishlistButton({ slug, variant = "button" }: { slug: string; var
       writeWishlist(next);
       setSaved(!saved);
       setError("");
+      showToast({ message: saved ? "Saved তালিকা থেকে সরানো হয়েছে" : "Saved তালিকায় যোগ হয়েছে", tone: saved ? "info" : "success" });
     } catch {
       setError("Could not update wishlist. Check your browser storage permission.");
+      showToast({ message: "Save করা যায়নি", tone: "error" });
     }
   }
 

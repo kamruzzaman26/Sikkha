@@ -37,15 +37,20 @@ export async function saveGeneralSettings(form: FormData) {
   const deliveryNote = field(form, "deliveryNote");
   const deliveryDaysRaw = field(form, "deliveryDays");
   const deliveryDays = deliveryDaysRaw === "" ? 7 : Number(deliveryDaysRaw);
+  const zoneDays = (key: string, fallback: number) => { const raw = field(form, key); return raw === "" ? fallback : Number(raw); };
+  const daysDhaka = zoneDays("deliveryDaysDhaka", 2);
+  const daysOutside = zoneDays("deliveryDaysOutside", 3);
+  const delayNote = field(form, "deliveryDelayNote");
   const currency = field(form, "currency");
   const facebook = field(form, "facebook");
   const instagram = field(form, "instagram");
   const youtube = field(form, "youtube");
   if (siteName.length < 2 || siteName.length > 100 || tagline.length > 200 || email.length > 160 || phone.length > 40 || address.length > 300 || !["BDT","USD"].includes(currency) || ![facebook,instagram,youtube].every(safeUrl)) redirect("/admin/settings?status=invalid");
   if (!Number.isInteger(deliveryDays) || deliveryDays < 0 || deliveryDays > 60) redirect("/admin/settings?status=invalid");
+  if (![daysDhaka, daysOutside].every((d) => Number.isInteger(d) && d >= 1 && d <= 60) || delayNote.length > 300) redirect("/admin/settings?status=invalid");
   if (helpline.length > 40 || deliveryNote.length > 120) redirect("/admin/settings?status=invalid");
   if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) redirect("/admin/settings?status=invalid");
-  await save("general", "manage_settings", { site_name: siteName, tagline, contact_email: email, contact_phone: phone, helpline, delivery_note: deliveryNote, delivery_days: deliveryDays, address, currency, social: { facebook, instagram, youtube } });
+  await save("general", "manage_settings", { site_name: siteName, tagline, contact_email: email, contact_phone: phone, helpline, delivery_note: deliveryNote, delivery_days: deliveryDays, delivery_days_dhaka: daysDhaka, delivery_days_outside: daysOutside, delivery_delay_note: delayNote, address, currency, social: { facebook, instagram, youtube } });
 }
 
 export async function saveSeoSettings(form: FormData) {

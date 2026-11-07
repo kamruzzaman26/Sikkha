@@ -54,6 +54,7 @@ export default function BookTabs({
             {tab.label}
           </button>
         ))}
+        <a href="#book-qa" className="-mb-px flex min-h-11 items-center border-b-2 border-transparent px-1 pb-2 text-sm font-bold text-slate-500 hover:text-slate-800 sm:text-base">Q&amp;A</a>
       </div>
 
       {active === "summary" && hasSummary && (
@@ -103,6 +104,12 @@ export default function BookTabs({
           </p>
         </div>
       )}
+      <div className="mt-5 border-t border-slate-100 pt-4 text-center">
+        <a href="/contact" className="inline-flex items-center gap-2 text-sm text-rose-600 hover:underline">
+          <span aria-hidden="true" className="flex size-5 items-center justify-center rounded-full border border-rose-500 text-xs font-bold">i</span>
+          Report incorrect information
+        </a>
+      </div>
     </section>
   );
 }

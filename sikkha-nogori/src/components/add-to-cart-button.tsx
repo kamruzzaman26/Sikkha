@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { addCartItem } from "@/lib/cart";
+import { showToast } from "@/lib/toast";
 
 export function AddToCartButton({ productId, variant = "default" }: { productId: string; variant?: "default" | "bar" }) {
   const [status, setStatus] = useState<"idle" | "added" | "error">("idle");
@@ -10,8 +11,11 @@ export function AddToCartButton({ productId, variant = "default" }: { productId:
     try {
       addCartItem(productId);
       setStatus("added");
+      showToast({ message: "কার্টে যোগ হয়েছে", href: "/cart", actionLabel: "কার্ট দেখুন" });
+      window.setTimeout(() => setStatus("idle"), 2500);
     } catch {
       setStatus("error");
+      showToast({ message: "কার্টে যোগ করা যায়নি", tone: "error" });
     }
   }
 

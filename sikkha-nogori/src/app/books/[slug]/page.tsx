@@ -13,16 +13,19 @@ import BookFeedback from "@/components/book-feedback";
 import { createSupabasePublicServerClient } from "@/lib/supabase/server";
 import { getActiveAffiliateLinks } from "@/lib/supabase/affiliate-links";
 import { getBookBySlug, formatPrice, getSavings } from "@/lib/books";
-import { estimateDeliveryDate, formatDeliveryDate, normalizeDeliveryDays } from "@/lib/delivery-estimate.mjs";
+import { DeliveryBox } from "@/components/delivery-box";
+import { DEFAULT_DHAKA_DAYS, DEFAULT_OUTSIDE_DAYS, describeDeliveryDay, normalizeZoneDays } from "@/lib/delivery-estimate.mjs";
+
+const DEFAULT_DELIVERY_NOTE = "অনাকাঙ্ক্ষিত কারণে এবং অনলাইন পেমেন্ট এর ক্ষেত্রে পেমেন্টে বিলম্ব হলে সম্ভাব্য ডেলিভারি তারিখ পরিবর্তিত হতে পারে।";
 import {
   getPublishedBookBySlug,
   toCatalogBook,
 } from "@/lib/catalog";
 
 function partnerBuyLabel(partner: string | null): string {
-  if (partner === "rokomari") return "Buy on Rokomari";
-  if (partner === "10_minute_school") return "Buy on 10 Minute School";
-  return "Buy from partner";
+  if (partner === "rokomari") return "রকমারিতে কিনুন";
+  if (partner === "10_minute_school") return "10 Minute School-এ কিনুন";
+  return "পার্টনারের সাইটে কিনুন";
 }
 
 function CartIcon() {
@@ -101,8 +104,12 @@ async function BookDetails({
     ? await createSupabasePublicServerClient().from("public_product_stock").select("available_copies").eq("product_id", book.productId).maybeSingle()
     : { data: null, error: null };
   const { data: generalSettings } = await createSupabasePublicServerClient().from("site_settings").select("value").eq("key", "general").maybeSingle();
-  const deliveryDays = normalizeDeliveryDays((generalSettings?.value as { delivery_days?: unknown } | null)?.delivery_days);
-  const deliveryText = deliveryDays > 0 ? formatDeliveryDate(estimateDeliveryDate(new Date(), deliveryDays), "en-GB") : null;
+  const general = (generalSettings?.value ?? null) as { delivery_days?: unknown; delivery_days_dhaka?: unknown; delivery_days_outside?: unknown; delivery_delay_note?: unknown } | null;
+  const showDelivery = Number(general?.delivery_days) !== 0;
+  const now = new Date();
+  const deliveryInside = describeDeliveryDay(now, normalizeZoneDays(general?.delivery_days_dhaka, DEFAULT_DHAKA_DAYS));
+  const deliveryOutside = describeDeliveryDay(now, normalizeZoneDays(general?.delivery_days_outside, DEFAULT_OUTSIDE_DAYS));
+  const deliveryNote = typeof general?.delivery_delay_note === "string" ? general.delivery_delay_note : DEFAULT_DELIVERY_NOTE;
   const ratingSummary = book.productId
     ? await createSupabasePublicServerClient().rpc("get_product_review_summary", { p_product_id: book.productId })
     : { data: null };
@@ -195,15 +202,7 @@ async function BookDetails({
             </section>
           </div>
 
-          {isDirectProduct && deliveryText && stockQuantity !== 0 && (
-            <div className="mt-4 flex items-start gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
-              <svg aria-hidden="true" viewBox="0 0 24 24" className="mt-0.5 size-6 shrink-0 text-blue-700" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6.5h11v9H3zM14 9.5h4l3 3v3h-7z" /><circle cx="7" cy="17.5" r="1.6" /><circle cx="17" cy="17.5" r="1.6" /></svg>
-              <div>
-                <p className="text-sm font-bold text-blue-700">Estimated Delivery</p>
-                <p className="mt-0.5 text-sm text-slate-700">Arrives by {deliveryText}</p>
-              </div>
-            </div>
-          )}
+          {isDirectProduct && showDelivery && stockQuantity !== 0 && <DeliveryBox inside={deliveryInside} outside={deliveryOutside} note={deliveryNote} />}
 
           <div className="mt-4 grid grid-cols-3 items-stretch">
             <a href="#book-feedback" className="flex min-h-12 flex-col items-center justify-center gap-0.5 px-2 text-sm font-medium text-slate-700 hover:text-emerald-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700">
@@ -219,7 +218,9 @@ async function BookDetails({
               {stockQuantity > 0 ? (
                 <>
                   <span className="rounded-full border border-emerald-200 bg-emerald-50 px-4 py-1.5 text-sm font-semibold text-emerald-700">In Stock</span>
-                  <span className="text-sm text-slate-600">({stockQuantity >= 50 ? "50+" : stockQuantity} copies available)</span>
+                  {stockQuantity <= 5 && <span className="text-sm text-rose-600">(only {stockQuantity} cop{stockQuantity === 1 ? "y" : "ies"} left)</span>}
+                  {stockQuantity > 5 && <span className="text-sm text-slate-600">({stockQuantity >= 50 ? "50+" : stockQuantity} copies available)</span>}
+                  {stockQuantity <= 5 && <p className="basis-full text-sm text-slate-900">* স্টক আউট হওয়ার আগেই অর্ডার করুন</p>}
                 </>
               ) : (
                 <span className="rounded-full border border-rose-200 bg-rose-50 px-4 py-1.5 text-sm font-semibold text-rose-700">Out of Stock</span>
