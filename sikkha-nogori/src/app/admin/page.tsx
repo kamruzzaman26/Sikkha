@@ -893,7 +893,11 @@ async function AdminContent({
                           <span className={`inline-flex rounded-full px-3 py-1 text-xs font-bold ${product.archived_at ? "bg-slate-100 text-slate-600" : product.is_published ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800"}`}>
                             {product.archived_at ? "Archived" : product.is_published ? "Published" : "Draft"}
                           </span>
-                          <p className="mt-1 text-xs text-slate-500">{product.commerce_mode === "affiliate" ? "Affiliate" : product.commerce_mode === "direct" ? "Direct sale" : "Sales type required"}</p>
+                          <div className="mt-1.5">
+                            <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-bold ring-1 ring-inset ${product.commerce_mode === "affiliate" ? "bg-violet-50 text-violet-800 ring-violet-200" : product.commerce_mode === "direct" ? "bg-sky-50 text-sky-800 ring-sky-200" : "bg-amber-50 text-amber-800 ring-amber-200"}`}>
+                              {product.commerce_mode === "affiliate" ? "Affiliate" : product.commerce_mode === "direct" ? "Direct sale" : "Sales type required"}
+                            </span>
+                          </div>
                         </td>
                         <td className="px-4 py-3">
                           <a href="#affiliate-links" className="font-semibold text-blue-700 hover:underline">{productLinks.length} {productLinks.length === 1 ? "link" : "links"}</a>
