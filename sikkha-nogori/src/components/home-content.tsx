@@ -1,4 +1,5 @@
 import { CatalogProductCard } from "@/components/catalog-product-card";
+import Image from "next/image";
 import Link from "next/link";
 import BookCard from "@/components/book-card";
 import { bookCategories, getSavings, type Book } from "@/lib/books";
@@ -112,22 +113,35 @@ async function loadProducts(): Promise<CatalogProduct[]> {
   }
 }
 
-function BookRow({ id, title, subtitle, href, books, linkMap }: {
+function SectionHeader({ id, title, subtitle, href, cta = "সব দেখুন" }: { id?: string; title: string; subtitle?: string; href?: string; cta?: string }) {
+  return (
+    <div className="mb-3 flex items-end justify-between gap-3">
+      <div className="min-w-0">
+        <h2 id={id} className="text-lg font-extrabold tracking-tight text-slate-900 sm:text-xl">{title}</h2>
+        {subtitle && <p className="mt-0.5 text-sm text-slate-600">{subtitle}</p>}
+      </div>
+      {href && (
+        <Link href={href} className="inline-flex min-h-10 shrink-0 items-center gap-1 rounded-lg px-2 text-sm font-bold text-emerald-800 transition hover:bg-emerald-50">
+          {cta} <span aria-hidden="true">›</span>
+        </Link>
+      )}
+    </div>
+  );
+}
+
+const railClass = "-mx-3 flex snap-x gap-3 overflow-x-auto px-3 pb-2 [scrollbar-width:none] sm:mx-0 sm:px-0 sm:gap-4";
+const railItemClass = "w-[44%] min-w-[9.25rem] max-w-[13.5rem] shrink-0 snap-start sm:w-[28%] lg:w-[19%]";
+
+function BookRow({ id, title, subtitle, href, books, linkMap, boxed = false }: {
   id?: string; title: string; subtitle?: string; href: string; books: Book[];
-  linkMap: Record<string, PublicAffiliateLink>;
+  linkMap: Record<string, PublicAffiliateLink>; boxed?: boolean;
 }) {
   if (books.length === 0) return null;
   return (
-    <section id={id} className="scroll-mt-24 py-6 sm:py-8">
-      <div className="mb-4 flex items-end justify-between gap-3">
-        <div>
-          <h2 className="text-xl font-extrabold tracking-tight text-slate-900 sm:text-2xl">{title}</h2>
-          {subtitle && <p className="mt-1 text-sm text-slate-600">{subtitle}</p>}
-        </div>
-        <Link href={href} className="inline-flex min-h-10 shrink-0 items-center gap-1 rounded-xl px-3 py-2 text-sm font-bold text-emerald-800 hover:bg-emerald-50">সব দেখুন <span aria-hidden="true">→</span></Link>
-      </div>
-      <div className="-mx-1 flex snap-x snap-mandatory gap-3 overflow-x-auto px-1 pb-3 [scrollbar-width:none] sm:gap-4">
-        {books.map((book) => <div key={book.slug} className="w-[46%] min-w-[9.5rem] max-w-[14rem] shrink-0 snap-start sm:w-[30%] lg:w-[22%]"><BookCard book={book} buyLink={linkMap[book.slug] ?? null} /></div>)}
+    <section id={id} aria-label={title} className={`scroll-mt-24 ${boxed ? "mt-6 rounded-2xl border-2 border-emerald-600 bg-white p-3 sm:p-5" : "mt-8"}`}>
+      <SectionHeader title={title} subtitle={subtitle} href={href} />
+      <div className={railClass}>
+        {books.map((book) => <div key={book.slug} className={railItemClass}><BookCard book={book} buyLink={linkMap[book.slug] ?? null} /></div>)}
       </div>
     </section>
   );
@@ -136,20 +150,44 @@ function BookRow({ id, title, subtitle, href, books, linkMap }: {
 function ProductRow({ products }: { products: CatalogProduct[] }) {
   if (!products.length) return null;
   return (
-    <section className="py-6 sm:py-8">
-      <div className="mb-4 flex items-end justify-between gap-3">
-        <div>
-          <h2 className="text-xl font-extrabold tracking-tight text-slate-900 sm:text-2xl">Featured Products</h2>
-        </div>
-        <Link href="/products" className="inline-flex min-h-10 items-center rounded-xl px-3 text-sm font-bold text-emerald-800 hover:bg-emerald-50">View All →</Link>
-      </div>
-      <div className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-3 [scrollbar-width:none] sm:mx-0 sm:px-0 sm:gap-4">
+    <section aria-label="Featured Products" className="mt-8">
+      <SectionHeader title="Featured Products · বিশেষ পণ্য" href="/products" cta="সব পণ্য" />
+      <div className={railClass}>
         {products.slice(0, 12).map((product) => (
-          <div key={product.id} className="w-[46%] min-w-[9.5rem] max-w-[14rem] shrink-0 snap-start sm:w-[30%] lg:w-[22%]">
-            <CatalogProductCard product={product} />
-          </div>
+          <div key={product.id} className={railItemClass}><CatalogProductCard product={product} /></div>
         ))}
       </div>
+    </section>
+  );
+}
+
+function Thumb({ book }: { book: Book }) {
+  if (book.imageUrl) {
+    return <Image src={book.imageUrl} alt="" width={96} height={128} unoptimized className="h-24 w-auto max-w-full object-contain" />;
+  }
+  return (
+    <span aria-hidden="true" className={`flex h-24 w-[4.5rem] items-center justify-center rounded-r-md px-1 text-center text-[10px] font-bold leading-3 text-white ${book.coverAccent}`}>
+      <span className="line-clamp-4 whitespace-pre-line">{book.cover}</span>
+    </span>
+  );
+}
+
+function CollectionBlock({ title, books }: { title: string; books: Book[] }) {
+  if (books.length === 0) return null;
+  return (
+    <section aria-label={title} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+      <h3 className="line-clamp-1 text-base font-extrabold text-slate-900">{title}</h3>
+      <div className="mt-3 grid grid-cols-2 gap-x-3 gap-y-4">
+        {books.slice(0, 4).map((book) => (
+          <Link key={book.slug} href={`/books/${book.slug}`} className="group flex min-w-0 flex-col items-center text-center">
+            <span className="flex h-24 items-center justify-center transition group-hover:scale-[1.03]"><Thumb book={book} /></span>
+            <span className="mt-2 line-clamp-2 text-xs font-semibold leading-4 text-slate-700 group-hover:text-emerald-800">{book.title}</span>
+          </Link>
+        ))}
+      </div>
+      <Link href={`/books?category=${encodeURIComponent(title)}`} className="mt-4 inline-flex min-h-10 items-center gap-1 text-sm font-bold text-emerald-800 hover:underline">
+        আরও দেখুন <span aria-hidden="true">›</span>
+      </Link>
     </section>
   );
 }
@@ -173,96 +211,87 @@ export default async function HomeContent({ searchParams }: { searchParams: Prom
     .slice(0, 12)
     .map((item) => item.book);
   const popularBookCategories = (await getPublishedBookCategories()) ?? [];
+  // Topic rail and collection blocks: categories that actually have books, with real covers.
+  const topics = popularBookCategories
+    .map((category) => ({ category, books: books.filter((book) => book.category === category) }))
+    .filter((topic) => topic.books.length > 0);
 
   return (
-    <main className="min-h-screen overflow-hidden bg-[#f7faf8] pb-24 text-slate-900">
+    <main className="min-h-screen overflow-hidden bg-[#f6f8f7] pb-24 text-slate-900">
       <div className="mx-auto max-w-7xl px-3 pt-3 sm:px-6 sm:pt-5 lg:px-8">
-        {/* Search bar: query submits to the existing books search route. */}
-        <form action="/books" method="get" role="search">
-          <div className="flex min-h-12 rounded-xl border-2 border-emerald-700 bg-white p-1 shadow-sm">
-            <label className="sr-only" htmlFor="home-search">বই, লেখক বা পণ্য খুঁজুন</label>
-            <span className="flex items-center pl-2 text-slate-400" aria-hidden="true">⌕</span>
-            <input id="home-search" name="q" type="search" placeholder="বই, লেখক, পণ্য ও ক্যাটাগরি খুঁজুন..." className="min-w-0 flex-1 bg-transparent px-3 text-sm outline-none placeholder:text-slate-500" />
-            <button type="submit" className="min-h-10 rounded-lg bg-emerald-700 px-5 text-sm font-bold text-white hover:bg-emerald-800">Search</button>
-          </div>
-        </form>
-
-        {/* Promotional banner slider: swipe horizontally on mobile. */}
-        <section aria-label="প্রচারমূলক ব্যানার" className="mt-4">
+        {/* Hero banners: swipe on mobile. Banner content comes from Banner Management. */}
+        <section aria-label="প্রচারমূলক ব্যানার">
           <div className="-mx-3 flex snap-x snap-mandatory gap-3 overflow-x-auto px-3 pb-2 [scrollbar-width:none] sm:mx-0 sm:px-0">
             {homeSettings.slides.map((slide, index) => (
-              <Link key={slide.title} href={slide.href} className={`relative flex min-h-40 w-[92%] shrink-0 snap-center flex-col justify-center overflow-hidden rounded-2xl bg-gradient-to-br ${slide.tone} p-5 text-white shadow-md sm:min-h-52 sm:w-[70%] sm:p-8 lg:w-[49%]`}>
-                <span className="absolute -right-5 -top-8 size-36 rounded-full border-[18px] border-white/10" aria-hidden="true" />
+              <Link key={slide.title} href={slide.href} className={`relative flex min-h-44 w-[92%] shrink-0 snap-center flex-col justify-center overflow-hidden rounded-2xl bg-gradient-to-br ${slide.tone} p-5 text-white shadow-sm sm:min-h-56 sm:w-[calc(50%-0.5rem)] sm:p-8 lg:min-h-64`}>
+                <span className="absolute -right-6 -top-10 size-40 rounded-full border-[18px] border-white/10" aria-hidden="true" />
                 <span className="relative text-xl font-extrabold leading-snug sm:text-3xl">{slide.title}</span>
-                <span className="relative mt-2 max-w-md text-sm text-emerald-50 sm:text-base">{slide.text}</span>
-                <span className="relative mt-4 inline-flex w-fit rounded-lg bg-white px-4 py-2 text-sm font-bold text-emerald-900">{slide.cta} →</span>
+                <span className="relative mt-2 max-w-md text-sm text-white/90 sm:text-base">{slide.text}</span>
+                <span className="relative mt-4 inline-flex min-h-10 w-fit items-center rounded-lg bg-white px-4 text-sm font-bold text-slate-900">{slide.cta} →</span>
                 <span className="absolute bottom-3 right-4 text-xs text-white/70">{index + 1} / {homeSettings.slides.length}</span>
               </Link>
             ))}
           </div>
-          <div className="mt-1 flex justify-center gap-1.5" aria-hidden="true">{homeSettings.slides.map((slide, index) => <span key={slide.title} className={`h-1.5 rounded-full ${index === 0 ? "w-5 bg-emerald-700" : "w-1.5 bg-slate-300"}`} />)}</div>
         </section>
 
-        {/* Store benefits and curated discovery shortcuts. Keep claims limited to features currently available. */}
-        <section aria-label="শিক্ষা নগরীর সুবিধা" className="mt-3 grid grid-cols-1 gap-2 rounded-2xl border border-emerald-100 bg-white p-3 shadow-sm sm:grid-cols-3 sm:gap-3 sm:p-4">
-          <div className="flex items-center gap-3 rounded-xl bg-emerald-50/70 px-3 py-3">
-            <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-white text-xl" aria-hidden="true">📚</span>
-            <div><p className="text-sm font-extrabold text-slate-900">বইয়ের বিশাল সংগ্রহ</p><p className="text-xs text-slate-600">বিভিন্ন বিষয়ের বই এক জায়গায়</p></div>
-          </div>
-          <div className="flex items-center gap-3 rounded-xl bg-emerald-50/70 px-3 py-3">
-            <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-white text-xl" aria-hidden="true">🔎</span>
-            <div><p className="text-sm font-extrabold text-slate-900">সহজে খুঁজে নিন</p><p className="text-xs text-slate-600">নাম, লেখক বা বিভাগ দিয়ে সার্চ</p></div>
-          </div>
-          <div className="flex items-center gap-3 rounded-xl bg-emerald-50/70 px-3 py-3">
-            <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-white text-xl" aria-hidden="true">🛒</span>
-            <div><p className="text-sm font-extrabold text-slate-900">সহজ অর্ডার</p><p className="text-xs text-slate-600">বইয়ের বিস্তারিত দেখে অর্ডার করুন</p></div>
-          </div>
-        </section>
-
-        <section aria-labelledby="featured-collections" className="mt-5">
-          <div className="mb-3 flex items-end justify-between gap-3">
-            <div><h2 id="featured-collections" className="text-lg font-extrabold text-slate-900 sm:text-xl">বিশেষ বইয়ের সংগ্রহ</h2><p className="mt-1 text-sm text-slate-600">আপনার প্রয়োজন অনুযায়ী বই খুঁজুন</p></div>
-            <Link href="/books" className="shrink-0 text-sm font-bold text-emerald-800 hover:underline">সব বই →</Link>
-          </div>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <Link href="/books?q=আরবি" className="group relative flex min-h-32 items-center justify-between overflow-hidden rounded-2xl bg-gradient-to-r from-[#075b46] to-[#0b8061] p-5 text-white shadow-sm transition hover:shadow-md">
-              <span className="relative z-10"><span className="block text-xs font-semibold text-emerald-100">ARABIC BOOKS</span><span className="mt-1 block text-xl font-extrabold">আরবি ও ইসলামি বই</span><span className="mt-2 inline-flex rounded-lg bg-white/15 px-3 py-1.5 text-xs font-bold">বই খুঁজুন →</span></span>
-              <span className="absolute -right-2 -bottom-7 text-8xl opacity-20 transition group-hover:scale-110" aria-hidden="true">📖</span>
-            </Link>
-            <Link href="/books?q=বোর্ড" className="group relative flex min-h-32 items-center justify-between overflow-hidden rounded-2xl bg-gradient-to-r from-[#344c72] to-[#526b94] p-5 text-white shadow-sm transition hover:shadow-md">
-              <span className="relative z-10"><span className="block text-xs font-semibold text-blue-100">BOARD BOOKS</span><span className="mt-1 block text-xl font-extrabold">বোর্ডের পাঠ্যবই</span><span className="mt-2 inline-flex rounded-lg bg-white/15 px-3 py-1.5 text-xs font-bold">বই খুঁজুন →</span></span>
-              <span className="absolute -right-2 -bottom-7 text-8xl opacity-20 transition group-hover:scale-110" aria-hidden="true">🎓</span>
-            </Link>
-          </div>
-        </section>
-
-        {/* Category icon grid: root categories come from the active database taxonomy. */}
+        {/* Category rail: two rows that scroll sideways on phones, a full grid on desktop. */}
         {config.show_categories !== false && categories.length > 0 && (
           <section id="categories" aria-labelledby="home-categories" className="mt-4 rounded-2xl bg-white p-3 shadow-sm sm:p-5">
-            <div className="mb-3 flex items-center justify-between"><h2 id="home-categories" className="text-lg font-extrabold sm:text-xl">{config.categories_title || "Shop By Category · ক্যাটাগরি"}</h2><Link href="/products" className="text-xs font-bold text-emerald-800">সব ক্যাটাগরি →</Link></div>
-            <div className="grid grid-cols-4 gap-x-2 gap-y-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8">
-              {categories.map((category) => (
-                <Link key={category.id} href={category.category_group === "books" ? `/books?category=${encodeURIComponent(category.name)}` : `/products?category=${encodeURIComponent(category.name)}`} className="group flex min-w-0 flex-col items-center text-center">
-                  <span className="flex size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-50 to-teal-100 text-2xl shadow-inner transition group-hover:-translate-y-0.5 group-hover:shadow-md sm:size-16 sm:text-3xl" aria-hidden="true">{getCategoryIcon(category.name)}</span>
-                  <span className="mt-1.5 line-clamp-2 min-h-8 text-[11px] font-semibold leading-4 text-slate-700 sm:text-xs">{category.name}</span>
+            <SectionHeader id="home-categories" title={config.categories_title || "Shop By Category · ক্যাটাগরি"} />
+            <div className="-mx-3 overflow-x-auto px-3 pb-1 [scrollbar-width:none] sm:mx-0 sm:px-0">
+              <div className="grid auto-cols-[5.5rem] grid-flow-col grid-rows-2 gap-x-3 gap-y-4 lg:auto-cols-auto lg:grid-flow-row lg:grid-cols-8 lg:grid-rows-none">
+                {categories.map((category) => (
+                  <Link key={category.id} href={category.category_group === "books" ? `/books?category=${encodeURIComponent(category.name)}` : `/products?category=${encodeURIComponent(category.name)}`} className="group flex flex-col items-center text-center">
+                    <span className="flex size-14 items-center justify-center rounded-full bg-emerald-50 text-2xl ring-1 ring-emerald-100 transition group-hover:-translate-y-0.5 group-hover:bg-emerald-100 sm:size-16" aria-hidden="true">{getCategoryIcon(category.name)}</span>
+                    <span className="mt-1.5 line-clamp-2 min-h-8 text-[11px] font-semibold leading-4 text-slate-700 sm:text-xs">{category.name}</span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* Topic rail: one real cover per category that has books. */}
+        {topics.length > 0 && (
+          <section aria-labelledby="home-topics" className="mt-6">
+            <SectionHeader id="home-topics" title="বিষয় অনুযায়ী বই" href="/books" cta="সব বই" />
+            <div className={railClass}>
+              {topics.slice(0, 14).map(({ category, books: topicBooks }) => (
+                <Link key={category} href={`/books?category=${encodeURIComponent(category)}`} className="group flex w-[7.5rem] shrink-0 snap-start flex-col items-center rounded-2xl border border-slate-200 bg-white p-3 text-center shadow-sm transition hover:border-emerald-300 hover:shadow-md sm:w-36">
+                  <span className="flex h-24 items-center justify-center"><Thumb book={topicBooks[0]} /></span>
+                  <span className="mt-2 line-clamp-2 min-h-8 text-xs font-bold leading-4 text-slate-800 group-hover:text-emerald-800">{category}</span>
                 </Link>
               ))}
             </div>
           </section>
         )}
 
-        {/* Curated book row: catalog records, not a claimed popularity ranking. */}
-        {/* Source filter pills + 4-column grid (design). Filter is URL-driven so it works without client JS. */}
-        {books.length > 0 && (
-          <section id="latest-books" aria-labelledby="latest-books-title" className="mt-5">
-            <div className="flex items-center gap-2 overflow-x-auto rounded-xl border border-slate-100 bg-white p-3 shadow-sm [scrollbar-width:none]">
-              {([["all", "সব বই", "/#latest-books"], ["inhouse", "শিক্ষা নগরী স্টক", "/?source=inhouse#latest-books"], ["partner", "পার্টনার", "/?source=partner#latest-books"]] as const).map(([key, label, href]) => (
-                <Link key={key} href={href} scroll={false} aria-current={activeSource === key ? "true" : undefined} className={`whitespace-nowrap rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors ${activeSource === key ? "bg-emerald-600 text-white" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}>{label}</Link>
+        {config.show_deals !== false && <BookRow boxed title={config.deals_title || "Quick Deal · সেরা ছাড়"} subtitle="তালিকামূল্যের তুলনায় কম দামের বই" href="/books?sort=discount-high" books={deals} linkMap={linkMap} />}
+
+        <ProductRow products={products} />
+
+        {config.show_new_arrivals !== false && <BookRow id="new-arrivals" title={config.new_arrivals_title || "New Arrivals · নতুন বই"} subtitle="সদ্য যোগ হওয়া বই" href="/books?sort=newest" books={newArrivals} linkMap={linkMap} />}
+
+        {/* Collection blocks: four real covers per category, like a shop-window. */}
+        {topics.length > 0 && (
+          <section aria-labelledby="home-collections" className="mt-8">
+            <SectionHeader id="home-collections" title="Collections · বইয়ের সংগ্রহ" />
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {topics.slice(0, 6).map(({ category, books: topicBooks }) => (
+                <CollectionBlock key={category} title={category} books={topicBooks} />
               ))}
             </div>
-            <div className="mb-4 mt-5 flex items-center justify-between">
-              <h2 id="latest-books-title" className="text-lg font-bold text-slate-800">সদ্য সংযোজিত বইসমূহ</h2>
-              <Link href="/books?sort=newest" className="text-xs font-semibold text-emerald-600 hover:underline">সব দেখুন →</Link>
+          </section>
+        )}
+
+        {/* Source filter pills + grid. The filter is URL-driven so it works without client JS. */}
+        {books.length > 0 && (
+          <section id="latest-books" aria-labelledby="latest-books-title" className="mt-8">
+            <SectionHeader id="latest-books-title" title="সদ্য সংযোজিত বইসমূহ" href="/books?sort=newest" />
+            <div className="mb-4 flex items-center gap-2 overflow-x-auto [scrollbar-width:none]">
+              {([["all", "সব বই", "/#latest-books"], ["inhouse", "শিক্ষা নগরী স্টক", "/?source=inhouse#latest-books"], ["partner", "পার্টনার", "/?source=partner#latest-books"]] as const).map(([key, label, href]) => (
+                <Link key={key} href={href} scroll={false} aria-current={activeSource === key ? "true" : undefined} className={`inline-flex min-h-10 items-center whitespace-nowrap rounded-full border px-4 text-sm font-semibold transition-colors ${activeSource === key ? "border-emerald-700 bg-emerald-700 text-white" : "border-slate-200 bg-white text-slate-700 hover:border-emerald-300"}`}>{label}</Link>
+              ))}
             </div>
             {shownBooks.length > 0 ? (
               <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
@@ -273,19 +302,15 @@ export default async function HomeContent({ searchParams }: { searchParams: Prom
             )}
           </section>
         )}
-        <ProductRow products={products} />
 
-        {config.show_new_arrivals !== false && <BookRow id="new-arrivals" title={config.new_arrivals_title || "New Arrivals · নতুন বই"} subtitle="সদ্য যোগ হওয়া বই" href="/books?sort=newest" books={newArrivals} linkMap={linkMap} />}
-        {config.show_deals !== false && <BookRow title={config.deals_title || "Best Deals · সেরা ছাড়"} subtitle="তালিকামূল্যের তুলনায় কম দামের বই" href="/books?sort=price-low" books={deals} linkMap={linkMap} />}
-
-        {popularBookCategories.slice(0, 6).map((category) => (
-          <BookRow key={category} title={category} href={`/books?category=${encodeURIComponent(category)}`} books={books.filter((book) => book.category === category).slice(0, 10)} linkMap={linkMap} />
+        {topics.slice(0, 6).map(({ category, books: topicBooks }) => (
+          <BookRow key={category} title={category} href={`/books?category=${encodeURIComponent(category)}`} books={topicBooks.slice(0, 10)} linkMap={linkMap} />
         ))}
 
         {books.length === 0 && products.length === 0 ? (
-          <p className="mt-8 rounded-2xl bg-white p-6 text-center text-slate-600">ক্যাটালগে নতুন আইটেম শীঘ্রই যোগ হবে। <Link href="/books" className="font-bold text-emerald-800 underline">বই দেখুন</Link> অথবা <Link href="/products" className="font-bold text-emerald-800 underline">পণ্য দেখুন</Link>।</p>
+          <p className="mt-8 rounded-2xl bg-white p-6 text-center text-slate-600">ক্যাটালগে নতুন আইটেম শীঘ্রই যোগ হবে। <Link href="/books" className="font-bold text-emerald-800 underline">সব বই দেখুন</Link></p>
         ) : (
-          <div className="mt-6 text-center"><Link href="/books" className="inline-flex min-h-12 items-center rounded-xl bg-emerald-700 px-8 text-base font-bold text-white hover:bg-emerald-800">সব বই দেখুন · Explore All Books</Link></div>
+          <div className="mt-8 text-center"><Link href="/books" className="inline-flex min-h-12 items-center rounded-xl bg-emerald-700 px-8 text-base font-bold text-white hover:bg-emerald-800">সব বই দেখুন</Link></div>
         )}
       </div>
     </main>
