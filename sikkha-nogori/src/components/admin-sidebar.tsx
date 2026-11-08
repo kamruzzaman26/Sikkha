@@ -1,10 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AdminIcon } from "@/components/admin-icons";
 import { AdminNavLink } from "@/components/admin-nav-link";
 import { adminNav } from "@/lib/admin-nav";
+
+type AdminIdentity = { email?: string | null; name?: string | null; avatarUrl?: string | null };
 
 function NavList({ onNavigate }: { onNavigate?: () => void }) {
   return (
@@ -60,9 +62,52 @@ function Brand() {
   );
 }
 
-export function AdminShell({ children }: { children: React.ReactNode }) {
-  const mobileMenuRef = useRef<HTMLDetailsElement>(null);
-  const closeMobileMenu = () => mobileMenuRef.current?.removeAttribute("open");
+function AdminTopbar({ identity }: { identity: AdminIdentity }) {
+  const displayName = identity.name || identity.email?.split("@")[0] || "Administrator";
+  const initials = displayName.slice(0, 2).toUpperCase();
+  return (
+    <header className="sticky top-0 z-30 flex min-h-[72px] items-center justify-end gap-3 border-b border-slate-200/80 bg-white/95 px-4 shadow-sm backdrop-blur sm:px-7">
+      <details className="relative">
+        <summary aria-label="Notifications" className="flex size-10 cursor-pointer list-none items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 transition hover:bg-blue-50 hover:text-blue-800 [&::-webkit-details-marker]:hidden">
+          <AdminIcon name="bell" className="size-[19px]" />
+        </summary>
+        <div className="absolute right-0 top-12 z-50 w-64 rounded-xl border border-slate-200 bg-white p-4 shadow-xl">
+          <p className="text-sm font-bold text-slate-900">Notifications</p>
+          <p className="mt-1 text-xs leading-5 text-slate-500">There are no new notifications.</p>
+        </div>
+      </details>
+      <details className="relative">
+        <summary className="flex cursor-pointer list-none items-center gap-3 rounded-xl border border-slate-200 bg-white py-1.5 pl-1.5 pr-3 text-left transition hover:bg-slate-50 [&::-webkit-details-marker]:hidden">
+          {identity.avatarUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={identity.avatarUrl} alt="" className="size-9 rounded-lg object-cover" />
+          ) : (
+            <span className="flex size-9 items-center justify-center rounded-lg bg-[#1d376b] text-xs font-extrabold text-white">{initials}</span>
+          )}
+          <span className="hidden min-w-0 sm:block">
+            <span className="block max-w-40 truncate text-xs font-bold text-slate-900">{displayName}</span>
+            <span className="block max-w-40 truncate text-[10px] text-slate-500">{identity.email || "Admin account"}</span>
+          </span>
+          <AdminIcon name="chevron" className="size-4 text-slate-500" />
+        </summary>
+        <div className="absolute right-0 top-12 z-50 w-64 rounded-xl border border-slate-200 bg-white p-4 shadow-xl">
+          <p className="text-sm font-bold text-slate-900">{displayName}</p>
+          <p className="mt-1 break-all text-xs text-slate-500">{identity.email || "Administrator account"}</p>
+          <p className="mt-3 border-t border-slate-100 pt-3 text-[11px] font-semibold text-blue-800">Sikkha Nogori Admin</p>
+        </div>
+      </details>
+    </header>
+  );
+}
+
+export function AdminShell({ children, identity }: { children: React.ReactNode; identity: AdminIdentity }) {
+  const [mobileOpen, setMobileOpen] = useState(false);
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = previous; };
+  }, [mobileOpen]);
 
   return (
     <div lang="en" className="min-h-screen bg-[#f4f6fb] lg:flex">
@@ -78,30 +123,28 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         </div>
       </aside>
       <div className="min-w-0 flex-1">
-        <details ref={mobileMenuRef} className="group sticky top-0 z-50 border-b border-slate-200 bg-white/95 shadow-sm backdrop-blur lg:hidden">
-          <summary className="flex min-h-[62px] cursor-pointer list-none items-center gap-3 px-4">
-            <span className="flex size-9 items-center justify-center rounded-xl bg-[#1d376b] text-xs font-black text-white">SN</span>
-            <span className="flex-1">
-              <span className="block text-sm font-extrabold tracking-wide text-slate-900">SIKKHA NOGORI</span>
-              <span className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500">Admin workspace</span>
-            </span>
-            <span className="flex size-9 items-center justify-center rounded-xl bg-blue-50 text-blue-900"><AdminIcon name="menu" /></span>
-          </summary>
-          <div className="fixed inset-x-0 bottom-0 top-[62px] z-40 bg-[#08132b]/95 backdrop-blur-sm" onClick={closeMobileMenu}>
-            <button type="button" aria-label="Close navigation" className="absolute inset-0 size-full cursor-default" />
-          </div>
-          <div className="fixed bottom-0 left-0 top-[62px] z-50 w-[min(86vw,340px)] overflow-y-auto border-r border-slate-200 bg-[#0d1933] px-3 py-5 text-white shadow-2xl">
-            <div className="mb-5 flex items-center justify-between px-2">
-              <span className="text-xs font-bold uppercase tracking-widest text-blue-200">Navigation</span>
-              <button type="button" onClick={closeMobileMenu} aria-label="Close menu" className="flex size-9 items-center justify-center rounded-lg text-slate-200 hover:bg-white/10"><AdminIcon name="menu" /></button>
-            </div>
-            <div onClick={(event) => { if ((event.target as HTMLElement).closest("a")) closeMobileMenu(); }}>
-              <NavList onNavigate={closeMobileMenu} />
-            </div>
-          </div>
-        </details>
-        <div className="min-w-0">{children}</div>
+        <div className="sticky top-0 z-30 flex min-h-[62px] items-center justify-between border-b border-slate-200 bg-white/95 px-4 shadow-sm backdrop-blur lg:hidden">
+          <button type="button" onClick={() => setMobileOpen(true)} aria-label="Open navigation menu" aria-expanded={mobileOpen} className="flex size-10 items-center justify-center rounded-xl bg-[#1d376b] text-white">
+            <AdminIcon name="menu" />
+          </button>
+          <span className="text-xs font-extrabold tracking-wide text-slate-900">SIKKHA NOGORI</span>
+          <span className="size-10" />
+        </div>
+        <AdminTopbar identity={identity} />
+        <main className="min-w-0">{children}</main>
       </div>
+      {mobileOpen && (
+        <div className="fixed inset-0 z-[100] lg:hidden" role="dialog" aria-modal="true" aria-label="Admin navigation">
+          <button type="button" aria-label="Close navigation menu" onClick={() => setMobileOpen(false)} className="absolute inset-0 size-full bg-slate-950/60 backdrop-blur-sm" />
+          <aside className="absolute bottom-0 left-0 top-0 w-[min(86vw,340px)] overflow-y-auto overscroll-contain border-r border-white/10 bg-[#0d1933] px-4 py-5 text-white shadow-2xl">
+            <div className="mb-5 flex items-center justify-between">
+              <Brand />
+              <button type="button" onClick={() => setMobileOpen(false)} aria-label="Close menu" className="flex size-9 shrink-0 items-center justify-center rounded-lg text-slate-200 hover:bg-white/10"><AdminIcon name="x" /></button>
+            </div>
+            <NavList onNavigate={() => setMobileOpen(false)} />
+          </aside>
+        </div>
+      )}
     </div>
   );
 }
