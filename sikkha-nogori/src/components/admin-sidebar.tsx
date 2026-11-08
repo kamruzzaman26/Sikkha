@@ -62,11 +62,11 @@ function Brand() {
   );
 }
 
-function AdminTopbar({ identity }: { identity: AdminIdentity }) {
+function AdminTopbar({ identity, onMenuClick }: { identity: AdminIdentity; onMenuClick: () => void }) {
   const displayName = identity.name || identity.email?.split("@")[0] || "Administrator";
   const initials = displayName.slice(0, 2).toUpperCase();
   return (
-    <header className="sticky top-0 z-30 flex min-h-[72px] items-center justify-end gap-3 border-b border-slate-200/80 bg-white/95 px-4 shadow-sm backdrop-blur sm:px-7">
+    <header className="sticky top-0 z-40 flex min-h-[72px] items-center justify-between gap-3 border-b border-slate-200/80 bg-white/95 px-4 shadow-sm backdrop-blur sm:px-7">\n      <button type="button" onClick={onMenuClick} aria-label="Open navigation menu" className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[#1d376b] text-white lg:hidden"><AdminIcon name="menu" /></button>
       <details className="relative">
         <summary aria-label="Notifications" className="flex size-10 cursor-pointer list-none items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 transition hover:bg-blue-50 hover:text-blue-800 [&::-webkit-details-marker]:hidden">
           <AdminIcon name="bell" className="size-[19px]" />
