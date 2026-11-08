@@ -22,7 +22,17 @@ async function AdminChrome({ children }: { children: React.ReactNode }) {
     isAdmin = false;
   }
 
-  return isAdmin ? <AdminShell>{children}</AdminShell> : <>{children}</>;
+  return isAdmin && user ? (
+    <AdminShell
+      identity={{
+        email: user.email,
+        name: typeof user.user_metadata?.full_name === "string" ? user.user_metadata.full_name : typeof user.user_metadata?.name === "string" ? user.user_metadata.name : null,
+        avatarUrl: typeof user.user_metadata?.avatar_url === "string" ? user.user_metadata.avatar_url : null,
+      }}
+    >
+      {children}
+    </AdminShell>
+  ) : <>{children}</>;
 }
 
 export default function AdminLayout({ children }: LayoutProps<"/admin">) {
