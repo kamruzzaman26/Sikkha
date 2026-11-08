@@ -640,18 +640,6 @@ async function AdminContent({
   const productTypes = productTypesResult.data
     .filter((type) => type.is_active)
     .map(({ slug, label }) => ({ slug, label }));
-  const productGroups = productTypesResult.data
-    .map(({ slug, label, is_active }) => ({
-      slug,
-      title: is_active ? label : `${label} · Inactive`,
-      entries: filteredProducts.filter(
-        (product) => product.product_type === slug,
-      ),
-    }))
-    .filter(
-      ({ slug, entries }) =>
-        entries.length > 0 || productTypeFilter === slug,
-    );
   const affiliateProducts = products.filter(
     (product) =>
       product.commerce_mode === "affiliate" && !product.archived_at,
