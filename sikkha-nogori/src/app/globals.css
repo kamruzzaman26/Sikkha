@@ -77,7 +77,6 @@ body:has([data-admin-route]) > .site-footer-slot { display: none; }
 [data-admin-route] .ring-emerald-300,
 [data-admin-route] .ring-emerald-400,
 [data-admin-route] .ring-emerald-500 { --tw-ring-color: #6594f5 !important; }
-[data-admin-route] .focus\\:ring-emerald-500:focus { --tw-ring-color: #3d72e8 !important; }
 
 /* Admin page transition feedback and accessible focus states. */
 [data-admin-route] :is(button, a, summary, select, input, textarea):focus-visible {
