@@ -658,16 +658,16 @@ async function AdminContent({
   );
 
   return (
-    <main lang="en" className="min-h-screen bg-[#f4f6fb] px-4 py-6 text-slate-900 sm:px-7 sm:py-8 xl:px-10">
+    <main lang="en" className="min-h-screen bg-[#f4f7ff] px-4 py-6 text-slate-900 sm:px-7 sm:py-8 xl:px-10">
       <div className="mx-auto max-w-[1500px]">
         <header className="relative overflow-hidden rounded-[28px] border border-slate-800 bg-[#101b35] px-6 py-7 text-white shadow-xl sm:px-8 sm:py-9"><div className="pointer-events-none absolute -right-12 -top-20 size-64 rounded-full bg-blue-500/15 blur-3xl" /><div className="relative flex flex-wrap items-end justify-between gap-4">
           <div className="min-w-0">
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-blue-200">Catalog workspace</p>
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-blue-200">PRODUCT MANAGEMENT</p>
             <h1 className="mt-1 text-3xl font-extrabold tracking-tight text-white">
               Products &amp; Affiliate Links
             </h1>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-blue-100/80">
-              Manage product types, sales channels, categories, and cover images. Third-party
+              Organize your product catalog, partner links, categories, and product details. Third-party
               seller products are not available for direct checkout.
             </p>
           </div>
@@ -746,7 +746,7 @@ async function AdminContent({
           id="product-catalog"
           className="mt-7 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7"
         >
-          <h2 className="text-xl font-bold">Product Catalog</h2>
+          <div className="flex flex-wrap items-center justify-between gap-3"><div><p className="text-xs font-extrabold uppercase tracking-[0.14em] text-blue-700">Catalog</p><h2 className="mt-1 text-xl font-extrabold text-slate-900">Products</h2></div><a href="#affiliate-links" className="rounded-xl border border-blue-200 bg-blue-50 px-4 py-2.5 text-sm font-bold text-blue-800 hover:bg-blue-100">View Affiliate Links ↓</a></div>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
             Published and categorized products appear in the public catalog. Affiliate product prices are not treated as verified current prices. For direct-sale products,
             enter a verified selling price.
@@ -865,144 +865,91 @@ async function AdminContent({
             Showing {filteredProducts.length} products · {products.length} total
           </p>
 
-          <div className="mt-6 grid gap-5 lg:grid-cols-2">
-            {productGroups.map(({ slug, title, entries }) => (
-              <section key={slug} aria-label={`${title} catalog`} className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 sm:p-5">
-                <h3 className="font-bold">
-                  {title} · {entries.length}
-                </h3>
-                {entries.length === 0 ? (
-                  <p className="mt-2 rounded-lg bg-slate-50 px-3 py-4 text-sm text-slate-600">
-                    {hasProductFilters
-                      ? `No ${title} match the selected filters.`
-                      : `No ${title} have been added yet.`}
-                  </p>
-                ) : (
-                  <ul className="mt-3 grid gap-3">
-                    {entries.map((product) => (
-                      <li
-                        key={product.id}
-                        className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-blue-200 hover:shadow-md"
-                      >
-                        <div className="mb-3 flex flex-wrap justify-between gap-2">
-                          <p className="font-semibold">
-                            {product.title}{" "}
-                            <span className="font-normal text-slate-500">
-                              · {product.slug}
-                            </span>
-                          </p>
-                          <span className="text-xs font-bold text-slate-600">
-                            {product.archived_at
-                              ? "Archived"
-                              : product.is_published
-                                ? "Published"
-                                : "Draft"}
-                            {product.commerce_mode
-                              ? ` · ${
-                                  product.commerce_mode === "affiliate"
-                                    ? "affiliate"
-                                    : "Direct sale"
-                                }`
-                              : " · Sales type required"}
-                          </span>
-                        </div>
-                        <article
-                          aria-label={`${product.title} product preview`}
-                          className="mt-3 flex max-w-sm gap-3 rounded-xl border border-slate-200 bg-white p-3"
-                        >
-                          {product.image_url ? (
-                            <Image
-                              src={product.image_url}
-                              alt={`${product.title} cover image`}
-                              width={72}
-                              height={96}
-                              unoptimized
-                              className="h-24 w-[4.5rem] shrink-0 rounded-lg bg-slate-100 object-cover"
-                            />
-                          ) : (
-                            <div
-                              role="img"
-                              aria-label={`${product.title} image unavailable`}
-                              className="flex h-24 w-[4.5rem] shrink-0 items-center justify-center rounded-lg bg-emerald-50 px-1 text-center text-xs text-emerald-900"
-                            >
-                              No image
+          <div className="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[920px] border-collapse text-left text-sm">
+                <thead className="bg-blue-50/80 text-slate-800">
+                  <tr>
+                    <th className="px-4 py-4 font-bold">Product</th>
+                    <th className="px-4 py-4 font-bold">Category / Type</th>
+                    <th className="px-4 py-4 font-bold">Price</th>
+                    <th className="px-4 py-4 font-bold">Status</th>
+                    <th className="px-4 py-4 font-bold">Affiliate Links</th>
+                    <th className="px-4 py-4 text-right font-bold">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {filteredProducts.map((product) => {
+                    const productLinks = links.filter((link) => link.product_id === product.id);
+                    return (
+                      <tr key={product.id} className="align-middle transition hover:bg-blue-50/40">
+                        <td className="px-4 py-3">
+                          <div className="flex min-w-[230px] items-center gap-3">
+                            {product.image_url ? (
+                              <Image src={product.image_url} alt="" width={48} height={60} className="h-[60px] w-12 rounded-lg bg-slate-100 object-cover" />
+                            ) : (
+                              <div className="flex h-[60px] w-12 items-center justify-center rounded-lg bg-blue-50 text-[10px] font-semibold text-blue-800">No image</div>
+                            )}
+                            <div className="min-w-0">
+                              <p className="line-clamp-2 font-bold text-slate-900">{product.title}</p>
+                              <p className="mt-1 truncate text-xs text-slate-500">{product.slug}</p>
                             </div>
-                          )}
-                          <div className="min-w-0">
-                            {product.category && (
-                              <p className="text-xs font-semibold text-emerald-700">
-                                {product.category}
-                              </p>
-                            )}
-                            <p className="mt-1 line-clamp-2 font-bold">
-                              {product.title}
-                            </p>
-                            {(product.author || product.publisher) && (
-                              <p className="mt-1 line-clamp-1 text-xs text-slate-500">
-                                {[product.author, product.publisher]
-                                  .filter(Boolean)
-                                  .join(" · ")}
-                              </p>
-                            )}
                           </div>
-                        </article>
-                        {role === "admin" && (
-                          <>
-                            <details>
-                              <summary className="cursor-pointer text-sm font-semibold text-emerald-800">
-                                Edit
-                              </summary>
-                              <div className="mt-4">
-                                <ProductForm
-                                  product={product}
-                                  idPrefix={`product-${product.id}`}
-                                  productTypes={productTypes}
-                                  categoryOptions={categoryOptions}
-                                  selectedCategoryIds={
-                                    selectedByProduct.get(product.id) ?? []
-                                  }
-                                  primaryCategoryId={
-                                    primaryByProduct.get(product.id) ?? ""
-                                  }
-                                />
+                        </td>
+                        <td className="px-4 py-3">
+                          <span className="inline-flex rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-800">{product.category || product.product_type}</span>
+                        </td>
+                        <td className="whitespace-nowrap px-4 py-3 font-bold tabular-nums text-slate-900">{product.price != null ? `৳ ${Number(product.price).toLocaleString("en-BD")}` : "—"}</td>
+                        <td className="px-4 py-3">
+                          <span className={`inline-flex rounded-full px-3 py-1 text-xs font-bold ${product.archived_at ? "bg-slate-100 text-slate-600" : product.is_published ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800"}`}>
+                            {product.archived_at ? "Archived" : product.is_published ? "Published" : "Draft"}
+                          </span>
+                          <p className="mt-1 text-xs text-slate-500">{product.commerce_mode === "affiliate" ? "Affiliate" : product.commerce_mode === "direct" ? "Direct sale" : "Sales type required"}</p>
+                        </td>
+                        <td className="px-4 py-3">
+                          <a href="#affiliate-links" className="font-semibold text-blue-700 hover:underline">{productLinks.length} {productLinks.length === 1 ? "link" : "links"}</a>
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="flex justify-end gap-2">
+                            <details className="group relative">
+                              <summary className="cursor-pointer list-none rounded-lg bg-blue-700 px-3 py-2 text-xs font-bold text-white hover:bg-blue-800">Edit</summary>
+                              <div className="fixed inset-0 z-[70] overflow-y-auto bg-slate-950/50 p-3 sm:p-8">
+                                <div className="mx-auto my-4 max-w-4xl rounded-2xl bg-white p-5 shadow-2xl sm:p-7">
+                                  <div className="mb-5 flex items-center justify-between gap-3">
+                                    <h3 className="text-lg font-extrabold text-slate-900">Edit product</h3>
+                                    <button type="button" onClick={(event) => event.currentTarget.closest("details")?.removeAttribute("open")} className="rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold">Close</button>
+                                  </div>
+                                  <ProductForm product={product} idPrefix={`product-${product.id}`} productTypes={productTypes} categoryOptions={categoryOptions} selectedCategoryIds={selectedByProduct.get(product.id) ?? []} primaryCategoryId={primaryByProduct.get(product.id) ?? ""} />
+                                  <form action={setProductArchiveStatus} className="mt-4 border-t border-slate-100 pt-4">
+                                    <input type="hidden" name="id" value={product.id} />
+                                    <input type="hidden" name="archive" value={product.archived_at ? "false" : "true"} />
+                                    <AdminSubmitButton pendingLabel={product.archived_at ? "Restoring…" : "Archiving…"} className="min-h-11 rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">{product.archived_at ? "Restore from Archive" : "Archive Product"}</AdminSubmitButton>
+                                  </form>
+                                </div>
                               </div>
                             </details>
-                            <form
-                              action={setProductArchiveStatus}
-                              className="mt-3"
-                            >
-                              <input
-                                type="hidden"
-                                name="id"
-                                value={product.id}
-                              />
-                              <input
-                                type="hidden"
-                                name="archive"
-                                value={product.archived_at ? "false" : "true"}
-                              />
-                              <AdminSubmitButton
-                                pendingLabel={product.archived_at ? "Restoring…" : "Archiving…"}
-                                className="min-h-11 rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
-                              >
-                                {product.archived_at ? "Restore from Archive" : "Archive Product"}
-                              </AdminSubmitButton>
-                            </form>
-                          </>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </section>
-            ))}
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                  {filteredProducts.length === 0 && (
+                    <tr><td colSpan={6} className="px-4 py-12 text-center text-slate-500">{hasProductFilters ? "No products match these filters." : "No products have been added yet."}</td></tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 bg-slate-50/70 px-4 py-3 text-xs text-slate-600">
+              <span>Showing {filteredProducts.length} of {products.length} products</span>
+              <a href="#product-catalog" className="font-semibold text-blue-700 hover:underline">Back to filters ↑</a>
+            </div>
           </div>
         </section>
         )}
 
         {role === "admin" && (
           <section className="mt-7 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
-            <h2 className="text-xl font-bold">Add Product Type</h2>
+            <h2 className="text-xl font-extrabold text-slate-900">Manage Product Types</h2>
             <p className="mt-2 text-sm leading-6 text-slate-600">
               New types become available in product forms. Types already in use
               cannot be deleted.
@@ -1052,264 +999,132 @@ async function AdminContent({
           </section>
         )}
 
-        <section className="mt-7 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
-          <h2 className="text-xl font-bold">Create Affiliate Link</h2>
-          {affiliateProducts.length === 0 ? (
-            <p className="mt-4 rounded-xl bg-amber-50 px-4 py-3 leading-6 text-amber-900">
-              First, save a product with the Affiliate sales mode.
-            </p>
-          ) : (
-            <form action={saveAffiliateLink} className="mt-5 grid gap-4">
-              <div className="grid gap-4 md:grid-cols-2">
-                <div>
-                  <label
-                    htmlFor="new-product"
-                    className="mb-2 block text-sm font-semibold text-slate-700"
-                  >
-                    Product
-                  </label>
-                  <select
-                    id="new-product"
-                    name="productId"
-                    required
-                    defaultValue=""
-                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5"
-                  >
-                    <option value="" disabled>
-                      Select a product
-                    </option>
-                    {affiliateProducts.map((product) => (
-                      <option key={product.id} value={product.id}>
-                        {product.title} · {product.slug}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="new-partner"
-                    className="mb-2 block text-sm font-semibold text-slate-700"
-                  >
-                    Affiliate Partner
-                  </label>
-                  <select
-                    id="new-partner"
-                    name="partner"
-                    required
-                    defaultValue=""
-                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5"
-                  >
-                    <option value="" disabled>
-                      Select a partner
-                    </option>
-                    {Object.entries(partnerNames).map(([value, name]) => (
-                      <option key={value} value={value}>
-                        {name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label
-                  htmlFor="new-url"
-                  className="mb-2 block text-sm font-semibold text-slate-700"
-                >
-                  Approved Affiliate URL (HTTPS)
-                </label>
-                <input
-                  id="new-url"
-                  name="url"
-                  type="url"
-                  inputMode="url"
-                  required
-                  maxLength={2048}
-                  placeholder="https://..."
-                  className="w-full rounded-lg border border-slate-300 px-3 py-2.5"
-                />
-              </div>
-
-              <button
-                type="submit"
-                className="w-fit rounded-lg bg-emerald-700 px-5 py-2.5 font-bold text-white transition hover:bg-emerald-800"
-              >
-                Create Link
-              </button>
-            </form>
-          )}
-        </section>
-
-        <section className="mt-8">
-          <div className="flex flex-wrap items-end justify-between gap-3">
+        <section id="affiliate-links" className="mt-8 scroll-mt-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
+          <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
-              <h2 className="text-xl font-bold">Saved Affiliate Links</h2>
-              <p className="mt-1 text-sm text-slate-600">
-                {links.length} links total
-              </p>
+              <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-blue-700">Partner tracking</p>
+              <h2 className="mt-1 text-xl font-extrabold text-slate-900">Affiliate Links</h2>
+              <p className="mt-1 text-sm text-slate-600">Manage approved partner URLs connected to your catalog products.</p>
             </div>
+            <details className="group">
+              <summary className="cursor-pointer list-none rounded-xl bg-blue-700 px-4 py-3 text-sm font-bold text-white shadow-sm hover:bg-blue-800">+ Add Affiliate Link</summary>
+              <div className="fixed inset-0 z-[70] overflow-y-auto bg-slate-950/50 p-3 sm:p-8">
+                <div className="mx-auto my-8 max-w-2xl rounded-2xl bg-white p-5 shadow-2xl sm:p-7">
+                  <div className="mb-5 flex items-center justify-between gap-3">
+                    <h3 className="text-lg font-extrabold text-slate-900">Create Affiliate Link</h3>
+                    <button type="button" onClick={(event) => event.currentTarget.closest("details")?.removeAttribute("open")} className="rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold">Close</button>
+                  </div>
+                  {affiliateProducts.length === 0 ? (
+                    <p className="rounded-xl bg-amber-50 px-4 py-3 leading-6 text-amber-900">First, save a product with the Affiliate sales mode.</p>
+                  ) : (
+                    <form action={saveAffiliateLink} className="grid gap-4">
+                      <div>
+                        <label htmlFor="new-product" className="mb-2 block text-sm font-semibold text-slate-700">Product</label>
+                        <select id="new-product" name="productId" required defaultValue="" className="w-full rounded-xl border border-slate-300 bg-white px-3 py-3">
+                          <option value="" disabled>Select a product</option>
+                          {affiliateProducts.map((product) => <option key={product.id} value={product.id}>{product.title} · {product.slug}</option>)}
+                        </select>
+                      </div>
+                      <div>
+                        <label htmlFor="new-partner" className="mb-2 block text-sm font-semibold text-slate-700">Affiliate Partner</label>
+                        <select id="new-partner" name="partner" required defaultValue="" className="w-full rounded-xl border border-slate-300 bg-white px-3 py-3">
+                          <option value="" disabled>Select a partner</option>
+                          {Object.entries(partnerNames).map(([value, name]) => <option key={value} value={value}>{name}</option>)}
+                        </select>
+                      </div>
+                      <div>
+                        <label htmlFor="new-url" className="mb-2 block text-sm font-semibold text-slate-700">Approved Affiliate URL (HTTPS)</label>
+                        <input id="new-url" name="url" type="url" inputMode="url" required maxLength={2048} placeholder="https://..." className="w-full rounded-xl border border-slate-300 px-3 py-3" />
+                      </div>
+                      <AdminSubmitButton pendingLabel="Creating link…" className="min-h-11 w-fit rounded-xl bg-blue-700 px-5 py-3 text-sm font-bold text-white hover:bg-blue-800">Create Link</AdminSubmitButton>
+                    </form>
+                  )}
+                </div>
+              </div>
+            </details>
           </div>
 
-          {links.length === 0 ? (
-            <p className="mt-4 rounded-2xl border border-dashed border-slate-300 bg-white px-5 py-10 text-center text-slate-600">
-              No affiliate links have been created yet.
-            </p>
-          ) : (
-            <ul className="mt-4 grid gap-4">
-              {links.map((link) => {
-                const partnerName = getPartnerName(link.partner);
+          <div className="mt-6 grid gap-3 sm:grid-cols-3">
+            <div className="rounded-xl border border-blue-100 bg-blue-50/70 p-4"><p className="text-xs font-semibold text-blue-800">Total Links</p><p className="mt-1 text-2xl font-extrabold tabular-nums text-slate-900">{links.length}</p></div>
+            <div className="rounded-xl border border-emerald-100 bg-emerald-50/70 p-4"><p className="text-xs font-semibold text-emerald-800">Active Links</p><p className="mt-1 text-2xl font-extrabold tabular-nums text-slate-900">{links.filter((link) => link.is_active).length}</p></div>
+            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4"><p className="text-xs font-semibold text-slate-600">Inactive Links</p><p className="mt-1 text-2xl font-extrabold tabular-nums text-slate-900">{links.filter((link) => !link.is_active).length}</p></div>
+          </div>
 
-                return (
-                  <li
-                    key={link.id}
-                    className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-blue-200 hover:shadow-md sm:p-6"
-                  >
-                    <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-                      <div>
-                        <h3 className="font-bold">
-                          {(() => {
-                            // A many-to-one embed returns one object, not an array.
-                            const embedded = link.products as
-                              | { title?: string }
-                              | { title?: string }[]
-                              | null
-                              | undefined;
-                            const embeddedTitle = Array.isArray(embedded)
-                              ? embedded[0]?.title
-                              : embedded?.title;
-                            return (
-                              embeddedTitle ??
-                              products.find((p) => p.id === link.product_id)?.title ??
-                              "Product not found"
-                            );
-                          })()}
-                        </h3>
-                        <p className="mt-1 break-all text-sm text-slate-600">
-                          {partnerName ?? "Select a partner"} · {link.url}
-                        </p>
-                      </div>
-                      <span
-                        className={`rounded-full px-3 py-1 text-sm font-bold ${
-                          link.is_active
-                            ? "bg-emerald-100 text-emerald-800"
-                            : "bg-slate-100 text-slate-600"
-                        }`}
-                      >
-                        {link.is_active ? "Active" : "Inactive"}
-                      </span>
-                    </div>
-
-                    <form
-                      action={saveAffiliateLink}
-                      className="grid gap-4 border-t border-slate-100 pt-4"
-                    >
-                      <input type="hidden" name="id" value={link.id} />
-                      <div className="grid gap-4 md:grid-cols-2">
-                        <div>
-                          <label
-                            htmlFor={`product-${link.id}`}
-                            className="mb-2 block text-sm font-semibold text-slate-700"
-                          >
-                            Products
-                          </label>
-                          <select
-                            id={`product-${link.id}`}
-                            name="productId"
-                            required
-                            defaultValue={link.product_id}
-                            className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5"
-                          >
-                            {products.map((product) => (
-                              <option key={product.id} value={product.id}>
-                                {product.product_type === "course"
-                                  ? "Course"
-                                  : "Book"}
-                                : {product.title} · {product.slug}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-
-                        <div>
-                          <label
-                            htmlFor={`partner-${link.id}`}
-                            className="mb-2 block text-sm font-semibold text-slate-700"
-                          >
-                            Affiliate Partner
-                          </label>
-                          <select
-                            id={`partner-${link.id}`}
-                            name="partner"
-                            required
-                            defaultValue={link.partner ?? ""}
-                            className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5"
-                          >
-                            <option value="" disabled>
-                              Select a partner
-                            </option>
-                            {Object.entries(partnerNames).map(
-                              ([value, name]) => (
-                                <option key={value} value={value}>
-                                  {name}
-                                </option>
-                              ),
-                            )}
-                          </select>
-                        </div>
-                      </div>
-
-                      <div>
-                        <label
-                          htmlFor={`url-${link.id}`}
-                          className="mb-2 block text-sm font-semibold text-slate-700"
-                        >
-                          Affiliate URL (HTTPS)
-                        </label>
-                        <input
-                          id={`url-${link.id}`}
-                          name="url"
-                          type="url"
-                          inputMode="url"
-                          required
-                          maxLength={2048}
-                          defaultValue={link.url}
-                          className="w-full rounded-lg border border-slate-300 px-3 py-2.5"
-                        />
-                      </div>
-
-                      <div className="flex flex-wrap gap-3">
-                        <button
-                          type="submit"
-                          className="rounded-lg bg-emerald-700 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-emerald-800"
-                        >
-                          Save Changes
-                        </button>
-                      </div>
-                    </form>
-
-                    <form
-                      action={setAffiliateLinkStatus}
-                      className="mt-3"
-                    >
-                      <input type="hidden" name="id" value={link.id} />
-                      <input
-                        type="hidden"
-                        name="isActive"
-                        value={link.is_active ? "false" : "true"}
-                      />
-                      <button
-                        type="submit"
-                        className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
-                      >
-                        {link.is_active ? "Deactivate" : "Activate"}
-                      </button>
-                    </form>
-                  </li>
-                );
-              })}
-            </ul>
-          )}
+          <div className="mt-5 overflow-hidden rounded-2xl border border-slate-200">
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[900px] border-collapse text-left text-sm">
+                <thead className="bg-blue-50/80 text-slate-800">
+                  <tr>
+                    <th className="px-4 py-4 font-bold">Product</th>
+                    <th className="px-4 py-4 font-bold">Partner</th>
+                    <th className="px-4 py-4 font-bold">Affiliate URL</th>
+                    <th className="px-4 py-4 font-bold">Status</th>
+                    <th className="px-4 py-4 font-bold">Created</th>
+                    <th className="px-4 py-4 text-right font-bold">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {links.map((link) => {
+                    const embedded = link.products as { title?: string } | { title?: string }[] | null | undefined;
+                    const embeddedTitle = Array.isArray(embedded) ? embedded[0]?.title : embedded?.title;
+                    const productTitle = embeddedTitle ?? products.find((product) => product.id === link.product_id)?.title ?? "Product not found";
+                    return (
+                      <tr key={link.id} className="align-middle hover:bg-blue-50/40">
+                        <td className="px-4 py-3 font-bold text-slate-900">{productTitle}</td>
+                        <td className="px-4 py-3 font-medium text-slate-700">{getPartnerName(link.partner) ?? "Partner not set"}</td>
+                        <td className="max-w-[240px] px-4 py-3"><a href={link.url} target="_blank" rel="noreferrer" className="block truncate font-medium text-blue-700 hover:underline">{link.url}</a></td>
+                        <td className="px-4 py-3"><span className={`inline-flex rounded-full px-3 py-1 text-xs font-bold ${link.is_active ? "bg-emerald-100 text-emerald-800" : "bg-slate-100 text-slate-600"}`}>{link.is_active ? "Active" : "Inactive"}</span></td>
+                        <td className="whitespace-nowrap px-4 py-3 text-slate-600">{new Date(link.created_at).toLocaleDateString("en-BD", { day: "numeric", month: "short", year: "numeric" })}</td>
+                        <td className="px-4 py-3">
+                          <div className="flex justify-end gap-2">
+                            <details className="group">
+                              <summary className="cursor-pointer list-none rounded-lg bg-blue-700 px-3 py-2 text-xs font-bold text-white hover:bg-blue-800">Edit</summary>
+                              <div className="fixed inset-0 z-[70] overflow-y-auto bg-slate-950/50 p-3 sm:p-8">
+                                <div className="mx-auto my-8 max-w-2xl rounded-2xl bg-white p-5 shadow-2xl sm:p-7">
+                                  <div className="mb-5 flex items-center justify-between gap-3">
+                                    <h3 className="text-lg font-extrabold text-slate-900">Edit Affiliate Link</h3>
+                                    <button type="button" onClick={(event) => event.currentTarget.closest("details")?.removeAttribute("open")} className="rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold">Close</button>
+                                  </div>
+                                  <form action={saveAffiliateLink} className="grid gap-4">
+                                    <input type="hidden" name="id" value={link.id} />
+                                    <div>
+                                      <label htmlFor={`product-${link.id}`} className="mb-2 block text-sm font-semibold text-slate-700">Product</label>
+                                      <select id={`product-${link.id}`} name="productId" required defaultValue={link.product_id} className="w-full rounded-xl border border-slate-300 bg-white px-3 py-3">
+                                        {products.map((product) => <option key={product.id} value={product.id}>{product.product_type === "course" ? "Course" : "Book"}: {product.title} · {product.slug}</option>)}
+                                      </select>
+                                    </div>
+                                    <div>
+                                      <label htmlFor={`partner-${link.id}`} className="mb-2 block text-sm font-semibold text-slate-700">Affiliate Partner</label>
+                                      <select id={`partner-${link.id}`} name="partner" required defaultValue={link.partner ?? ""} className="w-full rounded-xl border border-slate-300 bg-white px-3 py-3">
+                                        <option value="" disabled>Select a partner</option>
+                                        {Object.entries(partnerNames).map(([value, name]) => <option key={value} value={value}>{name}</option>)}
+                                      </select>
+                                    </div>
+                                    <div>
+                                      <label htmlFor={`url-${link.id}`} className="mb-2 block text-sm font-semibold text-slate-700">Affiliate URL (HTTPS)</label>
+                                      <input id={`url-${link.id}`} name="url" type="url" inputMode="url" required maxLength={2048} defaultValue={link.url} className="w-full rounded-xl border border-slate-300 px-3 py-3" />
+                                    </div>
+                                    <AdminSubmitButton pendingLabel="Saving changes…" className="min-h-11 w-fit rounded-xl bg-blue-700 px-5 py-3 text-sm font-bold text-white hover:bg-blue-800">Save Changes</AdminSubmitButton>
+                                  </form>
+                                </div>
+                              </div>
+                            </details>
+                            <form action={setAffiliateLinkStatus}>
+                              <input type="hidden" name="id" value={link.id} />
+                              <input type="hidden" name="isActive" value={link.is_active ? "false" : "true"} />
+                              <AdminSubmitButton pendingLabel="Updating…" className="min-h-9 rounded-lg border border-slate-300 px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50">{link.is_active ? "Deactivate" : "Activate"}</AdminSubmitButton>
+                            </form>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                  {links.length === 0 && <tr><td colSpan={6} className="px-4 py-12 text-center text-slate-500">No affiliate links have been created yet.</td></tr>}
+                </tbody>
+              </table>
+            </div>
+            <div className="border-t border-slate-100 bg-slate-50/70 px-4 py-3 text-xs text-slate-600">Showing {links.length} saved affiliate links</div>
+          </div>
         </section>
       </div>
     </main>
