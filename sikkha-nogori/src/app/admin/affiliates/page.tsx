@@ -21,6 +21,26 @@ const messages: Record<string, string> = {
   "not-found": "Application not found.",
 };
 
+const badgeStyles: Record<string, string> = {
+  pending: "bg-amber-100 text-amber-900",
+  approved: "bg-emerald-100 text-emerald-900",
+  active: "bg-emerald-100 text-emerald-900",
+  rejected: "bg-rose-100 text-rose-900",
+  suspended: "bg-rose-100 text-rose-900",
+};
+
+function Badge({ status }: { status: string }) {
+  return (
+    <span
+      className={`inline-flex h-6 items-center rounded-full px-2.5 text-xs font-semibold capitalize ${
+        badgeStyles[status] ?? "bg-slate-100 text-slate-700"
+      }`}
+    >
+      {status}
+    </span>
+  );
+}
+
 async function AdminAffiliatesContent({
   searchParams,
 }: {
@@ -77,83 +97,107 @@ async function AdminAffiliatesContent({
   const status = Array.isArray(params.status) ? params.status[0] : params.status;
   const message =
     status && Object.hasOwn(messages, status) ? messages[status] : undefined;
+  const pendingCount = applications.filter((a) => a.status === "pending").length;
 
   return (
-    <main lang="en" className="min-h-screen bg-[#f3f7f5] px-5 py-10 text-slate-900 sm:px-8 sm:py-14">
-      <div className="mx-auto max-w-5xl">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <Link href="/admin" className="font-semibold text-emerald-700">
-            ← Admin workspace
-          </Link>
-          <form action={logoutAdmin}>
-            <button
-              type="submit"
-              className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-white"
+    <main lang="en" className="min-h-screen bg-[#f3f6f5] px-4 py-6 text-slate-900 sm:px-7 sm:py-8 xl:px-10">
+      <div className="mx-auto max-w-[1500px]">
+        <header className="flex flex-wrap items-end justify-between gap-4">
+          <div className="min-w-0">
+            <p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-800">System administration</p>
+            <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900">Affiliate accounts</h1>
+            <p className="mt-1.5 max-w-2xl text-[15px] leading-6 text-slate-600">
+              Approving an application creates affiliate membership only. It never grants an admin role.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2.5">
+            <Link
+              href="/admin"
+              className="inline-flex min-h-11 items-center rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-800 transition hover:bg-slate-50"
             >
-              Sign out
-            </button>
-          </form>
-        </div>
-        <h1 className="mt-8 text-3xl font-extrabold">Affiliate Accounts</h1>
-        <p className="mt-2 leading-7 text-slate-600">
-          Approving an application creates affiliate membership only. It never grants an admin role.
-        </p>
+              Open product catalog
+            </Link>
+            <form action={logoutAdmin}>
+              <button
+                type="submit"
+                className="inline-flex min-h-11 items-center rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-800 transition hover:bg-slate-50"
+              >
+                Sign out
+              </button>
+            </form>
+          </div>
+        </header>
+
         {message && (
-          <p role="status" className="mt-5 rounded-lg bg-emerald-50 px-4 py-3">
+          <p
+            role="status"
+            className="mt-5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-900"
+          >
             {message}
           </p>
         )}
 
-        <section className="mt-7 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-          <h2 className="text-xl font-bold">Applications · {applications.length}</h2>
+        <section aria-label="Summary" className="mt-6 grid gap-4 sm:grid-cols-3">
+          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <p className="text-sm font-semibold text-slate-600">Applications</p>
+            <p className="mt-3 text-3xl font-bold tabular-nums">{applications.length}</p>
+          </div>
+          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <p className="text-sm font-semibold text-slate-600">Waiting for review</p>
+            <p className="mt-3 text-3xl font-bold tabular-nums">{pendingCount}</p>
+          </div>
+          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <p className="text-sm font-semibold text-slate-600">Affiliate accounts</p>
+            <p className="mt-3 text-3xl font-bold tabular-nums">{accounts.length}</p>
+          </div>
+        </section>
+
+        <section className="mt-6 rounded-2xl border border-slate-200 bg-white shadow-sm">
+          <div className="px-5 pt-5 sm:px-6 sm:pt-6">
+            <h2 className="text-lg font-bold tracking-tight">Applications</h2>
+            <p className="mt-0.5 text-sm text-slate-600">Newest first. Only pending applications can be reviewed.</p>
+          </div>
           {applications.length === 0 ? (
-            <p className="mt-3 text-slate-600">No applications found.</p>
+            <div className="m-5 rounded-xl border border-dashed border-slate-300 bg-slate-50 px-4 py-8 text-center text-sm text-slate-600 sm:m-6">
+              No applications found.
+            </div>
           ) : (
-            <ul className="mt-4 grid gap-3">
+            <ul className="mt-3 divide-y divide-slate-100">
               {applications.map((application) => (
                 <li
                   key={application.user_id}
-                  className="rounded-xl border border-slate-200 p-4"
+                  className="flex flex-wrap items-center justify-between gap-4 px-5 py-4 sm:px-6"
                 >
-                  <p className="break-all font-semibold">
-                    {displayNames.get(application.user_id) || "Name not provided"}
-                  </p>
-                  <p className="mt-1 break-all text-xs text-slate-500">
-                    User ID: {application.user_id}
-                  </p>
-                  <p className="mt-1 text-sm text-slate-600">
-                    Status: {application.status}
-                  </p>
-                  <p className="mt-1 text-sm text-slate-600">
-                    Application:{" "}
-                    {new Date(application.created_at).toLocaleString("en-GB")}
-                  </p>
+                  <div className="min-w-0 flex-1 basis-64">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="break-words font-semibold text-slate-900">
+                        {displayNames.get(application.user_id) || "Name not provided"}
+                      </p>
+                      <Badge status={application.status} />
+                    </div>
+                    <p className="mt-1 text-sm text-slate-600">
+                      Applied {new Date(application.created_at).toLocaleString("en-GB")}
+                    </p>
+                    <p className="mt-0.5 break-all font-mono text-xs text-slate-500">{application.user_id}</p>
+                  </div>
                   {application.status === "pending" && (
-                    <div className="mt-3 flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-2">
                       <form action={reviewAffiliate}>
-                        <input
-                          type="hidden"
-                          name="userId"
-                          value={application.user_id}
-                        />
+                        <input type="hidden" name="userId" value={application.user_id} />
                         <input type="hidden" name="status" value="approved" />
                         <button
                           type="submit"
-                          className="min-h-10 rounded-lg bg-emerald-700 px-4 py-2 font-bold text-white"
+                          className="min-h-11 rounded-xl bg-emerald-800 px-5 text-sm font-semibold text-white transition hover:bg-emerald-900"
                         >
                           Approve
                         </button>
                       </form>
                       <form action={reviewAffiliate}>
-                        <input
-                          type="hidden"
-                          name="userId"
-                          value={application.user_id}
-                        />
+                        <input type="hidden" name="userId" value={application.user_id} />
                         <input type="hidden" name="status" value="rejected" />
                         <button
                           type="submit"
-                          className="min-h-10 rounded-lg border border-rose-700 px-4 py-2 font-bold text-rose-800"
+                          className="min-h-11 rounded-xl border border-rose-300 bg-white px-5 text-sm font-semibold text-rose-800 transition hover:bg-rose-50"
                         >
                           Reject
                         </button>
@@ -166,24 +210,32 @@ async function AdminAffiliatesContent({
           )}
         </section>
 
-        <section className="mt-7 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-          <h2 className="text-xl font-bold">Active & Suspended Accounts</h2>
+        <section className="mt-6 rounded-2xl border border-slate-200 bg-white shadow-sm">
+          <div className="px-5 pt-5 sm:px-6 sm:pt-6">
+            <h2 className="text-lg font-bold tracking-tight">Active and suspended accounts</h2>
+          </div>
           {accounts.length === 0 ? (
-            <p className="mt-3 text-slate-600">No affiliate accounts yet.</p>
+            <div className="m-5 rounded-xl border border-dashed border-slate-300 bg-slate-50 px-4 py-8 text-center text-sm text-slate-600 sm:m-6">
+              No affiliate accounts yet.
+            </div>
           ) : (
-            <ul className="mt-4 grid gap-3">
+            <ul className="mt-3 divide-y divide-slate-100">
               {accounts.map((account) => (
                 <li
                   key={account.user_id}
-                  className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 p-4"
+                  className="flex flex-wrap items-center justify-between gap-4 px-5 py-4 sm:px-6"
                 >
-                  <div>
-                    <p className="font-semibold">
-                      Code: <code>{account.referral_code}</code>
-                    </p>
-                    <p className="mt-1 break-all text-xs text-slate-500">
-                      User ID: {account.user_id} · {account.status}
-                    </p>
+                  <div className="min-w-0 flex-1 basis-64">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="font-semibold text-slate-900">
+                        Code{" "}
+                        <code className="rounded-md bg-slate-100 px-2 py-0.5 font-mono text-sm">
+                          {account.referral_code}
+                        </code>
+                      </p>
+                      <Badge status={account.status} />
+                    </div>
+                    <p className="mt-1 break-all font-mono text-xs text-slate-500">{account.user_id}</p>
                   </div>
                   <form action={reviewAffiliate}>
                     <input type="hidden" name="userId" value={account.user_id} />
@@ -194,7 +246,7 @@ async function AdminAffiliatesContent({
                     />
                     <button
                       type="submit"
-                      className="min-h-10 rounded-lg border border-slate-300 px-4 py-2 font-semibold hover:bg-slate-50"
+                      className="min-h-11 rounded-xl border border-slate-300 bg-white px-5 text-sm font-semibold text-slate-800 transition hover:bg-slate-50"
                     >
                       {account.status === "active" ? "Suspend" : "Reactivate"}
                     </button>
@@ -217,7 +269,7 @@ export default function AdminAffiliatesPage({
   return (
     <Suspense
       fallback={
-        <main lang="en" className="min-h-screen bg-[#f3f7f5] px-5 py-10 sm:px-8 sm:py-14">
+        <main lang="en" className="min-h-screen bg-[#f3f6f5] px-5 py-8 sm:px-8">
           <div className="mx-auto max-w-5xl animate-pulse rounded-2xl bg-white p-8">
             <div className="h-8 w-64 rounded bg-slate-100" />
             <div className="mt-8 h-56 rounded-xl bg-slate-100" />

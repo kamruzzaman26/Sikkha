@@ -47,31 +47,28 @@ export default async function InventoryPage({ searchParams }: { searchParams: Pr
   };
 
   return (
-    <main lang="en" className="min-h-screen bg-[#f3f7f5] px-4 py-6 text-slate-900 sm:px-7 sm:py-9">
-      <div className="mx-auto max-w-7xl">
-        <header className="relative overflow-hidden rounded-[28px] bg-[#082f29] px-6 py-7 text-white shadow-[0_22px_60px_-35px_rgba(8,47,41,.65)] sm:px-9 sm:py-9">
-          <div className="pointer-events-none absolute -right-16 -top-24 size-72 rounded-full border-[36px] border-white/[0.04]" />
-          <div className="relative flex flex-wrap items-end justify-between gap-5">
-            <div>
-              <p className="text-[10px] font-extrabold uppercase tracking-[.24em] text-emerald-200">Operations workspace</p>
-              <h1 className="mt-2 text-3xl font-black tracking-tight sm:text-4xl">Inventory Control</h1>
-              <p className="mt-2 max-w-xl text-sm leading-6 text-emerald-50/75">Track product stock, set low-stock alerts and keep your catalog operations organized.</p>
-            </div>
-            <Link href="/admin" className="inline-flex min-h-11 items-center rounded-xl border border-white/20 px-4 text-sm font-bold text-white hover:bg-white/10">Product catalog ↗</Link>
+    <main lang="en" className="min-h-screen bg-[#f3f6f5] px-4 py-6 text-slate-900 sm:px-7 sm:py-8 xl:px-10">
+      <div className="mx-auto max-w-[1500px]">
+        <header className="flex flex-wrap items-end justify-between gap-4">
+          <div className="min-w-0">
+            <p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-800">Operations workspace</p>
+            <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900">Inventory Control</h1>
+            <p className="mt-1.5 max-w-2xl text-[15px] leading-6 text-slate-600">Track product stock, set low-stock alerts and keep your catalog operations organized.</p>
           </div>
-          <div className="relative mt-8 grid grid-cols-3 gap-2 sm:max-w-2xl sm:gap-3">
-            {[
-              ["Catalog products", rows.length],
-              ["Tracked products", tracked.length],
-              ["Low stock", low.length],
-            ].map(([name, count]) => (
-              <div key={name} className="rounded-2xl border border-white/10 bg-white/[0.07] p-3 sm:p-4">
-                <p className="text-[10px] font-bold uppercase tracking-wide text-emerald-100/65">{name}</p>
-                <p className="mt-1 text-2xl font-black tabular-nums">{count}</p>
-              </div>
-            ))}
-          </div>
+          <Link href="/admin" className="inline-flex min-h-11 items-center rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-800 transition hover:bg-slate-50">Open product catalog</Link>
         </header>
+        <section aria-label="Stock summary" className="mt-6 grid gap-4 sm:grid-cols-3">
+          {[
+            ["Catalog products", rows.length, "text-slate-900"],
+            ["Tracked products", tracked.length, "text-slate-900"],
+            ["Low stock", low.length, low.length > 0 ? "text-amber-800" : "text-slate-900"],
+          ].map(([name, count, tone]) => (
+            <div key={String(name)} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+              <p className="text-sm font-semibold text-slate-600">{name}</p>
+              <p className={`mt-3 text-3xl font-bold tabular-nums ${tone}`}>{count}</p>
+            </div>
+          ))}
+        </section>
 
         {status && messages[status] && <p role="status" className={`mt-5 rounded-xl border px-4 py-3 text-sm font-semibold ${status === "saved" ? "border-emerald-200 bg-emerald-50 text-emerald-900" : "border-amber-200 bg-amber-50 text-amber-900"}`}>{messages[status]}</p>}
 

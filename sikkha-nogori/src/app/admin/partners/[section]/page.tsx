@@ -58,11 +58,11 @@ export default async function LibraryPartnershipPage({ params, searchParams }: {
     content = <Rows rows={(data ?? []).map((x) => [x.library_partners?.[0]?.library_name ?? "Library", money(x.order_total), `${x.commission_rate}%`, money(x.commission_amount), x.settlement_status, x.settled_at ? new Date(x.settled_at).toLocaleDateString("en-GB") : "—", x.settlement_reference ?? "—"])} headers={["লাইব্রেরি","অর্ডার মূল্য","কমিশন হার","কমিশন","নিষ্পত্তি","তারিখ","রেফারেন্স"]}/>;
   }
 
-  return <main className="min-h-screen bg-[#f3f7f5] px-4 py-7 text-slate-900 sm:px-8"><div className="mx-auto max-w-7xl">
-    <p className="text-xs font-extrabold uppercase tracking-[.2em] text-emerald-700">Sikkha Nogori · Super Admin</p>
-    <h1 className="mt-2 text-3xl font-black">Library Partnership</h1><p className="mt-2 text-sm text-slate-600">লাইব্রেরি পার্টনারদের আবেদন থেকে কমিশন নিষ্পত্তি পর্যন্ত ব্যবস্থাপনা।</p>
+  return <main className="min-h-screen bg-[#f3f6f5] px-4 py-6 text-slate-900 sm:px-7 sm:py-8 xl:px-10"><div className="mx-auto max-w-[1500px]">
+    <p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-800">Library partnership</p>
+    <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900">Library Partnership</h1><p className="mt-1.5 max-w-3xl text-[15px] leading-6 text-slate-600">লাইব্রেরি পার্টনারদের আবেদন থেকে কমিশন নিষ্পত্তি পর্যন্ত ব্যবস্থাপনা।</p>
     <nav aria-label="Library partnership steps" className="mt-6 grid grid-cols-2 gap-2 md:grid-cols-5">{sections.map(([key,label],i)=><Link key={key} href={`/admin/partners/${key}`} className={`rounded-xl border px-3 py-3 text-sm font-bold ${key===section ? "border-emerald-700 bg-emerald-700 text-white" : "border-slate-200 bg-white text-slate-700 hover:border-emerald-400"}`}><span className="block text-[10px] opacity-70">STEP {i+1}</span>{label}</Link>)}</nav>
-    <header className="mt-7"><h2 className="text-2xl font-extrabold">{active[1]}</h2><p className="mt-1 text-sm text-slate-600">{active[2]}</p></header>
+    <header className="mt-7"><h2 className="text-xl font-bold tracking-tight">{active[1]}</h2><p className="mt-1 text-sm text-slate-600">{active[2]}</p></header>
     {status && messages[status] && <p role="status" className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-900">{messages[status]}</p>}
     <section className="mt-5">{content}</section>
   </div></main>;

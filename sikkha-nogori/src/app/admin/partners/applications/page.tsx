@@ -21,11 +21,11 @@ export default async function PartnerApplicationsPage({ searchParams }: { search
   if (error) throw new Error("লাইব্রেরির আবেদন লোড করা যায়নি।",{cause:error});
   const rows = data ?? [];
   const pending = rows.filter((r) => r.status === "pending").length;
-  return <main lang="bn" className="mx-auto min-h-screen max-w-6xl px-4 py-8 sm:px-6">
-    <header className="border-b border-slate-200 pb-6">
-      <p className="text-sm font-bold text-emerald-700">LIBRARY PARTNERSHIP / STEP 01</p>
-      <h1 className="mt-1 text-3xl font-extrabold text-slate-950">Partner Applications</h1>
-      <p className="mt-2 text-sm text-slate-600">নতুন লাইব্রেরির আবেদন যাচাই ও অনুমোদন করুন। অনুমোদন শুধু Super Admin করতে পারবেন।</p>
+  return <main lang="bn" className="mx-auto min-h-screen max-w-[1500px] bg-[#f3f6f5] px-4 py-6 text-slate-900 sm:px-7 sm:py-8 xl:px-10">
+    <header className="min-w-0">
+      <p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-800">LIBRARY PARTNERSHIP / STEP 01</p>
+      <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900">Partner Applications</h1>
+      <p className="mt-1.5 max-w-3xl text-[15px] leading-6 text-slate-600">নতুন লাইব্রেরির আবেদন যাচাই ও অনুমোদন করুন। অনুমোদন শুধু Super Admin করতে পারবেন।</p>
       <div className="mt-4 flex flex-wrap gap-2 text-sm"><span className="rounded-lg bg-amber-50 px-3 py-2 font-bold text-amber-900">Pending: {pending}</span><span className="rounded-lg bg-emerald-50 px-3 py-2 font-bold text-emerald-900">Approved: {rows.filter(r=>r.status==="approved").length}</span><span className="rounded-lg bg-rose-50 px-3 py-2 font-bold text-rose-900">Rejected: {rows.filter(r=>r.status==="rejected").length}</span></div>
     </header>
     {params.status && messages[params.status] && <p role="status" className="mt-5 rounded-xl bg-emerald-50 px-4 py-3 text-sm text-emerald-900">{messages[params.status]}</p>}

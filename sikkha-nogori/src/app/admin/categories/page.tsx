@@ -161,13 +161,13 @@ export default async function AdminCategoriesPage({
   };
 
   return (
-    <main lang="en" className="mx-auto min-h-screen max-w-6xl px-4 py-8 sm:px-6">
-      <header className="border-b border-slate-200 pb-6">
-        <p className="text-sm font-bold text-emerald-700">CATALOG CONTROL</p>
-        <h1 className="mt-1 text-3xl font-extrabold text-slate-950">
+    <main lang="en" className="mx-auto min-h-screen max-w-[1500px] bg-[#f3f6f5] px-4 py-6 text-slate-900 sm:px-7 sm:py-8 xl:px-10">
+      <header className="min-w-0">
+        <p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-800">Catalog control</p>
+        <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900">
           Category Management
         </h1>
-        <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
+        <p className="mt-1.5 max-w-2xl text-[15px] leading-6 text-slate-600">
           {rows.length} categories total, including {roots.length} root categories. Use the &quot;Bulk
           Add&quot; section below to create multiple categories at once.
         </p>

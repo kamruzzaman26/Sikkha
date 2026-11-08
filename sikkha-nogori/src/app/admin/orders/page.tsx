@@ -143,33 +143,20 @@ async function AdminOrdersContent({
   const typedOrders = orders as AdminOrder[];
 
   return (
-    <main lang="en" className="min-h-screen bg-[#f3f7f5] px-5 py-10 text-slate-900 sm:px-8 sm:py-14">
-      <div className="mx-auto max-w-5xl">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <Link href="/admin" className="font-semibold text-emerald-700">
-            ← Admin workspace
-          </Link>
-          <form action={logoutAdmin}>
-            <button
-              type="submit"
-              className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-white"
-            >
-              Sign out
-            </button>
-          </form>
-        </div>
-
-        <header className="mt-8">
-          <p className="text-sm font-bold text-emerald-700">
-            SIKKHA NOGORI · ADMINISTRATION
-          </p>
-          <h1 className="mt-2 text-3xl font-extrabold sm:text-4xl">
-            Order Management
-          </h1>
-          <p className="mt-3 leading-7 text-slate-600">
-            Showing the latest 100 orders. Orders are not marked Paid without manual payment verification
-            Do not mark Paid until COD delivery is completed and cash is collected.
-          </p>
+    <main lang="en" className="min-h-screen bg-[#f3f6f5] px-4 py-6 text-slate-900 sm:px-7 sm:py-8 xl:px-10">
+      <div className="mx-auto max-w-[1500px]">
+        <header className="flex flex-wrap items-end justify-between gap-4">
+          <div className="min-w-0">
+            <p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-800">Daily operations</p>
+            <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900">Order Management</h1>
+            <p className="mt-1.5 max-w-3xl text-[15px] leading-6 text-slate-600">Showing the latest 100 orders. Orders are not marked Paid without manual payment verification. Do not mark Paid until COD delivery is completed and cash is collected.</p>
+          </div>
+          <div className="flex flex-wrap gap-2.5">
+            <Link href="/admin/dashboard" className="inline-flex min-h-11 items-center rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-800 transition hover:bg-slate-50">Dashboard</Link>
+            <form action={logoutAdmin}>
+              <button type="submit" className="inline-flex min-h-11 items-center rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-800 transition hover:bg-slate-50">Sign out</button>
+            </form>
+          </div>
         </header>
 
         {message && (

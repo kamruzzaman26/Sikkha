@@ -11,7 +11,7 @@ function NavList() {
     <nav aria-label="Admin navigation" className="space-y-7">
       {adminNav.map((group) => (
         <section key={group.title}>
-          <p className="px-3 text-[10px] font-extrabold uppercase tracking-[0.18em] text-emerald-200/60">{group.title}</p>
+          <p className="px-3 text-[10px] font-extrabold uppercase tracking-[0.18em] text-emerald-200/80">{group.title}</p>
           <ul className="mt-3 space-y-1">
             {group.items.map((item) => (
               <li key={item.label}>
@@ -33,7 +33,7 @@ function NavList() {
                 ) : item.href ? (
                   <AdminNavLink href={item.href} label={item.label} icon={item.icon} />
                 ) : (
-                  <span aria-disabled="true" className="flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm text-emerald-100/45">
+                  <span aria-disabled="true" className="flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm text-emerald-100/65">
                     <AdminIcon name={item.icon} className="size-[18px] shrink-0" />
                     <span className="flex-1">{item.label}</span>
                     <span className="rounded-md border border-white/10 bg-white/5 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-emerald-100/60">Soon</span>
@@ -72,7 +72,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         <div className="mt-auto pt-8">
           <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
             <p className="text-xs font-bold text-white">Sikkha Nogori</p>
-            <p className="mt-1 text-[11px] leading-5 text-emerald-100/60">Manage your store, catalog, customers, and partners from one place.</p>
+            <p className="mt-1 text-[11px] leading-5 text-emerald-100/75">Manage your store, catalog, customers, and partners from one place.</p>
           </div>
         </div>
       </aside>

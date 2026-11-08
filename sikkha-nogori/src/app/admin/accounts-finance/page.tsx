@@ -76,10 +76,10 @@ export default async function AccountsFinancePage({
   return (
     <main lang="en" className="min-h-screen bg-[#f3f7f5] px-4 py-7 text-slate-900 sm:px-7 sm:py-9 xl:px-10">
       <div className="mx-auto max-w-[1400px]">
-        <header className="rounded-[28px] bg-gradient-to-br from-[#0b5949] via-[#0a493e] to-[#082f29] px-6 py-7 text-white shadow-[0_18px_45px_-28px_rgba(5,48,39,0.75)] sm:px-8 sm:py-9">
-          <p className="text-[11px] font-extrabold uppercase tracking-[0.2em] text-emerald-200">SIKKHA NOGORI · FINANCE</p>
-          <h1 className="mt-3 text-3xl font-black tracking-tight text-white sm:text-4xl">Accounts & Finance</h1>
-          <p className="mt-3 max-w-3xl text-sm leading-7 text-emerald-50/80 sm:text-base">নিজস্ব ব্যবসা ও পার্টনার লাইব্রেরির আয়, ব্যয়, পাওনা ও লেনদেন আলাদা লেজারে রাখুন।</p>
+        <header className="min-w-0">
+          <p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-800">Finance</p>
+          <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900">Accounts &amp; Finance</h1>
+          <p className="mt-1.5 max-w-3xl text-[15px] leading-6 text-slate-600">নিজস্ব ব্যবসা ও পার্টনার লাইব্রেরির আয়, ব্যয়, পাওনা ও লেনদেন আলাদা লেজারে রাখুন।</p>
         </header>
 
         <nav className="mt-6 flex flex-wrap gap-2" aria-label="Finance accounts">

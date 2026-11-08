@@ -660,35 +660,37 @@ async function AdminContent({
   return (
     <main lang="en" className="min-h-screen bg-[#f3f7f5] px-4 py-6 text-slate-900 sm:px-7 sm:py-8 xl:px-10">
       <div className="mx-auto max-w-[1500px]">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <Link href="/" className="font-semibold text-emerald-700">
-            ← Sikkha Nogori
-          </Link>
-          <form action={logoutAdmin}>
-            <button
-              type="submit"
-              className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-white"
+        <header className="flex flex-wrap items-end justify-between gap-4">
+          <div className="min-w-0">
+            <p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-800">Catalog</p>
+            <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900">
+              Products &amp; Affiliate Links
+            </h1>
+            <p className="mt-1.5 max-w-3xl text-[15px] leading-6 text-slate-600">
+              Manage product types, sales channels, categories, and cover images. Third-party
+              seller products are not available for direct checkout.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2.5">
+            <Link
+              href="/"
+              className="inline-flex min-h-11 items-center rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-800 transition hover:bg-slate-50"
             >
-              Sign out
-            </button>
-          </form>
-        </div>
-
-        <header className="mt-7 rounded-[28px] bg-gradient-to-br from-[#0b5949] via-[#0a493e] to-[#082f29] px-6 py-7 text-white shadow-[0_18px_45px_-28px_rgba(5,48,39,0.75)] sm:px-8 sm:py-9">
-          <p className="text-[11px] font-extrabold uppercase tracking-[0.2em] text-emerald-200">
-            SIKKHA NOGORI · ADMINISTRATION
-          </p>
-          <h1 className="mt-3 text-3xl font-black tracking-tight text-white sm:text-4xl">
-            Affiliate & Catalog Management
-          </h1>
-          <p className="mt-3 max-w-3xl text-sm leading-7 text-emerald-50/80 sm:text-base">
-            Manage product types, sales channels, categories, and cover images. Third-party
-            seller products are not available for direct checkout.
-          </p>
+              View storefront
+            </Link>
+            <form action={logoutAdmin}>
+              <button
+                type="submit"
+                className="inline-flex min-h-11 items-center rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-800 transition hover:bg-slate-50"
+              >
+                Sign out
+              </button>
+            </form>
+          </div>
         </header>
 
         {role === "admin" && (
-          <section aria-label="Quick actions" className="mt-7 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <section aria-label="Quick actions" className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
             {[
               { href: "/admin/payments", label: "Payment Methods", icon: "payments" as const, note: "Configure payment options" },
               { href: "/admin/orders", label: "Manage Orders", icon: "orders" as const, note: "Review and process orders" },
@@ -1166,7 +1168,22 @@ async function AdminContent({
                     <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
                       <div>
                         <h3 className="font-bold">
-                          {link.products?.[0]?.title ?? "Product not found"}
+                          {(() => {
+                            // A many-to-one embed returns one object, not an array.
+                            const embedded = link.products as
+                              | { title?: string }
+                              | { title?: string }[]
+                              | null
+                              | undefined;
+                            const embeddedTitle = Array.isArray(embedded)
+                              ? embedded[0]?.title
+                              : embedded?.title;
+                            return (
+                              embeddedTitle ??
+                              products.find((p) => p.id === link.product_id)?.title ??
+                              "Product not found"
+                            );
+                          })()}
                         </h3>
                         <p className="mt-1 break-all text-sm text-slate-600">
                           {partnerName ?? "Select a partner"} · {link.url}
