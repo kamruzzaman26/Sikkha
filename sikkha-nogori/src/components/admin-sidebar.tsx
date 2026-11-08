@@ -123,15 +123,8 @@ export function AdminShell({ children, identity }: { children: React.ReactNode; 
         </div>
       </aside>
       <div className="min-w-0 flex-1">
-        <div className="fixed left-0 right-0 top-0 z-40 flex min-h-[62px] items-center justify-between border-b border-slate-200 bg-white/95 px-4 shadow-sm backdrop-blur lg:hidden">
-          <button type="button" onClick={() => setMobileOpen(true)} aria-label="Open navigation menu" aria-expanded={mobileOpen} className="flex size-10 items-center justify-center rounded-xl bg-[#1d376b] text-white">
-            <AdminIcon name="menu" />
-          </button>
-          <span className="text-xs font-extrabold tracking-wide text-slate-900">SIKKHA NOGORI</span>
-          <span className="size-10" />
-        </div>
-        <AdminTopbar identity={identity} />
-        <main className="min-w-0 pt-[62px] lg:pt-0">{children}</main>
+        <AdminTopbar identity={identity} onMenuClick={() => setMobileOpen(true)} />
+        <main className="min-w-0">{children}</main>
       </div>
       {mobileOpen && (
         <div className="fixed inset-0 z-[100] lg:hidden" role="dialog" aria-modal="true" aria-label="Admin navigation">
