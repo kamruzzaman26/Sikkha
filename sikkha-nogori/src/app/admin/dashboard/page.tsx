@@ -142,13 +142,13 @@ function Card({
   tone?: "green" | "amber" | "rose" | "slate";
 }) {
   const tones = {
-    green: "bg-emerald-50 text-emerald-800",
+    green: "bg-blue-50 text-blue-800",
     amber: "bg-amber-50 text-amber-900",
     rose: "bg-rose-50 text-rose-900",
     slate: "bg-slate-100 text-slate-700",
   };
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+    <div className="rounded-2xl border border-blue-100 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
       <div className="flex items-center justify-between gap-3">
         <p className="text-sm font-semibold text-slate-600">{label}</p>
         <span className={`flex h-10 w-10 items-center justify-center rounded-xl ${tones[tone]}`}>
@@ -223,14 +223,14 @@ async function DashboardContent() {
   const topMax = Math.max(1, ...top.map((item) => Number(item.quantity) || 0));
 
   return (
-    <main lang="en" className="min-h-screen bg-[#f3f6f5] px-4 py-6 text-slate-900 sm:px-7 sm:py-8 xl:px-10">
+    <main lang="en" className="min-h-screen bg-[#f4f7ff] px-4 py-6 text-slate-900 sm:px-7 sm:py-8 xl:px-10">
       <div className="mx-auto max-w-[1500px]">
         <header className="flex flex-wrap items-end justify-between gap-4">
           <div className="min-w-0">
             <p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-800">Overview</p>
-            <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900">Dashboard</h1>
+            <h1 className="mt-1 text-3xl font-extrabold tracking-tight text-slate-950">Welcome back, Admin!</h1>
             <p className="mt-1.5 max-w-2xl text-[15px] leading-6 text-slate-600">
-              Live store performance at a glance. Sales include only payment-verified orders (today and month are based on Dhaka time).
+              Here’s what is happening with your website today. Sales include only payment-verified orders (today and month are based on Dhaka time).
             </p>
           </div>
           <div className="flex flex-wrap gap-2.5">
@@ -243,7 +243,7 @@ async function DashboardContent() {
             </Link>
             <Link
               href="/admin"
-              className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-emerald-800 px-4 text-sm font-semibold text-white transition hover:bg-emerald-900"
+              className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-blue-700 px-4 text-sm font-semibold text-white transition hover:bg-blue-800"
             >
               <Icon name="box" className="h-[18px] w-[18px]" />
               Open product catalog
@@ -251,7 +251,7 @@ async function DashboardContent() {
           </div>
         </header>
 
-        <SectionTitle title="Sales overview" />
+        <SectionTitle title="Sales Overview" hint="Verified sales and order activity" />
         {ordersResult.error ? (
           <Unavailable what="order data" />
         ) : (
@@ -266,7 +266,7 @@ async function DashboardContent() {
           </div>
         )}
 
-        <SectionTitle title="Catalog and customers" />
+        <SectionTitle title="Catalog & Customers" hint="Current catalog and registered account totals" />
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {productsResult.error ? (
             <div className="sm:col-span-2 xl:col-span-4">
@@ -308,7 +308,7 @@ async function DashboardContent() {
         </div>
 
         <div className="mt-8 grid gap-6 lg:grid-cols-2">
-          <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+          <section className="rounded-2xl border border-blue-100 bg-white p-5 shadow-sm sm:p-6">
             <div className="flex items-center justify-between gap-3">
               <h2 className="text-lg font-bold tracking-tight">Recent orders</h2>
               <Link
@@ -372,7 +372,7 @@ async function DashboardContent() {
                       </div>
                       <div className="mt-1.5 h-2 rounded-full bg-slate-100">
                         <div
-                          className="h-2 rounded-full bg-emerald-700"
+                          className="h-2 rounded-full bg-blue-600"
                           style={{ width: `${Math.max(4, ((Number(item.quantity) || 0) / topMax) * 100)}%` }}
                         />
                       </div>
