@@ -191,7 +191,7 @@ async function DashboardContent() {
   await connection();
   const { supabase } = await requireAdmin("admin");
 
-  const [productsResult, ordersResult, usersResult] = await Promise.all([
+  const [productsResult, ordersResult, usersResult, affiliateLinksResult] = await Promise.all([
     supabase.from("products").select("id, is_published, archived_at"),
     supabase
       .from("orders")
@@ -201,6 +201,7 @@ async function DashboardContent() {
       .order("created_at", { ascending: false })
       .limit(1000),
     supabase.rpc("admin_list_users"),
+    supabase.from("affiliate_links").select("id, is_active, partner"),
   ]);
 
   const orders = ordersResult.data ?? [];
@@ -225,25 +226,25 @@ async function DashboardContent() {
   return (
     <main lang="en" className="min-h-screen bg-[#f4f7ff] px-4 py-6 text-slate-900 sm:px-7 sm:py-8 xl:px-10">
       <div className="mx-auto max-w-[1500px]">
-        <header className="flex flex-wrap items-end justify-between gap-4">
+        <header className="relative flex flex-wrap items-end justify-between gap-4 overflow-hidden rounded-[26px] bg-[#101b35] px-6 py-7 text-white shadow-xl sm:px-8 sm:py-8">
           <div className="min-w-0">
             <p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-800">Overview</p>
-            <h1 className="mt-1 text-3xl font-extrabold tracking-tight text-slate-950">Welcome back, Admin!</h1>
-            <p className="mt-1.5 max-w-2xl text-[15px] leading-6 text-slate-600">
+            <h1 className="mt-1 text-3xl font-extrabold tracking-tight text-white">Welcome back, Admin!</h1>
+            <p className="mt-1.5 max-w-2xl text-[15px] leading-6 text-blue-100/85">
               Here’s what is happening with your website today. Sales include only payment-verified orders (today and month are based on Dhaka time).
             </p>
           </div>
           <div className="flex flex-wrap gap-2.5">
             <Link
               href="/admin/orders"
-              className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-800 transition hover:bg-slate-50"
+              className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-white/25 bg-white/10 px-4 text-sm font-semibold text-white transition hover:bg-slate-50"
             >
               <Icon name="orders" className="h-[18px] w-[18px]" />
               Manage orders
             </Link>
             <Link
               href="/admin"
-              className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-blue-700 px-4 text-sm font-semibold text-white transition hover:bg-blue-800"
+              className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-blue-600 px-4 text-sm font-semibold text-white transition hover:bg-blue-800"
             >
               <Icon name="box" className="h-[18px] w-[18px]" />
               Open product catalog
@@ -266,7 +267,7 @@ async function DashboardContent() {
           </div>
         )}
 
-        <SectionTitle title="Catalog & Customers" hint="Current catalog and registered account totals" />
+        <SectionTitle title="Catalog, Customers & Affiliates" hint="Current catalog, registered accounts, and partner link activity" />
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {productsResult.error ? (
             <div className="sm:col-span-2 xl:col-span-4">
@@ -297,6 +298,14 @@ async function DashboardContent() {
               icon="users"
               tone="slate"
             />
+          )}
+          {affiliateLinksResult.error ? (
+            <div className="sm:col-span-2"><Unavailable what="affiliate link data" /></div>
+          ) : (
+            <>
+              <Card label="Active affiliate links" value={String((affiliateLinksResult.data ?? []).filter((link) => link.is_active).length)} note="Enabled partner product links" icon="publish" />
+              <Card label="Inactive affiliate links" value={String((affiliateLinksResult.data ?? []).filter((link) => !link.is_active).length)} note="Links currently disabled" icon="alert" tone="slate" />
+            </>
           )}
         </div>
         <div className="mt-4 flex items-start gap-3 rounded-xl border border-dashed border-slate-300 bg-white px-4 py-3 text-sm leading-6 text-slate-700">
