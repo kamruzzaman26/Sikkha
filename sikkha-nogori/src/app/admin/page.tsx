@@ -8,6 +8,7 @@ import { ProductImageUpload } from "@/components/admin-product-image-upload";
 import { AdminAutoDraftForm } from "@/components/admin-auto-draft-form";
 import { AdminSubmitButton } from "@/components/admin-submit-button";
 import { AdminIcon } from "@/components/admin-icons";
+import { AdminCloseDetailsButton } from "@/components/admin-close-details-button";
 import {
   logoutAdmin,
   addProductType,
@@ -905,7 +906,7 @@ async function AdminContent({
                                 <div className="mx-auto my-4 max-w-4xl rounded-2xl bg-white p-5 shadow-2xl sm:p-7">
                                   <div className="mb-5 flex items-center justify-between gap-3">
                                     <h3 className="text-lg font-extrabold text-slate-900">Edit product</h3>
-                                    <button type="button" onClick={(event) => event.currentTarget.closest("details")?.removeAttribute("open")} className="rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold">Close</button>
+                                    <AdminCloseDetailsButton className="rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold" />
                                   </div>
                                   <ProductForm product={product} idPrefix={`product-${product.id}`} productTypes={productTypes} categoryOptions={categoryOptions} selectedCategoryIds={selectedByProduct.get(product.id) ?? []} primaryCategoryId={primaryByProduct.get(product.id) ?? ""} />
                                   <form action={setProductArchiveStatus} className="mt-4 border-t border-slate-100 pt-4">
@@ -1000,7 +1001,7 @@ async function AdminContent({
                 <div className="mx-auto my-8 max-w-2xl rounded-2xl bg-white p-5 shadow-2xl sm:p-7">
                   <div className="mb-5 flex items-center justify-between gap-3">
                     <h3 className="text-lg font-extrabold text-slate-900">Create Affiliate Link</h3>
-                    <button type="button" onClick={(event) => event.currentTarget.closest("details")?.removeAttribute("open")} className="rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold">Close</button>
+                    <AdminCloseDetailsButton className="rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold" />
                   </div>
                   {affiliateProducts.length === 0 ? (
                     <p className="rounded-xl bg-amber-50 px-4 py-3 leading-6 text-amber-900">First, save a product with the Affiliate sales mode.</p>
@@ -1071,7 +1072,7 @@ async function AdminContent({
                                 <div className="mx-auto my-8 max-w-2xl rounded-2xl bg-white p-5 shadow-2xl sm:p-7">
                                   <div className="mb-5 flex items-center justify-between gap-3">
                                     <h3 className="text-lg font-extrabold text-slate-900">Edit Affiliate Link</h3>
-                                    <button type="button" onClick={(event) => event.currentTarget.closest("details")?.removeAttribute("open")} className="rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold">Close</button>
+                                    <AdminCloseDetailsButton className="rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold" />
                                   </div>
                                   <form action={saveAffiliateLink} className="grid gap-4">
                                     <input type="hidden" name="id" value={link.id} />
