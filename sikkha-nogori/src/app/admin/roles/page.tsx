@@ -71,7 +71,7 @@ async function RolesContent({
     status && Object.hasOwn(messages, status) ? messages[status] : undefined;
 
   return (
-    <main lang="en" className="min-h-screen bg-[#f3f7f5] px-5 py-8 text-slate-900 sm:px-8">
+    <main lang="en" className="min-h-screen bg-[#f4f6fa] px-5 py-8 text-slate-900 sm:px-8">
       <div className="mx-auto max-w-5xl">
         <h1 className="text-3xl font-extrabold">Roles & Permissions</h1>
         <p className="mt-2 text-sm leading-6 text-slate-600">
@@ -82,7 +82,7 @@ async function RolesContent({
         {message && (
           <p
             role="status"
-            className="mt-4 rounded-xl bg-emerald-50 px-4 py-3 text-sm text-emerald-950"
+            className="mt-4 rounded-xl bg-brand-50 px-4 py-3 text-sm text-brand-950"
           >
             {message}
           </p>
@@ -122,7 +122,7 @@ async function RolesContent({
                   </select>
                   <button
                     type="submit"
-                    className="min-h-11 rounded-lg bg-emerald-700 px-4 font-bold text-white hover:bg-emerald-800"
+                    className="min-h-11 rounded-lg bg-brand-700 px-4 font-bold text-white hover:bg-brand-800"
                   >
                     Save Changes
                   </button>
@@ -158,7 +158,7 @@ export default function AdminRolesPage({
   return (
     <Suspense
       fallback={
-        <main lang="en" className="min-h-screen bg-[#f3f7f5] px-5 py-8">
+        <main lang="en" className="min-h-screen bg-[#f4f6fa] px-5 py-8">
           <div className="mx-auto h-64 max-w-5xl animate-pulse rounded-2xl bg-white" />
         </main>
       }

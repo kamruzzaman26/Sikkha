@@ -26,7 +26,7 @@ const statusStyles: Record<string, string> = {
   confirmed: "bg-sky-100 text-sky-900",
   processing: "bg-sky-100 text-sky-900",
   shipped: "bg-indigo-100 text-indigo-900",
-  delivered: "bg-emerald-100 text-emerald-900",
+  delivered: "bg-green-100 text-green-800",
   cancelled: "bg-rose-100 text-rose-900",
 };
 
@@ -142,7 +142,7 @@ function Card({
   tone?: "green" | "amber" | "rose" | "slate";
 }) {
   const tones = {
-    green: "bg-emerald-50 text-emerald-800",
+    green: "bg-brand-50 text-brand-800",
     amber: "bg-amber-50 text-amber-900",
     rose: "bg-rose-50 text-rose-900",
     slate: "bg-slate-100 text-slate-700",
@@ -223,11 +223,11 @@ async function DashboardContent() {
   const topMax = Math.max(1, ...top.map((item) => Number(item.quantity) || 0));
 
   return (
-    <main lang="en" className="min-h-screen bg-[#f3f6f5] px-4 py-6 text-slate-900 sm:px-7 sm:py-8 xl:px-10">
+    <main lang="en" className="min-h-screen bg-[#f4f6fa] px-4 py-6 text-slate-900 sm:px-7 sm:py-8 xl:px-10">
       <div className="mx-auto max-w-[1500px]">
         <header className="flex flex-wrap items-end justify-between gap-4">
           <div className="min-w-0">
-            <p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-800">Overview</p>
+            <p className="text-xs font-bold uppercase tracking-[0.14em] text-brand-800">Overview</p>
             <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900">Dashboard</h1>
             <p className="mt-1.5 max-w-2xl text-[15px] leading-6 text-slate-600">
               Live store performance at a glance. Sales include only payment-verified orders (today and month are based on Dhaka time).
@@ -243,7 +243,7 @@ async function DashboardContent() {
             </Link>
             <Link
               href="/admin"
-              className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-emerald-800 px-4 text-sm font-semibold text-white transition hover:bg-emerald-900"
+              className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-brand-800 px-4 text-sm font-semibold text-white transition hover:bg-brand-900"
             >
               <Icon name="box" className="h-[18px] w-[18px]" />
               Open product catalog
@@ -313,7 +313,7 @@ async function DashboardContent() {
               <h2 className="text-lg font-bold tracking-tight">Recent orders</h2>
               <Link
                 href="/admin/orders"
-                className="inline-flex min-h-11 items-center rounded-lg px-3 text-sm font-semibold text-emerald-800 transition hover:bg-emerald-50"
+                className="inline-flex min-h-11 items-center rounded-lg px-3 text-sm font-semibold text-brand-800 transition hover:bg-brand-50"
               >
                 View all
               </Link>
@@ -362,7 +362,7 @@ async function DashboardContent() {
               <ol className="mt-3 flex flex-col gap-4">
                 {top.map((item, index) => (
                   <li key={item.title} className="flex items-center gap-3 text-sm">
-                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-xs font-bold text-emerald-800">
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-xs font-bold text-brand-800">
                       {index + 1}
                     </span>
                     <div className="min-w-0 flex-1">
@@ -372,7 +372,7 @@ async function DashboardContent() {
                       </div>
                       <div className="mt-1.5 h-2 rounded-full bg-slate-100">
                         <div
-                          className="h-2 rounded-full bg-emerald-700"
+                          className="h-2 rounded-full bg-brand-700"
                           style={{ width: `${Math.max(4, ((Number(item.quantity) || 0) / topMax) * 100)}%` }}
                         />
                       </div>
@@ -397,7 +397,7 @@ export default function AdminDashboardPage() {
   return (
     <Suspense
       fallback={
-        <main className="min-h-screen bg-[#f3f6f5] px-5 py-8">
+        <main className="min-h-screen bg-[#f4f6fa] px-5 py-8">
           <div className="mx-auto h-64 max-w-6xl animate-pulse rounded-2xl bg-white" />
         </main>
       }

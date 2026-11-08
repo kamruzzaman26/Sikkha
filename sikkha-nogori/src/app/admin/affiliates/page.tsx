@@ -23,8 +23,8 @@ const messages: Record<string, string> = {
 
 const badgeStyles: Record<string, string> = {
   pending: "bg-amber-100 text-amber-900",
-  approved: "bg-emerald-100 text-emerald-900",
-  active: "bg-emerald-100 text-emerald-900",
+  approved: "bg-green-100 text-green-800",
+  active: "bg-green-100 text-green-800",
   rejected: "bg-rose-100 text-rose-900",
   suspended: "bg-rose-100 text-rose-900",
 };
@@ -100,11 +100,11 @@ async function AdminAffiliatesContent({
   const pendingCount = applications.filter((a) => a.status === "pending").length;
 
   return (
-    <main lang="en" className="min-h-screen bg-[#f3f6f5] px-4 py-6 text-slate-900 sm:px-7 sm:py-8 xl:px-10">
+    <main lang="en" className="min-h-screen bg-[#f4f6fa] px-4 py-6 text-slate-900 sm:px-7 sm:py-8 xl:px-10">
       <div className="mx-auto max-w-[1500px]">
         <header className="flex flex-wrap items-end justify-between gap-4">
           <div className="min-w-0">
-            <p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-800">System administration</p>
+            <p className="text-xs font-bold uppercase tracking-[0.14em] text-brand-800">System administration</p>
             <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900">Affiliate accounts</h1>
             <p className="mt-1.5 max-w-2xl text-[15px] leading-6 text-slate-600">
               Approving an application creates affiliate membership only. It never grants an admin role.
@@ -131,7 +131,7 @@ async function AdminAffiliatesContent({
         {message && (
           <p
             role="status"
-            className="mt-5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-900"
+            className="mt-5 rounded-xl border border-brand-200 bg-brand-50 px-4 py-3 text-sm font-semibold text-brand-900"
           >
             {message}
           </p>
@@ -187,7 +187,7 @@ async function AdminAffiliatesContent({
                         <input type="hidden" name="status" value="approved" />
                         <button
                           type="submit"
-                          className="min-h-11 rounded-xl bg-emerald-800 px-5 text-sm font-semibold text-white transition hover:bg-emerald-900"
+                          className="min-h-11 rounded-xl bg-brand-800 px-5 text-sm font-semibold text-white transition hover:bg-brand-900"
                         >
                           Approve
                         </button>
@@ -269,7 +269,7 @@ export default function AdminAffiliatesPage({
   return (
     <Suspense
       fallback={
-        <main lang="en" className="min-h-screen bg-[#f3f6f5] px-5 py-8 sm:px-8">
+        <main lang="en" className="min-h-screen bg-[#f4f6fa] px-5 py-8 sm:px-8">
           <div className="mx-auto max-w-5xl animate-pulse rounded-2xl bg-white p-8">
             <div className="h-8 w-64 rounded bg-slate-100" />
             <div className="mt-8 h-56 rounded-xl bg-slate-100" />

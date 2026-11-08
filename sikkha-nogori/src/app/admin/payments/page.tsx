@@ -178,14 +178,14 @@ function PaymentMethodForm({
           name="isEnabled"
           value="true"
           defaultChecked={method?.is_enabled ?? false}
-          className="size-4 rounded border-slate-300 text-emerald-700"
+          className="size-4 rounded border-slate-300 text-brand-700"
         />
         Make this method visible to customers
       </label>
 
       <button
         type="submit"
-        className="w-fit rounded-lg bg-emerald-700 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-emerald-800"
+        className="w-fit rounded-lg bg-brand-700 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-brand-800"
       >
         {method ? "Save Payment Method" : "Add Payment Method"}
       </button>
@@ -224,11 +224,11 @@ async function PaymentMethodsContent({
       : undefined;
 
   return (
-    <main lang="en" className="min-h-screen bg-[#f3f6f5] px-4 py-6 text-slate-900 sm:px-7 sm:py-8 xl:px-10">
+    <main lang="en" className="min-h-screen bg-[#f4f6fa] px-4 py-6 text-slate-900 sm:px-7 sm:py-8 xl:px-10">
       <div className="mx-auto max-w-[1500px]">
         <header className="flex flex-wrap items-end justify-between gap-4">
           <div className="min-w-0">
-            <p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-800">Daily operations</p>
+            <p className="text-xs font-bold uppercase tracking-[0.14em] text-brand-800">Daily operations</p>
             <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900">Payment Methods</h1>
             <p className="mt-1.5 max-w-3xl text-[15px] leading-6 text-slate-600">Manage names, types, instructions, enabled status, and display order. Manual payments are not marked Paid until verified. Checkout or online payment gateways are not currently enabled.</p>
           </div>
@@ -249,14 +249,14 @@ async function PaymentMethodsContent({
               statusValue === "gateway-unavailable" ||
               statusValue === "not-found"
                 ? "border-amber-200 bg-amber-50 text-amber-950"
-                : "border-emerald-200 bg-emerald-50 text-emerald-900"
+                : "border-brand-200 bg-brand-50 text-brand-900"
             }`}
           >
             {statusMessage}
           </p>
         )}
 
-        <section className="mt-8 rounded-2xl border border-emerald-100 bg-white p-5 shadow-sm sm:p-7">
+        <section className="mt-8 rounded-2xl border border-brand-100 bg-white p-5 shadow-sm sm:p-7">
           <h2 className="text-xl font-bold">Add Payment Method</h2>
           <p className="mb-5 mt-2 text-sm leading-6 text-slate-600">
             Add payment methods such as bKash, Nagad, Rocket, Bank Transfer, or COD.
@@ -306,7 +306,7 @@ async function PaymentMethodsContent({
                     <span
                       className={`rounded-full px-3 py-1 text-sm font-bold ${
                         method.is_enabled
-                          ? "bg-emerald-100 text-emerald-800"
+                          ? "bg-brand-100 text-brand-800"
                           : "bg-slate-100 text-slate-600"
                       }`}
                     >
@@ -322,7 +322,7 @@ async function PaymentMethodsContent({
                   )}
 
                   <details className="border-t border-slate-100 pt-4">
-                    <summary className="cursor-pointer text-sm font-semibold text-emerald-800">
+                    <summary className="cursor-pointer text-sm font-semibold text-brand-800">
                       Edit
                     </summary>
                     <div className="mt-4">
@@ -363,7 +363,7 @@ export default async function PaymentMethodsPage({
   return (
     <Suspense
       fallback={
-        <main lang="en" className="min-h-screen bg-[#f3f7f5] px-5 py-10 text-slate-900 sm:px-8 sm:py-14">
+        <main lang="en" className="min-h-screen bg-[#f4f6fa] px-5 py-10 text-slate-900 sm:px-8 sm:py-14">
           <div className="mx-auto max-w-5xl animate-pulse rounded-2xl bg-white p-8">
             <div className="h-8 w-72 rounded bg-slate-100" />
             <div className="mt-8 h-48 rounded-xl bg-slate-100" />

@@ -55,11 +55,11 @@ async function AdminUsersContent({
     status && Object.hasOwn(messages, status) ? messages[status] : undefined;
 
   return (
-    <main lang="en" className="min-h-screen bg-[#f3f6f5] px-4 py-6 text-slate-900 sm:px-7 sm:py-8 xl:px-10">
+    <main lang="en" className="min-h-screen bg-[#f4f6fa] px-4 py-6 text-slate-900 sm:px-7 sm:py-8 xl:px-10">
       <div className="mx-auto max-w-[1500px]">
         <header className="flex flex-wrap items-end justify-between gap-4">
           <div className="min-w-0">
-            <p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-800">Daily operations</p>
+            <p className="text-xs font-bold uppercase tracking-[0.14em] text-brand-800">Daily operations</p>
             <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900">Customer Management</h1>
             <p className="mt-1.5 max-w-3xl text-[15px] leading-6 text-slate-600">Latest 500 accounts. Admin and other non-customer roles cannot be modified here. Affiliate membership is managed through a separate approval workflow.</p>
           </div>
@@ -71,7 +71,7 @@ async function AdminUsersContent({
           </div>
         </header>
         {message && (
-          <p role="status" className="mt-5 rounded-lg bg-emerald-50 px-4 py-3">
+          <p role="status" className="mt-5 rounded-lg bg-brand-50 px-4 py-3">
             {message}
           </p>
         )}
@@ -81,7 +81,7 @@ async function AdminUsersContent({
             <ul className="mt-3 divide-y divide-slate-100">
               {staffUsers.map((staff) => <li key={staff.user_id} className="flex flex-wrap items-center justify-between gap-2 py-3">
                 <div><p className="font-semibold">{staff.display_name || "Name not provided"}</p><p className="text-sm text-slate-600">{staff.email}</p></div>
-                <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-800">{staff.access_role}</span>
+                <span className="rounded-full bg-brand-50 px-3 py-1 text-xs font-bold text-brand-800">{staff.access_role}</span>
               </li>)}
             </ul>
           )}
@@ -165,7 +165,7 @@ export default function AdminUsersPage({
   return (
     <Suspense
       fallback={
-        <main lang="en" className="min-h-screen bg-[#f3f7f5] px-5 py-10 sm:px-8 sm:py-14">
+        <main lang="en" className="min-h-screen bg-[#f4f6fa] px-5 py-10 sm:px-8 sm:py-14">
           <div className="mx-auto max-w-5xl animate-pulse rounded-2xl bg-white p-8">
             <div className="h-8 w-64 rounded bg-slate-100" />
             <div className="mt-8 h-56 rounded-xl bg-slate-100" />

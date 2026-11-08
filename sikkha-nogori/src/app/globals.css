@@ -5,6 +5,26 @@
   --foreground: #17211e;
 }
 
+@theme {
+  /* Admin brand palette. Change these values to re-color the whole admin. */
+  --color-brand-50: #eff4ff;
+  --color-brand-100: #dbe6fe;
+  --color-brand-200: #bfd3fe;
+  --color-brand-300: #93b4fd;
+  --color-brand-400: #6590f9;
+  --color-brand-500: #3b6df0;
+  --color-brand-600: #2755d6;
+  --color-brand-700: #1f44ae;
+  --color-brand-800: #1e3a8a;
+  --color-brand-900: #1b3068;
+  --color-brand-950: #121d44;
+  /* Admin surfaces */
+  --color-ink-800: #1e293b;
+  --color-ink-900: #0f172a;
+  --color-ink-950: #0a1020;
+  --color-canvas: #f4f6fa;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -43,4 +63,37 @@ body:has([data-admin-route]) > .site-footer-slot {
 
 .site-footer-slot {
   margin-top: auto;
+}
+
+/* Indeterminate top progress bar used by admin loading states. */
+@keyframes admin-progress {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(300%); }
+}
+.admin-progress-bar {
+  animation: admin-progress 1.1s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .admin-progress-bar { animation: none; width: 100%; opacity: .6; }
+}
+
+/* Admin interaction polish: clear focus, pointer cursors and press feedback. */
+[data-admin-route] :is(button, summary, [role="button"], select, label[for], input[type="submit"], input[type="checkbox"], input[type="radio"]):not(:disabled) {
+  cursor: pointer;
+}
+[data-admin-route] :is(button, input[type="submit"]):disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+[data-admin-route] :is(button, summary):not(:disabled):active {
+  transform: translateY(1px);
+}
+[data-admin-route] :is(input:not([type="checkbox"]):not([type="radio"]):not([type="file"]), select, textarea):focus-visible {
+  outline: 2px solid var(--color-brand-600);
+  outline-offset: 1px;
+  border-color: var(--color-brand-600);
+}
+[data-admin-route] :is(a, button, summary):focus-visible {
+  outline: 2px solid var(--color-brand-600);
+  outline-offset: 2px;
 }
