@@ -9,12 +9,14 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 async function AdminChrome({ children }: { children: React.ReactNode }) {
   await connection();
   let isAdmin = false;
+  let adminUser: { email?: string; user_metadata?: Record<string, unknown> } | null = null;
   try {
     const supabase = await createSupabaseServerClient();
     const {
       data: { user },
     } = await supabase.auth.getUser();
     if (user) {
+      adminUser = user;
       const { data } = await supabase.rpc("is_admin");
       isAdmin = data === true;
     }
@@ -22,12 +24,12 @@ async function AdminChrome({ children }: { children: React.ReactNode }) {
     isAdmin = false;
   }
 
-  return isAdmin && user ? (
+  return isAdmin && adminUser ? (
     <AdminShell
       identity={{
-        email: user.email,
-        name: typeof user.user_metadata?.full_name === "string" ? user.user_metadata.full_name : typeof user.user_metadata?.name === "string" ? user.user_metadata.name : null,
-        avatarUrl: typeof user.user_metadata?.avatar_url === "string" ? user.user_metadata.avatar_url : null,
+        email: adminUser.email,
+        name: typeof adminUser.user_metadata?.full_name === "string" ? adminUser.user_metadata.full_name : typeof adminUser.user_metadata?.name === "string" ? adminUser.user_metadata.name : null,
+        avatarUrl: typeof adminUser.user_metadata?.avatar_url === "string" ? adminUser.user_metadata.avatar_url : null,
       }}
     >
       {children}
