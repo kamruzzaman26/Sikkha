@@ -392,7 +392,7 @@ function ProductForm({
       <ProductImageUpload idPrefix={idPrefix} initialUrl={product?.image_url ?? ""} />
 
       {categoryOptions.length > 0 && (
-        <fieldset className="rounded-xl border border-slate-200 p-4">
+        <fieldset className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-blue-200 hover:shadow-md">
           <input type="hidden" name="categoriesSubmitted" value="1" />
           <legend className="px-1 text-sm font-semibold text-slate-700">
             Categories (select multiple)
@@ -658,35 +658,35 @@ async function AdminContent({
   );
 
   return (
-    <main lang="en" className="min-h-screen bg-[#f3f7f5] px-4 py-6 text-slate-900 sm:px-7 sm:py-8 xl:px-10">
+    <main lang="en" className="min-h-screen bg-[#f4f6fb] px-4 py-6 text-slate-900 sm:px-7 sm:py-8 xl:px-10">
       <div className="mx-auto max-w-[1500px]">
-        <header className="flex flex-wrap items-end justify-between gap-4">
+        <header className="relative overflow-hidden rounded-[28px] border border-slate-800 bg-[#101b35] px-6 py-7 text-white shadow-xl sm:px-8 sm:py-9"><div className="pointer-events-none absolute -right-12 -top-20 size-64 rounded-full bg-blue-500/15 blur-3xl" /><div className="relative flex flex-wrap items-end justify-between gap-4">
           <div className="min-w-0">
-            <p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-800">Catalog</p>
-            <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900">
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-blue-200">Catalog workspace</p>
+            <h1 className="mt-1 text-3xl font-extrabold tracking-tight text-white">
               Products &amp; Affiliate Links
             </h1>
-            <p className="mt-1.5 max-w-3xl text-[15px] leading-6 text-slate-600">
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-blue-100/80">
               Manage product types, sales channels, categories, and cover images. Third-party
               seller products are not available for direct checkout.
             </p>
           </div>
-          <div className="flex flex-wrap gap-2.5">
+          <div className="relative flex flex-wrap gap-2.5">
             <Link
               href="/"
-              className="inline-flex min-h-11 items-center rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-800 transition hover:bg-slate-50"
+              className="inline-flex min-h-11 items-center rounded-xl border border-white/20 bg-white/10 px-4 text-sm font-semibold text-white transition hover:bg-white/20"
             >
               View storefront
             </Link>
             <form action={logoutAdmin}>
               <button
                 type="submit"
-                className="inline-flex min-h-11 items-center rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-800 transition hover:bg-slate-50"
+                className="inline-flex min-h-11 items-center rounded-xl border border-white/20 bg-white/10 px-4 text-sm font-semibold text-white transition hover:bg-white/20"
               >
                 Sign out
               </button>
             </form>
-          </div>
+          </div></div>
         </header>
 
         {role === "admin" && (
@@ -710,20 +710,20 @@ async function AdminContent({
         )}
 
         {role === "admin" && (
-          <section aria-label="Catalog overview" className="mt-7 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_8px_24px_-20px_rgba(15,55,42,0.45)]">
+          <section aria-label="Catalog overview" className="mt-7 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
               <p className="text-sm text-slate-600">Total Products</p>
               <p className="mt-1 text-2xl font-extrabold tabular-nums">{products.length}</p>
             </div>
-            <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_8px_24px_-20px_rgba(15,55,42,0.45)]">
+            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
               <p className="text-sm text-slate-600">Published Products</p>
               <p className="mt-1 text-2xl font-extrabold tabular-nums">{products.filter((product) => product.is_published && !product.archived_at).length}</p>
             </div>
-            <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_8px_24px_-20px_rgba(15,55,42,0.45)]">
+            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
               <p className="text-sm text-slate-600">Draft Products</p>
               <p className="mt-1 text-2xl font-extrabold tabular-nums">{products.filter((product) => !product.is_published && !product.archived_at).length}</p>
             </div>
-            <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_8px_24px_-20px_rgba(15,55,42,0.45)]">
+            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
               <p className="text-sm text-slate-600">Active Affiliate Links</p>
               <p className="mt-1 text-2xl font-extrabold tabular-nums">{links.filter((link) => link.is_active).length}</p>
             </div>
@@ -744,7 +744,7 @@ async function AdminContent({
         {role === "admin" && (
         <section
           id="product-catalog"
-          className="mt-7 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_8px_30px_-18px_rgba(15,55,42,0.22)] sm:p-7"
+          className="mt-7 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7"
         >
           <h2 className="text-xl font-bold">Product Catalog</h2>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
@@ -753,11 +753,11 @@ async function AdminContent({
           </p>
 
           {role === "admin" && (
-            <details className="mt-5 rounded-xl border border-slate-200 p-4">
-              <summary className="cursor-pointer font-bold text-emerald-900">
+            <details className="group mt-5 rounded-xl border border-slate-200 bg-white open:bg-slate-50/70">
+              <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between rounded-xl px-4 text-sm font-bold text-blue-900 [&::-webkit-details-marker]:hidden">
                 Add a Product to Catalog
               </summary>
-              <div className="mt-4">
+              <div className="border-t border-slate-200 p-4">
                 <ProductForm
                   idPrefix="new-product"
                   productTypes={productTypes}
@@ -771,7 +771,7 @@ async function AdminContent({
             action="/admin"
             method="get"
             role="search"
-            className="mt-5 grid gap-3 rounded-xl bg-slate-50 p-4 sm:grid-cols-[minmax(0,1fr)_9rem_9rem_9rem_auto] sm:items-end"
+            className="mt-5 grid gap-3 rounded-2xl border border-slate-200 bg-slate-50/80 p-4 sm:grid-cols-[minmax(0,1fr)_9rem_9rem_9rem_auto] sm:items-end"
           >
             <div>
               <label
@@ -867,7 +867,7 @@ async function AdminContent({
 
           <div className="mt-6 grid gap-5 lg:grid-cols-2">
             {productGroups.map(({ slug, title, entries }) => (
-              <section key={slug} aria-label={`${title} catalog`}>
+              <section key={slug} aria-label={`${title} catalog`} className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 sm:p-5">
                 <h3 className="font-bold">
                   {title} · {entries.length}
                 </h3>
@@ -882,7 +882,7 @@ async function AdminContent({
                     {entries.map((product) => (
                       <li
                         key={product.id}
-                        className="rounded-xl border border-slate-200 p-4"
+                        className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-blue-200 hover:shadow-md"
                       >
                         <div className="mb-3 flex flex-wrap justify-between gap-2">
                           <p className="font-semibold">
@@ -1001,7 +1001,7 @@ async function AdminContent({
         )}
 
         {role === "admin" && (
-          <section className="mt-7 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_8px_30px_-18px_rgba(15,55,42,0.22)] sm:p-7">
+          <section className="mt-7 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
             <h2 className="text-xl font-bold">Add Product Type</h2>
             <p className="mt-2 text-sm leading-6 text-slate-600">
               New types become available in product forms. Types already in use
@@ -1052,7 +1052,7 @@ async function AdminContent({
           </section>
         )}
 
-        <section className="mt-7 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_8px_30px_-18px_rgba(15,55,42,0.22)] sm:p-7">
+        <section className="mt-7 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
           <h2 className="text-xl font-bold">Create Affiliate Link</h2>
           {affiliateProducts.length === 0 ? (
             <p className="mt-4 rounded-xl bg-amber-50 px-4 py-3 leading-6 text-amber-900">
@@ -1163,7 +1163,7 @@ async function AdminContent({
                 return (
                   <li
                     key={link.id}
-                    className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_8px_24px_-20px_rgba(15,55,42,0.45)] sm:p-6"
+                    className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-blue-200 hover:shadow-md sm:p-6"
                   >
                     <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
                       <div>
@@ -1322,7 +1322,7 @@ export default function AdminPage({
   return (
     <Suspense
       fallback={
-        <main lang="en" className="min-h-screen bg-[#f3f7f5] px-5 py-10 text-slate-900 sm:px-8 sm:py-14">
+        <main lang="en" className="min-h-screen bg-[#f4f6fb] px-5 py-10 text-slate-900 sm:px-8 sm:py-14">
           <div className="mx-auto max-w-5xl animate-pulse rounded-2xl bg-white p-8">
             <div className="h-8 w-64 rounded bg-slate-100" />
             <div className="mt-8 h-40 rounded-xl bg-slate-100" />
