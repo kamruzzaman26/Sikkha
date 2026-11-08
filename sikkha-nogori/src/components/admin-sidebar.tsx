@@ -51,7 +51,7 @@ function NavList({ onNavigate }: { onNavigate?: () => void }) {
 function Brand() {
   return (
     <Link href="/admin/dashboard" className="flex items-center gap-3 rounded-2xl px-2 py-3">
-      <span className="flex size-11 items-center justify-center rounded-2xl bg-blue-400 text-lg font-black text-slate-950 shadow-lg shadow-black/10">SN</span>
+      <span className="flex size-11 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-300 to-blue-600 text-lg font-black text-white shadow-lg shadow-black/10">SN</span>
       <span className="min-w-0">
         <span className="block truncate text-sm font-extrabold tracking-wide text-white">SIKKHA NOGORI</span>
         <span className="mt-0.5 block text-[10px] font-semibold uppercase tracking-[0.16em] text-blue-200/70">Admin workspace</span>
@@ -66,7 +66,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div lang="en" className="min-h-screen bg-[#f4f6fb] lg:flex">
-      <aside className="sticky top-0 hidden h-screen w-[276px] shrink-0 flex-col overflow-y-auto border-r border-white/10 bg-[#101b35] px-4 py-5 text-white lg:flex">
+      <aside className="sticky top-0 hidden h-screen w-[276px] shrink-0 flex-col overflow-y-auto border-r border-white/10 bg-[#0d1933] px-4 py-5 text-white lg:flex">
         <Brand />
         <div className="my-5 h-px bg-white/10" />
         <NavList />
@@ -87,10 +87,10 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             </span>
             <span className="flex size-9 items-center justify-center rounded-xl bg-blue-50 text-blue-900"><AdminIcon name="menu" /></span>
           </summary>
-          <div className="fixed inset-x-0 bottom-0 top-[62px] z-40 bg-slate-950/60 backdrop-blur-[2px]" onClick={closeMobileMenu}>
+          <div className="fixed inset-x-0 bottom-0 top-[62px] z-40 bg-[#08132b]/95 backdrop-blur-sm" onClick={closeMobileMenu}>
             <button type="button" aria-label="Close navigation" className="absolute inset-0 size-full cursor-default" />
           </div>
-          <div className="fixed bottom-0 left-0 top-[62px] z-50 w-[min(86vw,340px)] overflow-y-auto border-r border-slate-200 bg-[#101b35] px-3 py-5 text-white shadow-2xl">
+          <div className="fixed bottom-0 left-0 top-[62px] z-50 w-[min(86vw,340px)] overflow-y-auto border-r border-slate-200 bg-[#0d1933] px-3 py-5 text-white shadow-2xl">
             <div className="mb-5 flex items-center justify-between px-2">
               <span className="text-xs font-bold uppercase tracking-widest text-blue-200">Navigation</span>
               <button type="button" onClick={closeMobileMenu} aria-label="Close menu" className="flex size-9 items-center justify-center rounded-lg text-slate-200 hover:bg-white/10"><AdminIcon name="menu" /></button>
