@@ -29,7 +29,7 @@ async function AdminChrome({ children }: { children: React.ReactNode }) {
       identity={{
         email: adminUser.email,
         name: typeof adminUser.user_metadata?.full_name === "string" ? adminUser.user_metadata.full_name : typeof adminUser.user_metadata?.name === "string" ? adminUser.user_metadata.name : null,
-        avatarUrl: typeof adminUser.user_metadata?.avatar_url === "string" ? adminUser.user_metadata.avatar_url : null,
+        avatarUrl: typeof adminUser.user_metadata?.avatar_url === "string" ? adminUser.user_metadata.avatar_url : typeof adminUser.user_metadata?.picture === "string" ? adminUser.user_metadata.picture : null,
       }}
     >
       {children}
