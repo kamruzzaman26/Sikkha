@@ -12,6 +12,17 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
+function dhakaDateKey(value: string) {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Asia/Dhaka",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(new Date(value));
+  const part = (type: string) => parts.find((item) => item.type === type)?.value ?? "";
+  return `${part("year")}-${part("month")}-${part("day")}`;
+}
+
 const orderStatusLabels: Record<string, string> = {
   pending: "Pending",
   confirmed: "Confirmed",
