@@ -1,8 +1,14 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Hind_Siliguri } from "next/font/google";
 import { SiteShell } from "@/components/site-shell";
 import { DEFAULT_DESCRIPTION, getSiteSettings, resolveSiteOrigin } from "@/lib/site-settings";
 import "./globals.css";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+};
 
 const hindSiliguri = Hind_Siliguri({
   variable: "--font-hind-siliguri",
