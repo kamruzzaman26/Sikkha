@@ -721,12 +721,12 @@ export function toCatalogBook(product: CatalogProduct): Book {
 }
 
 export async function getPublishedBookSlugs(): Promise<
-  { slug: string; updated_at: string | null }[]
+  { slug: string }[]
 > {
   const supabase = createSupabasePublicServerClient();
   const { data, error } = await supabase
     .from("products")
-    .select("slug, updated_at")
+    .select("slug")
     .eq("product_type", "book")
     .eq("is_published", true)
     .is("archived_at", null)
