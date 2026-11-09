@@ -17,6 +17,7 @@ const staticPaths: { path: string; priority: number; changeFrequency: "daily" | 
   { path: "/about", priority: 0.5, changeFrequency: "monthly" },
   { path: "/contact", priority: 0.5, changeFrequency: "monthly" },
   { path: "/affiliate-disclosure", priority: 0.3, changeFrequency: "yearly" },
+  { path: "/returns", priority: 0.3, changeFrequency: "yearly" },
   { path: "/privacy", priority: 0.3, changeFrequency: "yearly" },
   { path: "/terms", priority: 0.3, changeFrequency: "yearly" },
 ];

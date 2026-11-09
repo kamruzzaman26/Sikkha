@@ -8,6 +8,7 @@ const footerLinks = [
   { href: "/books", label: "বইয়ের সংগ্রহ" },
   { href: "/courses", label: "অনলাইন কোর্স" },
   { href: "/affiliate-disclosure", label: "অ্যাফিলিয়েট প্রকাশনা" },
+  { href: "/returns", label: "রিটার্ন ও রিফান্ড" },
   { href: "/privacy", label: "গোপনীয়তা নীতি" },
   { href: "/terms", label: "ব্যবহারের শর্তাবলি" },
 ];
