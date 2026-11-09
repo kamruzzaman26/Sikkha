@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Hind_Siliguri } from "next/font/google";
 import { SiteShell } from "@/components/site-shell";
 import { DEFAULT_DESCRIPTION, getSiteSettings, resolveSiteOrigin } from "@/lib/site-settings";
@@ -57,3 +57,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     </html>
   );
 }
+
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+};
