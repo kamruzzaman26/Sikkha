@@ -574,7 +574,7 @@ export function SiteHeader({
         </div>
       )}
 
-      <nav aria-label="Bottom navigation" className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 border-t border-slate-200 bg-white/95 px-1 pb-[env(safe-area-inset-bottom)] pt-1 shadow-[0_-4px_18px_rgba(15,23,42,0.08)] backdrop-blur lg:hidden">
+      <nav aria-label="Bottom navigation" className="fixed bottom-0 left-0 right-0 z-40 grid w-screen max-w-none grid-cols-5 border-t border-slate-200 bg-white/95 px-1 pb-[env(safe-area-inset-bottom)] pt-1 shadow-[0_-4px_18px_rgba(15,23,42,0.08)] backdrop-blur lg:hidden">
         <BottomNavItem href="/" icon="⌂" label="হোম" />
         <BottomNavItem href="/books" icon="▤" label="বই" />
         <BottomNavItem href="/cart" icon="🛒" label="কার্ট" badge={<CartCount />} />
