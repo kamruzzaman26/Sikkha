@@ -7,7 +7,7 @@ import { AdminSubmitButton } from "@/components/admin-submit-button";
 export const metadata: Metadata = { title: "Website Settings | Sikkha Nogori Admin", robots: { index: false, follow: false } };
 const input = "min-h-11 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 outline-none transition focus:border-brand-600 focus:ring-4 focus:ring-brand-600/10";
 const label = "mb-1.5 block text-xs font-bold uppercase tracking-wide text-slate-600";
-type General = { logo_url?: string; favicon_url?: string; whatsapp?: string; business_hours?: string; announcement_text?: string; announcement_link?: string; footer_about?: string; return_policy?: string; site_name?: string; tagline?: string; contact_email?: string; contact_phone?: string; helpline?: string; delivery_note?: string; delivery_days?: number; delivery_days_dhaka?: number; delivery_days_outside?: number; delivery_delay_note?: string; address?: string; currency?: string; social?: { facebook?: string; instagram?: string; youtube?: string; tiktok?: string; x?: string } };
+type General = { logo_url?: string; favicon_url?: string; whatsapp?: string; business_hours?: string; announcement_text?: string; announcement_link?: string; footer_about?: string; return_policy?: string; site_name?: string; tagline?: string; contact_email?: string; contact_phone?: string; helpline?: string; delivery_note?: string; delivery_days?: number; delivery_days_dhaka?: number; delivery_days_outside?: number; delivery_delay_note?: string; address?: string; currency?: string; social?: { facebook?: string; instagram?: string; youtube?: string; tiktok?: string; linkedin?: string; x?: string } };
 export default async function WebsiteSettingsPage({ searchParams }: { searchParams: Promise<Record<string,string|string[]|undefined>> }) {
   await connection();
   const { supabase } = await requirePermission("manage_settings", "/admin/dashboard");
@@ -79,7 +79,7 @@ export default async function WebsiteSettingsPage({ searchParams }: { searchPara
 
         <section className={card}><p className={eyebrow}>Social presence</p><h2 className="mt-1 text-xl font-bold">Official social links</h2><p className="mt-1 text-sm text-slate-500">Only https links are accepted.</p>
           <div className="mt-5 grid gap-4 sm:grid-cols-2">
-            {(["facebook","instagram","youtube","tiktok","x"] as const).map((key)=><div key={key}><label className={label} htmlFor={key}>{key === "x" ? "X (Twitter)" : key[0].toUpperCase()+key.slice(1)} link</label><input className={input} id={key} name={key} type="url" placeholder="https://" defaultValue={s.social?.[key] ?? ""} /></div>)}
+            {(["facebook","instagram","linkedin","youtube","tiktok","x"] as const).map((key)=><div key={key}><label className={label} htmlFor={key}>{key === "x" ? "X (Twitter)" : key === "linkedin" ? "LinkedIn" : key === "youtube" ? "YouTube" : key === "tiktok" ? "TikTok" : key[0].toUpperCase()+key.slice(1)} link</label><input className={input} id={key} name={key} type="url" placeholder="https://" defaultValue={s.social?.[key] ?? ""} /></div>)}
           </div>
           {where("buttons in the footer and Contact page; also sent to Google as your official profiles.")}
         </section>

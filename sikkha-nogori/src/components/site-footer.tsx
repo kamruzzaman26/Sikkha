@@ -12,7 +12,7 @@ const footerLinks = [
   { href: "/terms", label: "ব্যবহারের শর্তাবলি" },
 ];
 
-const socialLabels: Record<string, string> = { facebook: "Facebook", instagram: "Instagram", youtube: "YouTube", tiktok: "TikTok", x: "X" };
+const socialLabels: Record<string, string> = { facebook: "Facebook", instagram: "Instagram", youtube: "YouTube", tiktok: "TikTok", linkedin: "LinkedIn", x: "X" };
 const DEFAULT_ABOUT = "বই ও শেখার উপকরণ খুঁজে দেখুন—তথ্য ও প্রাপ্যতা সংশ্লিষ্ট প্রকাশক বা বিক্রেতার কাছে যাচাই করুন।";
 
 export function SiteFooter({ settings, year }: { settings?: GeneralSettings; year?: number }) {

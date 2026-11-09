@@ -47,7 +47,7 @@ export async function saveGeneralSettings(form: FormData) {
   const urlFields = { logo_url: field(form, "logoUrl"), favicon_url: field(form, "faviconUrl") };
   const social = {
     facebook: field(form, "facebook"), instagram: field(form, "instagram"), youtube: field(form, "youtube"),
-    tiktok: field(form, "tiktok"), x: field(form, "x"),
+    tiktok: field(form, "tiktok"), linkedin: field(form, "linkedin"), x: field(form, "x"),
   };
   if (![...Object.values(urlFields), ...Object.values(social)].every(safeUrl)) invalid();
   const announcementLink = field(form, "announcementLink");

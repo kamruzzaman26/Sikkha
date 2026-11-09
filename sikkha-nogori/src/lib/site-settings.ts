@@ -22,7 +22,7 @@ export type GeneralSettings = {
   announcementLink: string;
   footerAbout: string;
   returnPolicy: string;
-  social: { facebook: string; instagram: string; youtube: string; tiktok: string; x: string };
+  social: { facebook: string; instagram: string; youtube: string; tiktok: string; linkedin: string; x: string };
 };
 
 /** Everything the site manager can configure under Admin → SEO. */
@@ -73,6 +73,7 @@ function normalizeGeneral(raw: Raw): GeneralSettings {
       instagram: str(social.instagram),
       youtube: str(social.youtube),
       tiktok: str(social.tiktok),
+      linkedin: str(social.linkedin),
       x: str(social.x),
     },
   };

@@ -17,6 +17,7 @@ function isValidEmail(value: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
 
+const socialLabels: Record<string, string> = { facebook: "Facebook", instagram: "Instagram", linkedin: "LinkedIn", youtube: "YouTube", tiktok: "TikTok", x: "X" };
 const card = "flex items-start gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm";
 const iconBox = "flex size-11 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-lg text-emerald-800";
 
@@ -65,7 +66,7 @@ async function ContactDetails() {
           <h2 className="font-bold">সোশ্যাল মিডিয়ায় আমরা</h2>
           <ul className="mt-3 flex flex-wrap gap-2">
             {social.map(([key, url]) => (
-              <li key={key}><a href={url} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-10 items-center rounded-full border border-slate-200 bg-white px-4 text-sm font-semibold capitalize text-slate-700 hover:border-emerald-300 hover:text-emerald-800">{key === "x" ? "X" : key}</a></li>
+              <li key={key}><a href={url} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-10 items-center rounded-full border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 hover:border-emerald-300 hover:text-emerald-800">{socialLabels[key] ?? key}</a></li>
             ))}
           </ul>
         </section>
