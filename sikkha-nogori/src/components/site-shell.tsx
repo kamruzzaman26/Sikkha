@@ -107,7 +107,7 @@ async function getTopBar() {
 async function AsyncFooter() {
   await connection();
   const { general } = await getSiteSettings();
-  return <SiteFooter settings={general} />;
+  return <SiteFooter settings={general} year={new Date().getFullYear()} />;
 }
 
 /** Search-engine structured data (organisation + site search) and analytics. */

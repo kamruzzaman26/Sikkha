@@ -15,7 +15,7 @@ const footerLinks = [
 const socialLabels: Record<string, string> = { facebook: "Facebook", instagram: "Instagram", youtube: "YouTube", tiktok: "TikTok", x: "X" };
 const DEFAULT_ABOUT = "বই ও শেখার উপকরণ খুঁজে দেখুন—তথ্য ও প্রাপ্যতা সংশ্লিষ্ট প্রকাশক বা বিক্রেতার কাছে যাচাই করুন।";
 
-export function SiteFooter({ settings }: { settings?: GeneralSettings }) {
+export function SiteFooter({ settings, year }: { settings?: GeneralSettings; year?: number }) {
   const name = settings?.siteName || "শিক্ষা নগরী";
   const social = Object.entries(settings?.social ?? {}).filter(([, url]) => url);
   const wa = settings?.whatsapp ? whatsappHref(settings.whatsapp) : "";
@@ -75,7 +75,7 @@ export function SiteFooter({ settings }: { settings?: GeneralSettings }) {
       <div className="border-t border-white/10 px-4 py-5 text-center text-xs leading-6 text-emerald-100/75">
         {settings?.returnPolicy && <p className="mx-auto mb-1 max-w-3xl">{settings.returnPolicy}</p>}
         <p>বিক্রেতার পৃষ্ঠায় মূল্য, মজুত ও পণ্যের বিবরণ যাচাই করুন।</p>
-        <p className="mt-1">© {new Date().getFullYear()} {name}</p>
+        <p className="mt-1">© {year ? `${year} ` : ""}{name}</p>
       </div>
     </footer>
   );
