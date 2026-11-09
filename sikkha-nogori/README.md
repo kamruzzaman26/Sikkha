@@ -37,9 +37,8 @@ runs migrations automatically.
 
 ### Admin CSV book import
 
-The admin CSV import accepts exactly these three headers:
-`book_name,affiliate_url,image_url`. Files are limited to 500 data rows and
-512 KiB. Preview parses and validates rows without writing products; it checks
+The admin catalog import accepts CSV and JSON exports. CSV uses exactly these three headers:
+`book_name,affiliate_url,image_url`. JSON accepts a product array or an object containing `products` / `items` and maps `book_name`, `bookName`, `productName`, `product_name`, `book_title`, or `title`; `affiliate_url` / `affiliateUrl`; and `image_url` / `imageUrl`. Other affiliate-manager metadata (price, brand, tags, SEO, SKU, availability, etc.) is intentionally not imported yet. Files are limited to 500 data rows and 512 KiB. Preview parses and validates rows without writing products; it checks
 approved HTTPS affiliate hostnames, safe HTTPS image URLs, malformed CSV,
 in-file duplicates, and existing product titles/affiliate URLs. Confirm
 revalidates on the server and calls the Admin-only
