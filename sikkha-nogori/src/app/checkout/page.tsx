@@ -8,6 +8,7 @@ import { getCheckoutOptions } from "@/lib/supabase/checkout";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { isNoActiveSessionError } from "@/lib/supabase/auth-errors";
 import { SubmitButton } from "@/components/submit-button";
+import { CouponField } from "@/components/coupon-field";
 
 export const metadata: Metadata = {
   title: "অর্ডার | শিক্ষা নগরী",
@@ -19,6 +20,12 @@ const statusMessages = {
   invalid: "তথ্য যাচাই করুন, পণ্য নির্বাচন এবং সব প্রয়োজনীয় ঘর পূরণ করুন।",
   unavailable:
     "নির্বাচিত পণ্য বা পেমেন্ট মেথড এখন উপলভ্য নয়। আবার পৃষ্ঠা লোড করে চেষ্টা করুন।",
+  "coupon-not-found": "কুপন কোডটি সঠিক নয়। কোড দেখে আবার লিখুন; অর্ডার জমা হয়নি।",
+  "coupon-inactive": "এই কুপনটি এখন চালু নেই; অর্ডার জমা হয়নি।",
+  "coupon-not-started": "এই কুপনটি এখনো শুরু হয়নি; অর্ডার জমা হয়নি।",
+  "coupon-expired": "এই কুপনের মেয়াদ শেষ হয়ে গেছে; অর্ডার জমা হয়নি।",
+  "coupon-used-up": "এই কুপনের ব্যবহারের সীমা শেষ; অর্ডার জমা হয়নি।",
+  "coupon-min-order": "এই কুপনের জন্য আরও বেশি মূল্যের অর্ডার প্রয়োজন; অর্ডার জমা হয়নি।",
   duplicate: "এই অর্ডারটি ইতিমধ্যে জমা হয়েছে। আপনার অর্ডার তালিকা দেখুন।",
 } as const;
 
@@ -51,6 +58,8 @@ async function CheckoutContent({
     getCheckoutOptions(),
     searchParams,
   ]);
+  const { data: couponRows } = user ? await supabase.rpc("get_public_coupons") : { data: null };
+  const publicCoupons = (couponRows ?? []) as { code: string; description: string; discount_percent: number; expires_at: string | null; min_order_amount: number }[];
   const status = Array.isArray(params.status) ? params.status[0] : params.status;
   const message =
     status && Object.hasOwn(statusMessages, status)
@@ -245,6 +254,16 @@ async function CheckoutContent({
                 </div>
               </div>
             </section>
+
+            <CouponField
+              coupons={publicCoupons.map((c) => ({
+                code: c.code,
+                percent: Number(c.discount_percent),
+                description: c.description,
+                expiresAt: c.expires_at,
+                minOrder: Number(c.min_order_amount),
+              }))}
+            />
 
             <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
               <h2 className="text-xl font-bold">পেমেন্ট মেথড</h2>

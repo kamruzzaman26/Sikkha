@@ -48,6 +48,8 @@ type CustomerOrder = {
   delivery_address: string;
   currency: string;
   total_amount: number | string;
+  discount_amount: number | string | null;
+  coupon_code: string | null;
   payment_method_name: string;
   payment_method_type: "manual" | "cod";
   payment_instructions: string;
@@ -66,7 +68,7 @@ async function AccountOrdersContent({
   const { data: orders, error: ordersError } = await supabase
     .from("orders")
     .select(
-      "id, customer_name, customer_phone, delivery_address, currency, total_amount, payment_method_name, payment_method_type, payment_instructions, status, payment_status, payment_refund_reason, created_at",
+      "id, customer_name, customer_phone, delivery_address, currency, total_amount, discount_amount, coupon_code, payment_method_name, payment_method_type, payment_instructions, status, payment_status, payment_refund_reason, created_at",
     )
     .eq("user_id", user.id)
     .order("created_at", { ascending: false })
@@ -221,6 +223,12 @@ async function AccountOrdersContent({
                   </ul>
 
                   <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
+                    {Number(order.discount_amount ?? 0) > 0 && (
+                      <div>
+                        <dt className="font-semibold text-slate-600">কুপন ছাড় ({order.coupon_code})</dt>
+                        <dd className="mt-1 text-lg font-extrabold text-emerald-700">−{formatBDT(order.discount_amount ?? 0)}</dd>
+                      </div>
+                    )}
                     <div>
                       <dt className="font-semibold text-slate-600">সর্বমোট</dt>
                       <dd className="mt-1 text-lg font-extrabold text-emerald-800">

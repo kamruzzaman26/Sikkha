@@ -24,7 +24,12 @@ export async function placeOrder(formData: FormData) {
     referralCode && /^[A-Z0-9]{1,32}$/i.test(referralCode)
       ? referralCode
       : null;
-  const { data: orderId, error } = await supabase.rpc("place_order_with_referral", {
+  const rawCoupon = formData.get("couponCode");
+  const couponCode =
+    typeof rawCoupon === "string" && rawCoupon.trim()
+      ? rawCoupon.trim().toUpperCase().slice(0, 40)
+      : null;
+  const { data: orderId, error } = await supabase.rpc("place_order_with_coupon", {
     p_idempotency_key: order.idempotencyKey,
     p_customer_name: order.customerName,
     p_customer_phone: order.customerPhone,
@@ -32,9 +37,14 @@ export async function placeOrder(formData: FormData) {
     p_payment_method_id: order.paymentMethodId,
     p_items: order.items,
     p_referral_code: validReferralCode,
+    p_coupon_code: couponCode,
   });
 
   if (error) {
+    // 22023 = the coupon was refused; the whole order is rolled back.
+    if (error.code === "22023" && /^coupon_[a-z_]+$/.test(error.message)) {
+      redirect(`/checkout?status=${error.message.replace("_", "-")}`);
+    }
     if (error.code === "23505") {
       redirect("/checkout?status=duplicate");
     }
