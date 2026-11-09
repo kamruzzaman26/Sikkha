@@ -461,14 +461,14 @@ export function SiteHeader({
       )}
 
       {portalReady && createPortal(
-        <nav aria-label="Bottom navigation" className="fixed inset-x-0 bottom-0 z-40 grid min-w-0 grid-cols-5 border-t border-slate-200 bg-white/95 px-1 pb-[env(safe-area-inset-bottom)] pt-1 shadow-[0_-8px_22px_rgba(15,23,42,0.06)] backdrop-blur-sm sm:hidden">
+        <nav aria-label="Bottom navigation" className="fixed bottom-0 left-0 right-0 z-40 grid w-screen max-w-[100vw] min-w-0 grid-cols-[repeat(5,minmax(0,1fr))] border-t border-slate-200 bg-white/95 px-1 pb-[env(safe-area-inset-bottom)] pt-1 shadow-[0_-8px_22px_rgba(15,23,42,0.06)] backdrop-blur-sm sm:hidden">
           <BottomNavItem href="/" icon="⌂" label="হোম" />
           <BottomNavItem href="/books" icon="▤" label="বই" />
           <BottomNavItem href="/cart" icon="🛒" label="কার্ট" badge={<CartCount />} />
           <BottomNavItem href="/e-library" icon="▧" label="ই-লাইব্রেরি" />
           <BottomNavItem href={identity ? "/dashboard/profile" : "/login"} icon="♙" label="অ্যাকাউন্ট" />
         </nav>,
-        document.body,
+        document.documentElement,
       )}
     </>
   );
