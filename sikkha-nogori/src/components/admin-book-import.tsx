@@ -21,7 +21,7 @@ function csvCell(value: unknown): string {
         ? String(value)
         : value == null
           ? ""
-          : JSON.stringify(value);
+          : JSON.stringify(value) ?? "";
   return `"${text.replace(/"/g, '""')}"`;
 }
 
