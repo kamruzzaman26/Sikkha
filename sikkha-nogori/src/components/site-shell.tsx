@@ -10,10 +10,8 @@ import { SiteAnalytics } from "@/components/site-analytics";
 import { WhatsAppButton } from "@/components/whatsapp-button";
 import { getSiteSettings, resolveSiteOrigin, whatsappHref } from "@/lib/site-settings";
 import {
-  createSupabasePublicServerClient,
   createSupabaseServerClient,
 } from "@/lib/supabase/server";
-import { buildCategoryMenu } from "@/lib/category-tree.mjs";
 import { isNoActiveSessionError } from "@/lib/supabase/auth-errors";
 
 type SiteIdentity = {
@@ -72,25 +70,6 @@ async function getSiteIdentity(): Promise<SiteIdentity> {
   };
 }
 
-async function getCategoryMenu() {
-  try {
-    const supabase = createSupabasePublicServerClient();
-    const { data, error } = await supabase
-      .from("categories")
-      .select("id, parent_id, name, sort_order, category_group")
-      .eq("is_active", true)
-      .limit(2000);
-    if (error || !data) {
-      return { books: [], products: [] };
-    }
-    return {
-      books: buildCategoryMenu(data, "books"),
-      products: buildCategoryMenu(data, "products"),
-    };
-  } catch {
-    return { books: [], products: [] };
-  }
-}
 
 async function getTopBar() {
   const { general } = await getSiteSettings();
@@ -153,12 +132,8 @@ async function SiteExtras() {
 
 async function AuthenticatedSiteHeader() {
   await connection();
-  const [identity, categoryMenu, topBar] = await Promise.all([
-    getSiteIdentity(),
-    getCategoryMenu(),
-    getTopBar(),
-  ]);
-  return <SiteHeader identity={identity} categoryMenu={categoryMenu} topBar={topBar} />;
+  const [identity, topBar] = await Promise.all([getSiteIdentity(), getTopBar()]);
+  return <SiteHeader identity={identity} topBar={topBar} />;
 }
 
 export function SiteShell({ children }: { children: ReactNode }) {
