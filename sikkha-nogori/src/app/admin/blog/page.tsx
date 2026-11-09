@@ -49,7 +49,7 @@ export default async function AdminBlogPage({ searchParams }: { searchParams: Pr
   const statusParam = pick(params.status);
   const filter = pick(params.show) === "draft" || pick(params.show) === "published" || pick(params.show) === "archived" ? pick(params.show) : "all";
 
-  const [{ data, error }, { data: categories, error: categoryError }, { data: general }] = await Promise.all([
+  const [{ data, error }, { data: categories, error: categoryError }, { data: general }, { data: scheduledData, error: scheduledError }] = await Promise.all([
     supabase.from("posts").select("id,title,slug,excerpt,content,featured_image_path,status,seo_title,seo_description,category_id,published_at,updated_at").order("updated_at", { ascending: false }).limit(200),
     supabase.from("categories").select("id,name").eq("is_active", true).order("name").limit(500),
     supabase.from("site_settings").select("value").eq("key", "general").maybeSingle(),
