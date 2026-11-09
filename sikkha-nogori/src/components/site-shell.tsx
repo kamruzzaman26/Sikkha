@@ -7,7 +7,8 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteChrome } from "@/components/site-chrome";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteAnalytics } from "@/components/site-analytics";
-import { getSiteSettings, resolveSiteOrigin } from "@/lib/site-settings";
+import { WhatsAppButton } from "@/components/whatsapp-button";
+import { getSiteSettings, resolveSiteOrigin, whatsappHref } from "@/lib/site-settings";
 import {
   createSupabasePublicServerClient,
   createSupabaseServerClient,
@@ -145,6 +146,7 @@ async function SiteExtras() {
     <>
       {jsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />}
       {seo.analyticsId && <SiteAnalytics id={seo.analyticsId} />}
+      {general.whatsapp && <WhatsAppButton href={whatsappHref(general.whatsapp)} />}
     </>
   );
 }
