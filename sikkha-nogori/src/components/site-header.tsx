@@ -2,6 +2,7 @@
 
 import { CartCount } from "@/components/cart-count";
 import Link from "next/link";
+import { createPortal } from "react-dom";
 import { useEffect, useRef, useState } from "react";
 import { signOutCustomer } from "@/app/login/actions";
 
@@ -170,6 +171,7 @@ export function SiteHeader({
   topBar?: TopBar;
 }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [portalReady, setPortalReady] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const drawerRef = useRef<HTMLElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
@@ -177,6 +179,10 @@ export function SiteHeader({
   const accountRef = useRef<HTMLDivElement>(null);
   const accountButtonRef = useRef<HTMLButtonElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    setPortalReady(true);
+  }, []);
 
   useEffect(() => {
     if (!drawerOpen) {
@@ -574,13 +580,16 @@ export function SiteHeader({
         </div>
       )}
 
-      <nav aria-label="Bottom navigation" className="fixed bottom-0 left-0 right-0 z-40 grid w-screen max-w-none grid-cols-5 border-t border-slate-200 bg-white/95 px-1 pb-[env(safe-area-inset-bottom)] pt-1 shadow-[0_-4px_18px_rgba(15,23,42,0.08)] backdrop-blur lg:hidden">
-        <BottomNavItem href="/" icon="⌂" label="হোম" />
-        <BottomNavItem href="/books" icon="▤" label="বই" />
-        <BottomNavItem href="/cart" icon="🛒" label="কার্ট" badge={<CartCount />} />
-        <BottomNavItem href="/e-library" icon="▧" label="ই-লাইব্রেরি" />
-        <BottomNavItem href={identity ? "/dashboard/profile" : "/login"} icon="♙" label="অ্যাকাউন্ট" />
-      </nav>
+      {portalReady && createPortal(
+        <nav aria-label="Bottom navigation" className="fixed inset-x-0 bottom-0 z-40 grid w-full grid-cols-5 border-t border-slate-200 bg-white/95 px-1 pb-[env(safe-area-inset-bottom)] pt-1 shadow-[0_-4px_18px_rgba(15,23,42,0.08)] backdrop-blur lg:hidden">
+          <BottomNavItem href="/" icon="⌂" label="হোম" />
+          <BottomNavItem href="/books" icon="▤" label="বই" />
+          <BottomNavItem href="/cart" icon="🛒" label="কার্ট" badge={<CartCount />} />
+          <BottomNavItem href="/e-library" icon="▧" label="ই-লাইব্রেরি" />
+          <BottomNavItem href={identity ? "/dashboard/profile" : "/login"} icon="♙" label="অ্যাকাউন্ট" />
+        </nav>,
+        document.body,
+      )}
     </>
   );
 }
@@ -623,7 +632,7 @@ function NavigationGroup({
 }
 
 function BottomNavItem({ href, icon, label, disabled = false, badge }: { href?: string; icon: string; label: string; disabled?: boolean; badge?: React.ReactNode }) {
-  const baseClass = "flex min-h-14 flex-col items-center justify-center gap-0.5 rounded-xl px-1 text-[10px] font-bold text-slate-600 transition-colors hover:bg-emerald-50 hover:text-emerald-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700";
+  const baseClass = "flex min-w-0 min-h-14 w-full flex-col items-center justify-center gap-0.5 rounded-xl px-1 text-center text-[10px] font-bold text-slate-600 transition-colors hover:bg-emerald-50 hover:text-emerald-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700";
   if (disabled || !href) return <span aria-disabled="true" title={label+" পৃষ্ঠা এখনো চালু হয়নি"} className={baseClass+" text-slate-400 opacity-60"}><span aria-hidden="true" className="text-lg leading-5">{icon}</span>{label}</span>;
   return <Link href={href} aria-label={label+" পৃষ্ঠায় যান"} className={baseClass}><span className="relative"><span aria-hidden="true" className="text-lg leading-5">{icon}</span>{badge}</span><span>{label}</span></Link>;
 }
