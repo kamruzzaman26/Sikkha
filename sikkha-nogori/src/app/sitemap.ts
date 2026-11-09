@@ -25,13 +25,17 @@ const staticPaths: { path: string; priority: number; changeFrequency: "daily" | 
 async function otherProducts() {
   try {
     const supabase = createSupabasePublicServerClient();
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("products")
-      .select("slug, product_type, updated_at")
+      .select("slug, product_type")
       .eq("is_published", true)
       .is("archived_at", null)
       .neq("product_type", "book")
       .limit(5000);
+    if (error) {
+      console.error("Unable to load products for the sitemap.", error);
+      return [];
+    }
     return data ?? [];
   } catch {
     return [];
@@ -48,10 +52,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return [
     ...staticPaths.map(({ path, priority, changeFrequency }) => ({ url: `${origin}${path}`, priority, changeFrequency })),
-    ...books.map((book) => ({ url: `${origin}/books/${encodeURIComponent(book.slug)}`, priority: 0.7, changeFrequency: "weekly" as const, ...modified(book.updated_at) })),
+    ...books.map((book) => ({ url: `${origin}/books/${encodeURIComponent(book.slug)}`, priority: 0.7, changeFrequency: "weekly" as const })),
     ...products.map((p) => ({
       url: `${origin}/${p.product_type === "course" ? "courses" : "products"}/${encodeURIComponent(p.slug as string)}`,
-      priority: 0.7, changeFrequency: "weekly" as const, ...modified(p.updated_at as string | null),
+      priority: 0.7, changeFrequency: "weekly" as const,
     })),
     ...posts.map((post) => ({ url: `${origin}/blog/${encodeURIComponent(post.slug)}`, priority: 0.6, changeFrequency: "monthly" as const, ...modified(post.updated) })),
   ];
