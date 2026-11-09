@@ -6,6 +6,8 @@ import { connection } from "next/server";
 import { SiteHeader } from "@/components/site-header";
 import { SiteChrome } from "@/components/site-chrome";
 import { SiteFooter } from "@/components/site-footer";
+import { SiteAnalytics } from "@/components/site-analytics";
+import { getSiteSettings, resolveSiteOrigin } from "@/lib/site-settings";
 import {
   createSupabasePublicServerClient,
   createSupabaseServerClient,
@@ -90,17 +92,61 @@ async function getCategoryMenu() {
 }
 
 async function getTopBar() {
-  try {
-    const supabase = createSupabasePublicServerClient();
-    const { data } = await supabase.from("site_settings").select("value").eq("key", "general").maybeSingle();
-    const value = (data?.value ?? {}) as { helpline?: unknown; delivery_note?: unknown };
-    return {
-      helpline: typeof value.helpline === "string" ? value.helpline : "",
-      note: typeof value.delivery_note === "string" ? value.delivery_note : "",
-    };
-  } catch {
-    return { helpline: "", note: "" };
-  }
+  const { general } = await getSiteSettings();
+  return {
+    helpline: general.helpline,
+    note: general.topNote,
+    brandName: general.siteName,
+    tagline: general.tagline,
+    logoUrl: general.logoUrl,
+    announcement: general.announcementText,
+    announcementLink: general.announcementLink,
+  };
+}
+
+async function AsyncFooter() {
+  await connection();
+  const { general } = await getSiteSettings();
+  return <SiteFooter settings={general} />;
+}
+
+/** Search-engine structured data (organisation + site search) and analytics. */
+async function SiteExtras() {
+  await connection();
+  const { general, seo } = await getSiteSettings();
+  const origin = resolveSiteOrigin(seo);
+  const sameAs = Object.values(general.social).filter(Boolean);
+  const jsonLd = origin && {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": `${origin}/#organization`,
+        name: general.siteName,
+        url: origin,
+        ...(general.logoUrl ? { logo: general.logoUrl } : {}),
+        ...(sameAs.length ? { sameAs } : {}),
+        ...(general.contactEmail || general.contactPhone
+          ? { contactPoint: { "@type": "ContactPoint", contactType: "customer support", ...(general.contactEmail ? { email: general.contactEmail } : {}), ...(general.contactPhone ? { telephone: general.contactPhone } : {}), availableLanguage: ["bn", "en"] } }
+          : {}),
+      },
+      {
+        "@type": "WebSite",
+        "@id": `${origin}/#website`,
+        url: origin,
+        name: general.siteName,
+        inLanguage: "bn",
+        publisher: { "@id": `${origin}/#organization` },
+        potentialAction: { "@type": "SearchAction", target: { "@type": "EntryPoint", urlTemplate: `${origin}/books?q={search_term_string}` }, "query-input": "required name=search_term_string" },
+      },
+    ],
+  };
+  return (
+    <>
+      {jsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />}
+      {seo.analyticsId && <SiteAnalytics id={seo.analyticsId} />}
+    </>
+  );
 }
 
 async function AuthenticatedSiteHeader() {
@@ -121,8 +167,15 @@ export function SiteShell({ children }: { children: ReactNode }) {
           <AuthenticatedSiteHeader />
         </Suspense>
       }
-      footer={<SiteFooter />}
+      footer={
+        <Suspense fallback={<SiteFooter />}>
+          <AsyncFooter />
+        </Suspense>
+      }
     >
+      <Suspense fallback={null}>
+        <SiteExtras />
+      </Suspense>
       {children}
     </SiteChrome>
   );

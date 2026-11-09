@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Hind_Siliguri } from "next/font/google";
 import { SiteShell } from "@/components/site-shell";
-import { createSupabasePublicServerClient } from "@/lib/supabase/server";
+import { DEFAULT_DESCRIPTION, getSiteSettings, resolveSiteOrigin } from "@/lib/site-settings";
 import "./globals.css";
 
 const hindSiliguri = Hind_Siliguri({
@@ -11,22 +11,41 @@ const hindSiliguri = Hind_Siliguri({
 });
 
 export async function generateMetadata(): Promise<Metadata> {
-  const supabase = createSupabasePublicServerClient();
-  const { data } = await supabase.from("site_settings").select("value").eq("key", "seo").maybeSingle();
-  const seo = (data?.value ?? {}) as {
-    title?: string; description?: string; canonical_url?: string; og_image?: string;
-    index?: boolean; follow?: boolean;
-  };
-  const title = seo.title || "Sikkha Nogori | শিক্ষা নগরী";
-  const description = seo.description || "বই ও শেখার উপকরণ খুঁজে দেখুন Sikkha Nogori-তে।";
-  const metadata: Metadata = {
+  const { general, seo } = await getSiteSettings();
+  const title = seo.title || `${general.siteName} | বই ও শেখার উপকরণ`;
+  const description = seo.description || general.tagline || DEFAULT_DESCRIPTION;
+  const origin = resolveSiteOrigin(seo);
+  const handle = seo.twitterHandle ? `@${seo.twitterHandle.replace(/^@/, "")}` : undefined;
+  return {
+    ...(origin ? { metadataBase: new URL(origin) } : {}),
     title,
     description,
-    robots: { index: seo.index ?? true, follow: seo.follow ?? true },
+    applicationName: general.siteName,
+    ...(seo.keywords ? { keywords: seo.keywords.split(",").map((k) => k.trim()).filter(Boolean) } : {}),
+    robots: { index: seo.index, follow: seo.follow },
+    // Every page gets its own canonical address (its own path, no query).
+    alternates: { canonical: "./" },
+    openGraph: {
+      type: "website",
+      siteName: general.siteName,
+      locale: "bn_BD",
+      title,
+      description,
+      ...(seo.ogImage ? { images: [seo.ogImage] } : {}),
+    },
+    twitter: {
+      card: seo.ogImage ? "summary_large_image" : "summary",
+      title,
+      description,
+      ...(handle ? { site: handle } : {}),
+      ...(seo.ogImage ? { images: [seo.ogImage] } : {}),
+    },
+    ...(general.faviconUrl ? { icons: { icon: general.faviconUrl } } : {}),
+    verification: {
+      ...(seo.googleVerification ? { google: seo.googleVerification } : {}),
+      ...(seo.bingVerification ? { other: { "msvalidate.01": seo.bingVerification } } : {}),
+    },
   };
-  if (seo.canonical_url) metadata.alternates = { canonical: seo.canonical_url };
-  if (seo.og_image) metadata.openGraph = { title, description, images: [seo.og_image] };
-  return metadata;
 }
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
