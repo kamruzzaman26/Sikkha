@@ -217,8 +217,8 @@ export default async function HomeContent({ searchParams }: { searchParams: Prom
     .filter((topic) => topic.books.length > 0);
 
   return (
-    <main className="min-h-screen overflow-hidden bg-[#f6f8f7] pb-24 text-slate-900">
-      <div className="mx-auto max-w-7xl px-3 pt-3 sm:px-6 sm:pt-5 lg:px-8">
+    <main className="min-h-screen w-full min-w-0 self-stretch overflow-hidden bg-[#f6f8f7] pb-24 text-slate-900">
+      <div className="mx-auto w-full min-w-0 max-w-7xl px-3 pt-3 sm:px-6 sm:pt-5 lg:px-8">
         {/* Hero banners: swipe on mobile. Banner content comes from Banner Management. */}
         <section aria-label="প্রচারমূলক ব্যানার">
           <div className="-mx-3 flex snap-x snap-mandatory gap-3 overflow-x-auto px-3 pb-2 [scrollbar-width:none] sm:mx-0 sm:px-0">
