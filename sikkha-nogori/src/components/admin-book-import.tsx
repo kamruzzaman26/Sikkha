@@ -13,6 +13,63 @@ import type {
   BookImportRowResult,
 } from "@/lib/book-import-types";
 
+function csvCell(value: unknown): string {
+  const text =
+    typeof value === "string"
+      ? value
+      : typeof value === "number" || typeof value === "boolean"
+        ? String(value)
+        : value == null
+          ? ""
+          : JSON.stringify(value);
+  return `"${text.replace(/"/g, '""')}"`;
+}
+
+function jsonProductsToCsv(source: string): string {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(source);
+  } catch {
+    throw new Error("JSON ফাইলটি সঠিক format-এ নেই।");
+  }
+
+  const records = Array.isArray(parsed)
+    ? parsed
+    : typeof parsed === "object" && parsed !== null
+      ? (parsed as { products?: unknown; items?: unknown }).products ??
+        (parsed as { items?: unknown }).items
+      : null;
+
+  if (!Array.isArray(records) || records.length === 0) {
+    throw new Error("JSON ফাইলে products array বা items array থাকতে হবে।");
+  }
+
+  const aliases = {
+    book_name: ["book_name", "bookName", "productName", "product_name", "book_title", "title"],
+    affiliate_url: ["affiliate_url", "affiliateUrl"],
+    image_url: ["image_url", "imageUrl"],
+  } as const;
+  const headers = ["book_name", "affiliate_url", "image_url"] as const;
+
+  const rows = records.map((record, index) => {
+    if (typeof record !== "object" || record === null || Array.isArray(record)) {
+      throw new Error(`JSON row ${index + 1} একটি object হতে হবে।`);
+    }
+    const item = record as Record<string, unknown>;
+    return headers.map((header) => {
+      const value = aliases[header]
+        .map((key) => item[key])
+        .find((candidate) => candidate !== undefined && candidate !== null);
+      return csvCell(value);
+    });
+  });
+
+  return [
+    headers.join(","),
+    ...rows.map((row) => row.join(",")),
+  ].join("\\n");
+}
+
 function statusLabel(status: BookImportRowResult["status"]): string {
   switch (status) {
     case "ready":
@@ -105,11 +162,11 @@ export function AdminBookImport() {
   async function handlePreview() {
     const file = fileInputRef.current?.files?.[0];
     if (!file) {
-      setError("Please select a CSV file first.");
+      setError("একটি CSV বা JSON ফাইল নির্বাচন করুন।");
       return;
     }
     if (file.size === 0 || file.size > MAX_BOOK_IMPORT_BYTES) {
-      setError("The CSV file must not be empty or exceed 512 KiB.");
+      setError("ফাইলটি খালি হতে পারবে না বা 512 KiB-এর বেশি হতে পারবে না।");
       return;
     }
 
@@ -177,14 +234,14 @@ export function AdminBookImport() {
       className="mt-8 rounded-2xl border border-brand-100 bg-white p-5 shadow-sm sm:p-7"
     >
       <h2 id="book-import-heading" className="text-xl font-bold">
-        Bulk Import Products (CSV)
+        Bulk Import Products (CSV / JSON)
       </h2>
       <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-        Required CSV headers:{" "}
+        CSV headers / JSON fields:{" "}
         <code className="rounded bg-slate-100 px-1">book_name</code>,{" "}
         <code className="rounded bg-slate-100 px-1">affiliate_url</code>, and{" "}
         <code className="rounded bg-slate-100 px-1">image_url</code>. Maximum 500 rows / 512 KiB.
-        Preview validates every row before import. Only valid new products are saved as unpublished drafts.
+        JSON export from Affiliate Product Manager is also supported. Preview validates every row before import. Only valid new products are saved as unpublished drafts.
         Product names and URLs are preserved exactly. Fix invalid rows, select the updated CSV, and run Preview again.
       </p>
       <p className="mt-2 text-sm leading-6 text-amber-900">
@@ -204,7 +261,7 @@ export function AdminBookImport() {
             ref={fileInputRef}
             id="book-import-csv"
             type="file"
-            accept=".csv,text/csv"
+            accept=".csv,.json,text/csv,application/json"
             disabled={busy}
             onChange={handleFileChange}
             className="block min-h-11 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm file:mr-3 file:rounded-md file:border-0 file:bg-brand-50 file:px-3 file:py-1 file:font-semibold file:text-brand-800"
