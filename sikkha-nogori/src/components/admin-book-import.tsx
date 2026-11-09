@@ -67,7 +67,7 @@ function jsonProductsToCsv(source: string): string {
   return [
     headers.join(","),
     ...rows.map((row) => row.join(",")),
-  ].join("\\n");
+  ].join("\n");
 }
 
 function statusLabel(status: BookImportRowResult["status"]): string {
