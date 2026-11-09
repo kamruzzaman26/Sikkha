@@ -112,6 +112,42 @@ function NavigationIcon({ name }: { name: NavigationIconName }) {
 }
 
 
+export type MenuCategory = { name: string; children: MenuCategory[] };
+
+function CategoryGlyph({ name }: { name: string }) {
+  const value = name.toLowerCase();
+  const glyph =
+    /author|লেখক/.test(value) ? "✍" :
+    /subject|বিষয়|বিষয়/.test(value) ? "▤" :
+    /publisher|প্রকাশক/.test(value) ? "▣" :
+    /discount|offer|ছাড়|ছাড়/.test(value) ? "％" :
+    /academic|একাডেমিক|পাঠ্য/.test(value) ? "🎓" :
+    /hsc|এইচএসসি/.test(value) ? "📘" :
+    /admission|ভর্তি/.test(value) ? "📝" :
+    /ebook|e-book|ই-বুক/.test(value) ? "▧" :
+    /islam|ইসলাম|কুরআন|হাদিস/.test(value) ? "☪" :
+    /stationery|স্টেশনারি/.test(value) ? "✏" :
+    /food|grocery|খাদ্য|মুদি/.test(value) ? "▦" :
+    /beauty|personal care|সৌন্দর্য/.test(value) ? "✿" :
+    /diary|ডায়েরি|ডায়েরি/.test(value) ? "▣" :
+    /calculator|ক্যালকুলেটর/.test(value) ? "＋" :
+    /fan|ফ্যান/.test(value) ? "✥" :
+    /art|শিল্প|আঁকা/.test(value) ? "✎" :
+    /computer|কম্পিউটার|laptop/.test(value) ? "▣" :
+    /mobile|phone|মোবাইল/.test(value) ? "▯" :
+    /office|অফিস/.test(value) ? "▤" :
+    /gaming|গেম/.test(value) ? "♢" :
+    /network|নেটওয়ার্ক|নেটওয়ার্ক/.test(value) ? "⌘" :
+    /sound|audio|সাউন্ড/.test(value) ? "♫" :
+    /groom|গ্রুম/.test(value) ? "✂" :
+    /appliance|যন্ত্রপাতি/.test(value) ? "⚙" :
+    /science|বিজ্ঞান/.test(value) ? "⚗" :
+    /baby|বেবি|শিশু/.test(value) ? "♡" :
+    /kid|শিশু|বাচ্চা/.test(value) ? "☆" :
+    /book|বই/.test(value) ? "▤" : "◇";
+  return <span aria-hidden="true" className="inline-flex size-5 shrink-0 items-center justify-center text-base text-emerald-800">{glyph}</span>;
+}
+
 const iconButtonClass =
   "inline-flex size-11 shrink-0 items-center justify-center rounded-xl text-slate-700 transition hover:bg-emerald-50 hover:text-emerald-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700";
 
