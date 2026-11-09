@@ -53,11 +53,15 @@ export default async function AdminBlogPage({ searchParams }: { searchParams: Pr
     supabase.from("posts").select("id,title,slug,excerpt,content,featured_image_path,status,seo_title,seo_description,category_id,published_at,updated_at").order("updated_at", { ascending: false }).limit(200),
     supabase.from("categories").select("id,name").eq("is_active", true).order("name").limit(500),
     supabase.from("site_settings").select("value").eq("key", "general").maybeSingle(),
+    supabase.from("posts").select("id").eq("status", "published").gt("published_at", "now"),
   ]);
   if (error) throw new Error("Unable to load blog posts.", { cause: error });
   if (categoryError) throw new Error("Unable to load blog categories.", { cause: categoryError });
 
+  if (scheduledError) throw new Error("Unable to load scheduled blog posts.", { cause: scheduledError });
+
   const posts = (data ?? []) as Post[];
+  const scheduledIds = new Set((scheduledData ?? []).map((post) => post.id));
   const siteName = ((general?.value ?? {}) as { site_name?: string }).site_name || "শিক্ষা নগরী";
   const row = posts.find((p) => p.id === editParam);
   const editing: EditablePost | null = row ? {
@@ -73,7 +77,6 @@ export default async function AdminBlogPage({ searchParams }: { searchParams: Pr
   };
   const visible = filter === "all" ? posts : posts.filter((p) => p.status === filter);
   const notice = statusParam && messages[statusParam] ? messages[statusParam] : null;
-  const now = Date.now();
 
   return (
     <main lang="en" className="mx-auto min-h-screen max-w-[1500px] bg-canvas px-4 py-6 text-slate-900 sm:px-7 sm:py-8 xl:px-10">
@@ -108,7 +111,7 @@ export default async function AdminBlogPage({ searchParams }: { searchParams: Pr
           ) : (
             <ul className="divide-y divide-slate-100">
               {visible.map((post) => {
-                const scheduled = post.status === "published" && post.published_at && new Date(post.published_at).getTime() > now;
+                const scheduled = post.status === "published" && scheduledIds.has(post.id);
                 return (
                   <li key={post.id} className={`px-4 py-4 sm:px-5 ${editing?.id === post.id ? "bg-brand-50/60" : ""}`}>
                     <div className="flex items-start justify-between gap-3">
