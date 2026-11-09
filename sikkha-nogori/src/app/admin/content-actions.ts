@@ -44,7 +44,7 @@ export async function saveBanners(form: FormData) {
   const valid = banners.length <= 3 && banners.every((b) =>
     b.title.length > 0 && b.title.length <= 100 && b.text.length <= 220 &&
     b.cta.length <= 40 && safePath(b.href) && b.tone.length <= 80 &&
-    ["from-emerald-700 to-emerald-950","from-teal-700 to-emerald-950","from-slate-700 to-emerald-950","from-blue-700 to-slate-950","from-amber-700 to-rose-950"].includes(b.tone)
+    ["from-brand-700 to-brand-950","from-brand-700 to-brand-950","from-slate-700 to-brand-950","from-blue-700 to-slate-950","from-amber-700 to-rose-950"].includes(b.tone)
   );
   if (!valid) redirect("/admin/banners?status=invalid");
   await saveSetting("banners", { items: banners });

@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 type Product = { id: string; title: string; slug: string; product_type: string; is_published: boolean; archived_at: string | null };
 type Stock = { product_id: string; sku: string | null; stock_quantity: number; low_stock_threshold: number };
 
-const input = "min-h-11 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 outline-none transition focus:border-emerald-600 focus:ring-4 focus:ring-emerald-600/10";
+const input = "min-h-11 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 outline-none transition focus:border-brand-600 focus:ring-4 focus:ring-brand-600/10";
 const label = "mb-1.5 block text-xs font-bold uppercase tracking-wide text-slate-600";
 
 export default async function InventoryPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
@@ -48,11 +48,11 @@ export default async function InventoryPage({ searchParams }: { searchParams: Pr
   };
 
   return (
-    <main lang="en" className="min-h-screen bg-[#f3f6f5] px-4 py-6 text-slate-900 sm:px-7 sm:py-8 xl:px-10">
+    <main lang="en" className="min-h-screen bg-[#f4f6fa] px-4 py-6 text-slate-900 sm:px-7 sm:py-8 xl:px-10">
       <div className="mx-auto max-w-[1500px]">
         <header className="flex flex-wrap items-end justify-between gap-4">
           <div className="min-w-0">
-            <p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-800">Operations workspace</p>
+            <p className="text-xs font-bold uppercase tracking-[0.14em] text-brand-800">Operations workspace</p>
             <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900">Inventory Control</h1>
             <p className="mt-1.5 max-w-2xl text-[15px] leading-6 text-slate-600">Track product stock, set low-stock alerts and keep your catalog operations organized.</p>
           </div>
@@ -71,7 +71,7 @@ export default async function InventoryPage({ searchParams }: { searchParams: Pr
           ))}
         </section>
 
-        {status && messages[status] && <p role="status" className={`mt-5 rounded-xl border px-4 py-3 text-sm font-semibold ${status === "saved" ? "border-emerald-200 bg-emerald-50 text-emerald-900" : "border-amber-200 bg-amber-50 text-amber-900"}`}>{messages[status]}</p>}
+        {status && messages[status] && <p role="status" className={`mt-5 rounded-xl border px-4 py-3 text-sm font-semibold ${status === "saved" ? "border-brand-200 bg-brand-50 text-brand-900" : "border-amber-200 bg-amber-50 text-amber-900"}`}>{messages[status]}</p>}
 
         <section className="mt-6 grid gap-4 sm:grid-cols-3">
           <div className="rounded-2xl border border-slate-200 bg-white p-5"><p className="text-xs font-bold uppercase tracking-wide text-slate-500">Tracked stock units</p><p className="mt-2 text-3xl font-black tabular-nums">{totalUnits.toLocaleString("en-US")}</p><p className="mt-1 text-xs text-slate-500">Across products with stock records</p></div>
@@ -81,7 +81,7 @@ export default async function InventoryPage({ searchParams }: { searchParams: Pr
 
         <section className="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_10px_35px_-28px_rgba(15,55,42,.35)]">
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 px-5 py-5 sm:px-6">
-            <div><p className="text-[10px] font-extrabold uppercase tracking-[.18em] text-emerald-700">Stock register</p><h2 className="mt-1 text-xl font-extrabold">Product inventory</h2></div>
+            <div><p className="text-[10px] font-extrabold uppercase tracking-[.18em] text-brand-700">Stock register</p><h2 className="mt-1 text-xl font-extrabold">Product inventory</h2></div>
             <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-600">{rows.length} products</span>
           </div>
           {rows.length === 0 ? <p className="px-6 py-12 text-center text-sm text-slate-500">No active catalog products found. Add products in the catalog first.</p> : (
@@ -94,7 +94,7 @@ export default async function InventoryPage({ searchParams }: { searchParams: Pr
                 return (
                   <article key={product.id} className="grid gap-4 px-5 py-5 sm:grid-cols-[minmax(0,1fr)_minmax(300px,.9fr)] sm:items-center sm:px-6">
                     <div className="min-w-0">
-                      <div className="flex flex-wrap items-center gap-2"><h3 className="font-bold">{product.title}</h3><span className={`rounded-full px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide ${!stock ? "bg-slate-100 text-slate-600" : isLow ? "bg-amber-100 text-amber-800" : "bg-emerald-100 text-emerald-800"}`}>{!stock ? "Not tracked" : isLow ? "Low stock" : "In stock"}</span></div>
+                      <div className="flex flex-wrap items-center gap-2"><h3 className="font-bold">{product.title}</h3><span className={`rounded-full px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide ${!stock ? "bg-slate-100 text-slate-600" : isLow ? "bg-amber-100 text-amber-800" : "bg-brand-100 text-brand-800"}`}>{!stock ? "Not tracked" : isLow ? "Low stock" : "In stock"}</span></div>
                       <p className="mt-1 truncate text-xs text-slate-500">/{product.slug} · {product.product_type} · {product.is_published ? "Published" : "Unpublished"}</p>
                       <p className="mt-2 text-sm text-slate-600">{stock ? `${quantity.toLocaleString("en-US")} units available · Alert at ${threshold}` : "No stock record yet. Set an opening quantity to start tracking."}</p>
                     </div>
@@ -103,7 +103,7 @@ export default async function InventoryPage({ searchParams }: { searchParams: Pr
                       <div><label className={label} htmlFor={`sku-${product.id}`}>SKU</label><input id={`sku-${product.id}`} name="sku" maxLength={80} defaultValue={stock?.sku ?? ""} placeholder="Optional" className={input} /></div>
                       <div><label className={label} htmlFor={`qty-${product.id}`}>Quantity</label><input id={`qty-${product.id}`} name="quantity" type="number" min="0" max="100000000" step="1" required defaultValue={stock?.stock_quantity ?? 0} className={input} /></div>
                       <div><label className={label} htmlFor={`threshold-${product.id}`}>Low-stock alert</label><input id={`threshold-${product.id}`} name="threshold" type="number" min="0" max="100000000" step="1" required defaultValue={stock?.low_stock_threshold ?? 5} className={input} /></div>
-                      <AdminSubmitButton pendingLabel="Saving stock…" className="col-span-2 min-h-11 rounded-xl bg-[#0b5b48] px-4 text-sm font-extrabold text-white transition hover:bg-[#084b3c] disabled:cursor-wait disabled:opacity-70 sm:col-span-1">Save stock</AdminSubmitButton>
+                      <AdminSubmitButton pendingLabel="Saving stock…" className="col-span-2 min-h-11 rounded-xl bg-[#2755d6] px-4 text-sm font-extrabold text-white transition hover:bg-[#1b3068] disabled:cursor-wait disabled:opacity-70 sm:col-span-1">Save stock</AdminSubmitButton>
                     </form>
                   </article>
                 );
@@ -115,7 +115,7 @@ export default async function InventoryPage({ searchParams }: { searchParams: Pr
 
         <section className="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white">
           <div className="border-b border-slate-100 px-5 py-5 sm:px-6">
-            <p className="text-[10px] font-extrabold uppercase tracking-[.18em] text-emerald-700">Audit trail</p>
+            <p className="text-[10px] font-extrabold uppercase tracking-[.18em] text-brand-700">Audit trail</p>
             <h2 className="mt-1 text-xl font-extrabold">Recent stock movements</h2>
             <p className="mt-1 text-xs text-slate-500">Latest 50 opening, adjustment and order deductions.</p>
           </div>
@@ -123,14 +123,14 @@ export default async function InventoryPage({ searchParams }: { searchParams: Pr
             <div className="overflow-x-auto">
               <table className="w-full min-w-[720px] text-left text-sm">
                 <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500"><tr><th className="px-5 py-3">Product</th><th className="px-5 py-3">Movement</th><th className="px-5 py-3">Change</th><th className="px-5 py-3">Before → After</th><th className="px-5 py-3">Note</th><th className="px-5 py-3">Date</th></tr></thead>
-                <tbody className="divide-y divide-slate-100">{(movements ?? []).map((movement) => <tr key={movement.id}><td className="px-5 py-3 font-semibold">{firstRow(movement.products)?.title ?? "Product"}</td><td className="px-5 py-3 capitalize">{movement.movement_type.replace("_", " ")}</td><td className={`px-5 py-3 font-bold tabular-nums ${movement.quantity_change < 0 ? "text-rose-700" : "text-emerald-700"}`}>{movement.quantity_change > 0 ? "+" : ""}{movement.quantity_change}</td><td className="px-5 py-3 tabular-nums">{movement.quantity_before} → {movement.quantity_after}</td><td className="max-w-56 truncate px-5 py-3 text-slate-500">{movement.note ?? "—"}</td><td className="whitespace-nowrap px-5 py-3 text-slate-500">{new Date(movement.created_at).toLocaleString("en-GB")}</td></tr>)}</tbody>
+                <tbody className="divide-y divide-slate-100">{(movements ?? []).map((movement) => <tr key={movement.id}><td className="px-5 py-3 font-semibold">{firstRow(movement.products)?.title ?? "Product"}</td><td className="px-5 py-3 capitalize">{movement.movement_type.replace("_", " ")}</td><td className={`px-5 py-3 font-bold tabular-nums ${movement.quantity_change < 0 ? "text-rose-700" : "text-brand-700"}`}>{movement.quantity_change > 0 ? "+" : ""}{movement.quantity_change}</td><td className="px-5 py-3 tabular-nums">{movement.quantity_before} → {movement.quantity_after}</td><td className="max-w-56 truncate px-5 py-3 text-slate-500">{movement.note ?? "—"}</td><td className="whitespace-nowrap px-5 py-3 text-slate-500">{new Date(movement.created_at).toLocaleString("en-GB")}</td></tr>)}</tbody>
               </table>
             </div>
           )}
         </section>
 
         <section className="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white">
-          <div className="border-b border-slate-100 px-5 py-5 sm:px-6"><p className="text-[10px] font-extrabold uppercase tracking-[.18em] text-emerald-700">Pricing audit</p><h2 className="mt-1 text-xl font-extrabold">Recent price changes</h2></div>
+          <div className="border-b border-slate-100 px-5 py-5 sm:px-6"><p className="text-[10px] font-extrabold uppercase tracking-[.18em] text-brand-700">Pricing audit</p><h2 className="mt-1 text-xl font-extrabold">Recent price changes</h2></div>
           {(priceHistory ?? []).length === 0 ? <p className="px-6 py-8 text-sm text-slate-500">No product price changes recorded yet.</p> : (
             <div className="overflow-x-auto"><table className="w-full min-w-[680px] text-left text-sm"><thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500"><tr><th className="px-5 py-3">Product</th><th className="px-5 py-3">Old price</th><th className="px-5 py-3">New price</th><th className="px-5 py-3">Mode</th><th className="px-5 py-3">Date</th></tr></thead><tbody className="divide-y divide-slate-100">{(priceHistory ?? []).map((entry) => <tr key={entry.id}><td className="px-5 py-3 font-semibold">{firstRow(entry.products)?.title ?? "Product"}</td><td className="px-5 py-3 tabular-nums">{entry.old_price == null ? "—" : `৳${Number(entry.old_price).toFixed(2)}`}</td><td className="px-5 py-3 font-bold tabular-nums">৳{Number(entry.new_price).toFixed(2)}</td><td className="px-5 py-3 capitalize">{entry.pricing_mode}</td><td className="whitespace-nowrap px-5 py-3 text-slate-500">{new Date(entry.created_at).toLocaleString("en-GB")}</td></tr>)}</tbody></table></div>
           )}

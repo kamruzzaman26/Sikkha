@@ -73,7 +73,7 @@ function TreeNode({
         </span>
         <Link
           href={`/admin/categories?edit=${node.id}#edit`}
-          className="text-sm font-semibold text-emerald-800 hover:underline"
+          className="text-sm font-semibold text-brand-800 hover:underline"
         >
           Edit
         </Link>
@@ -161,9 +161,9 @@ export default async function AdminCategoriesPage({
   };
 
   return (
-    <main lang="en" className="mx-auto min-h-screen max-w-[1500px] bg-[#f3f6f5] px-4 py-6 text-slate-900 sm:px-7 sm:py-8 xl:px-10">
+    <main lang="en" className="mx-auto min-h-screen max-w-[1500px] bg-[#f4f6fa] px-4 py-6 text-slate-900 sm:px-7 sm:py-8 xl:px-10">
       <header className="min-w-0">
-        <p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-800">Catalog control</p>
+        <p className="text-xs font-bold uppercase tracking-[0.14em] text-brand-800">Catalog control</p>
         <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900">
           Category Management
         </h1>
@@ -177,7 +177,7 @@ export default async function AdminCategoriesPage({
         <p
           role="status"
           className={`mt-5 rounded-xl px-4 py-3 text-sm ${
-            isError ? "bg-amber-50 text-amber-950" : "bg-emerald-50 text-emerald-950"
+            isError ? "bg-amber-50 text-amber-950" : "bg-brand-50 text-brand-950"
           }`}
         >
           {message}
@@ -236,7 +236,7 @@ export default async function AdminCategoriesPage({
           </div>
           <button
             type="submit"
-            className="min-h-11 rounded-lg bg-emerald-700 px-5 font-bold text-white hover:bg-emerald-800"
+            className="min-h-11 rounded-lg bg-brand-700 px-5 font-bold text-white hover:bg-brand-800"
           >
             Add Categories
           </button>
@@ -252,7 +252,7 @@ export default async function AdminCategoriesPage({
       {editing && (
         <section
           id="edit"
-          className="mt-6 rounded-xl border border-emerald-200 bg-white p-4 sm:p-6"
+          className="mt-6 rounded-xl border border-brand-200 bg-white p-4 sm:p-6"
         >
           <div className="flex items-center justify-between gap-3">
             <h2 className="text-lg font-bold">Edit: {editing.name}</h2>
@@ -305,7 +305,7 @@ export default async function AdminCategoriesPage({
               </label>
             </div>
             <div className="sm:col-span-2">
-              <button type="submit" className="min-h-11 rounded-lg bg-emerald-700 px-5 font-bold text-white hover:bg-emerald-800">
+              <button type="submit" className="min-h-11 rounded-lg bg-brand-700 px-5 font-bold text-white hover:bg-brand-800">
                 Save Changes
               </button>
             </div>

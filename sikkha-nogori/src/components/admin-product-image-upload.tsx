@@ -34,7 +34,7 @@ export function ProductImageUpload({ initialUrl = "", idPrefix }: { initialUrl?:
     <div className="flex flex-wrap items-center gap-3">
       {url ? <img src={url} alt="Product cover preview" className="h-24 w-20 rounded-lg border border-slate-200 object-cover" /> : <div className="flex h-24 w-20 items-center justify-center rounded-lg bg-slate-100 text-xs text-slate-500">No image</div>}
       <div className="min-w-0 flex-1">
-        <input ref={inputRef} id={`${idPrefix}-image-file`} type="file" accept="image/jpeg,image/png,image/webp" disabled={busy} onChange={(e) => upload(e.target.files?.[0])} className="block w-full text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-emerald-50 file:px-3 file:py-2 file:font-semibold file:text-emerald-800" />
+        <input ref={inputRef} id={`${idPrefix}-image-file`} type="file" accept="image/jpeg,image/png,image/webp" disabled={busy} onChange={(e) => upload(e.target.files?.[0])} className="block w-full text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-brand-50 file:px-3 file:py-2 file:font-semibold file:text-brand-800" />
         <p className="mt-1 text-xs text-slate-500">{busy ? "ছবি আপলোড হচ্ছে…" : "JPG, PNG বা WebP · সর্বোচ্চ ৫ MB"}</p>
         {error && <p role="alert" className="mt-1 text-xs text-rose-700">{error}</p>}
       </div>

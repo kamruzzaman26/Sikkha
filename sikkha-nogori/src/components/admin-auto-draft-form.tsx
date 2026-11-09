@@ -68,7 +68,7 @@ export function AdminAutoDraftForm({
   }, [storageKey]);
 
   return <form ref={formRef} action={action} className={className}>
-    <p className="mb-1 text-xs font-medium text-emerald-700" aria-live="polite">Auto Draft: তথ্য এই ব্রাউজারে স্বয়ংক্রিয়ভাবে সংরক্ষিত হবে।</p>
+    <p className="mb-1 text-xs font-medium text-brand-700" aria-live="polite">Auto Draft: তথ্য এই ব্রাউজারে স্বয়ংক্রিয়ভাবে সংরক্ষিত হবে।</p>
     {children}
   </form>;
 }

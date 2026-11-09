@@ -1,23 +1,23 @@
 import type { MetadataRoute } from "next";
-import { getPublicSiteOrigin } from "@/lib/supabase/env";
+import { connection } from "next/server";
+import { getSiteSettings, resolveSiteOrigin } from "@/lib/site-settings";
 
-export default function robots(): MetadataRoute.Robots {
-  const origin = getPublicSiteOrigin();
+export default async function robots(): Promise<MetadataRoute.Robots> {
+  await connection();
+  const { seo } = await getSiteSettings();
+  const origin = resolveSiteOrigin(seo);
+
+  // "Allow search indexing" switched off in Admin → SEO: ask crawlers to stay away.
+  if (!seo.index) {
+    return { rules: { userAgent: "*", disallow: "/" } };
+  }
 
   return {
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow: [
-        "/admin",
-        "/account",
-        "/dashboard",
-        "/checkout",
-        "/login",
-        "/register",
-        "/api/",
-      ],
+      disallow: ["/admin", "/account", "/dashboard", "/checkout", "/cart", "/login", "/register", "/api/", "/r/"],
     },
-    sitemap: `${origin}/sitemap.xml`,
+    ...(origin ? { sitemap: `${origin}/sitemap.xml` } : {}),
   };
 }

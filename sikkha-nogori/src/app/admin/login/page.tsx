@@ -26,13 +26,13 @@ async function AdminLoginContent({
       : undefined;
 
   return (
-    <main lang="en" className="flex min-h-screen items-center justify-center bg-[#edf4f1] px-5 py-10 text-slate-900">
+    <main lang="en" className="flex min-h-screen items-center justify-center bg-[#eef2f8] px-5 py-10 text-slate-900">
       <section className="w-full max-w-md rounded-[28px] border border-white bg-white p-7 shadow-[0_24px_70px_-35px_rgba(7,60,50,0.35)] sm:p-9">
-        <Link href="/" className="font-semibold text-emerald-700">
+        <Link href="/" className="font-semibold text-brand-700">
           ← Back to Sikkha Nogori
         </Link>
 
-        <p className="mt-8 text-[11px] font-extrabold uppercase tracking-[0.2em] text-emerald-700">
+        <p className="mt-8 text-[11px] font-extrabold uppercase tracking-[0.2em] text-brand-700">
           ADMIN PORTAL
         </p>
         <h1 className="mt-2 text-3xl font-black tracking-tight text-slate-950">Admin Login</h1>
@@ -87,7 +87,7 @@ async function AdminLoginContent({
 
           <button
             type="submit"
-            className="mt-2 min-h-12 rounded-xl bg-[#0a5748] px-4 py-3 font-bold text-white shadow-lg shadow-emerald-900/10 transition hover:bg-[#073c32] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700"
+            className="mt-2 min-h-12 rounded-xl bg-[#1f44ae] px-4 py-3 font-bold text-white shadow-lg shadow-brand-900/10 transition hover:bg-[#0f172a] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700"
           >
             Sign in
           </button>

@@ -174,7 +174,7 @@ export function AdminBookImport() {
   return (
     <section
       aria-labelledby="book-import-heading"
-      className="mt-8 rounded-2xl border border-emerald-100 bg-white p-5 shadow-sm sm:p-7"
+      className="mt-8 rounded-2xl border border-brand-100 bg-white p-5 shadow-sm sm:p-7"
     >
       <h2 id="book-import-heading" className="text-xl font-bold">
         Bulk Import Products (CSV)
@@ -207,14 +207,14 @@ export function AdminBookImport() {
             accept=".csv,text/csv"
             disabled={busy}
             onChange={handleFileChange}
-            className="block min-h-11 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm file:mr-3 file:rounded-md file:border-0 file:bg-emerald-50 file:px-3 file:py-1 file:font-semibold file:text-emerald-800"
+            className="block min-h-11 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm file:mr-3 file:rounded-md file:border-0 file:bg-brand-50 file:px-3 file:py-1 file:font-semibold file:text-brand-800"
           />
         </div>
         <button
           type="button"
           disabled={busy}
           onClick={handlePreview}
-          className="min-h-11 rounded-lg bg-emerald-700 px-5 py-2.5 text-sm font-bold text-white hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-60"
+          className="min-h-11 rounded-lg bg-brand-700 px-5 py-2.5 text-sm font-bold text-white hover:bg-brand-800 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {busy ? "Validating…" : "Preview & Validate"}
         </button>
@@ -235,7 +235,7 @@ export function AdminBookImport() {
           type="button"
           disabled={busy}
           onClick={handleConfirm}
-          className="mt-5 min-h-11 rounded-lg bg-emerald-800 px-5 py-2.5 text-sm font-bold text-white hover:bg-emerald-900 disabled:cursor-not-allowed disabled:opacity-60"
+          className="mt-5 min-h-11 rounded-lg bg-brand-800 px-5 py-2.5 text-sm font-bold text-white hover:bg-brand-900 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {busy ? "Importing…" : "Confirm Import of Valid Rows"}
         </button>

@@ -110,7 +110,7 @@ function ProductForm({
   primaryCategoryId?: string;
 }) {
   const inputClass =
-    "w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5";
+    "w-full min-h-11 rounded-lg border border-slate-300 bg-white px-3 text-sm";
 
   return (
     <AdminAutoDraftForm draftKey={product?.id ?? idPrefix} action={saveProduct} className="grid gap-4">
@@ -119,7 +119,7 @@ function ProductForm({
         <div>
           <label
             htmlFor={`${idPrefix}-title`}
-            className="mb-2 block text-sm font-semibold text-slate-700"
+            className="mb-1.5 block text-sm font-semibold text-slate-800"
           >
             Name
           </label>
@@ -135,7 +135,7 @@ function ProductForm({
         <div>
           <label
             htmlFor={`${idPrefix}-slug`}
-            className="mb-2 block text-sm font-semibold text-slate-700"
+            className="mb-1.5 block text-sm font-semibold text-slate-800"
           >
             URL slug (lowercase letters and hyphens)
           </label>
@@ -155,7 +155,7 @@ function ProductForm({
         <div>
           <label
             htmlFor={`${idPrefix}-type`}
-            className="mb-2 block text-sm font-semibold text-slate-700"
+            className="mb-1.5 block text-sm font-semibold text-slate-800"
           >
             Type
           </label>
@@ -176,7 +176,7 @@ function ProductForm({
         <div>
           <label
             htmlFor={`${idPrefix}-category`}
-            className="mb-2 block text-sm font-semibold text-slate-700"
+            className="mb-1.5 block text-sm font-semibold text-slate-800"
           >
             Category
           </label>
@@ -194,7 +194,7 @@ function ProductForm({
         <div>
           <label
             htmlFor={`${idPrefix}-commerce-mode`}
-            className="mb-2 block text-sm font-semibold text-slate-700"
+            className="mb-1.5 block text-sm font-semibold text-slate-800"
           >
             Sales Type
           </label>
@@ -215,7 +215,7 @@ function ProductForm({
         <div>
           <label
             htmlFor={`${idPrefix}-price`}
-            className="mb-2 block text-sm font-semibold text-slate-700"
+            className="mb-1.5 block text-sm font-semibold text-slate-800"
           >
             Price (৳)
           </label>
@@ -236,14 +236,14 @@ function ProductForm({
           </p>
         </div>
       <div className="grid gap-4 md:grid-cols-3">
-        <div><label htmlFor={`${idPrefix}-cost-price`} className="mb-2 block text-sm font-semibold text-slate-700">Purchase / Cost Price (৳)</label><input id={`${idPrefix}-cost-price`} name="costPrice" type="number" min="0" max="9999999999.99" step="0.01" defaultValue={product?.cost_price ?? ""} className={inputClass} /></div>
-        <div><label htmlFor={`${idPrefix}-pricing-mode`} className="mb-2 block text-sm font-semibold text-slate-700">Pricing Mode</label><select id={`${idPrefix}-pricing-mode`} name="pricingMode" defaultValue={product?.pricing_mode ?? "manual"} className={inputClass}><option value="manual">Manual price</option><option value="automatic">Automatic from cost</option></select></div>
-        <div><label htmlFor={`${idPrefix}-markup`} className="mb-2 block text-sm font-semibold text-slate-700">Profit Markup (%)</label><input id={`${idPrefix}-markup`} name="markupPercent" type="number" min="0" max="10000" step="0.01" defaultValue={product?.markup_percent ?? 0} className={inputClass} /><p className="mt-1 text-xs text-slate-500">Automatic price = cost × (1 + markup ÷ 100).</p></div>
+        <div><label htmlFor={`${idPrefix}-cost-price`} className="mb-1.5 block text-sm font-semibold text-slate-800">Purchase / Cost Price (৳)</label><input id={`${idPrefix}-cost-price`} name="costPrice" type="number" min="0" max="9999999999.99" step="0.01" defaultValue={product?.cost_price ?? ""} className={inputClass} /></div>
+        <div><label htmlFor={`${idPrefix}-pricing-mode`} className="mb-1.5 block text-sm font-semibold text-slate-800">Pricing Mode</label><select id={`${idPrefix}-pricing-mode`} name="pricingMode" defaultValue={product?.pricing_mode ?? "manual"} className={inputClass}><option value="manual">Manual price</option><option value="automatic">Automatic from cost</option></select></div>
+        <div><label htmlFor={`${idPrefix}-markup`} className="mb-1.5 block text-sm font-semibold text-slate-800">Profit Markup (%)</label><input id={`${idPrefix}-markup`} name="markupPercent" type="number" min="0" max="10000" step="0.01" defaultValue={product?.markup_percent ?? 0} className={inputClass} /><p className="mt-1 text-xs text-slate-500">Automatic price = cost × (1 + markup ÷ 100).</p></div>
       </div>
         <div>
           <label
             htmlFor={`${idPrefix}-list-price`}
-            className="mb-2 block text-sm font-semibold text-slate-700"
+            className="mb-1.5 block text-sm font-semibold text-slate-800"
           >
             List Price (৳, optional)
           </label>
@@ -267,7 +267,7 @@ function ProductForm({
         <div>
           <label
             htmlFor={`${idPrefix}-edition`}
-            className="mb-2 block text-sm font-semibold text-slate-700"
+            className="mb-1.5 block text-sm font-semibold text-slate-800"
           >
             Edition (optional)
           </label>
@@ -282,7 +282,7 @@ function ProductForm({
         <div>
           <label
             htmlFor={`${idPrefix}-isbn`}
-            className="mb-2 block text-sm font-semibold text-slate-700"
+            className="mb-1.5 block text-sm font-semibold text-slate-800"
           >
             ISBN (optional)
           </label>
@@ -297,7 +297,7 @@ function ProductForm({
         <div>
           <label
             htmlFor={`${idPrefix}-pageCount`}
-            className="mb-2 block text-sm font-semibold text-slate-700"
+            className="mb-1.5 block text-sm font-semibold text-slate-800"
           >
             Page Count (optional)
           </label>
@@ -312,7 +312,7 @@ function ProductForm({
         <div>
           <label
             htmlFor={`${idPrefix}-language`}
-            className="mb-2 block text-sm font-semibold text-slate-700"
+            className="mb-1.5 block text-sm font-semibold text-slate-800"
           >
             Language (optional)
           </label>
@@ -327,7 +327,7 @@ function ProductForm({
         <div>
           <label
             htmlFor={`${idPrefix}-country`}
-            className="mb-2 block text-sm font-semibold text-slate-700"
+            className="mb-1.5 block text-sm font-semibold text-slate-800"
           >
             Country (optional)
           </label>
@@ -342,7 +342,7 @@ function ProductForm({
         <div>
           <label
             htmlFor={`${idPrefix}-weightKg`}
-            className="mb-2 block text-sm font-semibold text-slate-700"
+            className="mb-1.5 block text-sm font-semibold text-slate-800"
           >
             Weight (kg, optional)
           </label>
@@ -360,7 +360,7 @@ function ProductForm({
         <div>
           <label
             htmlFor={`${idPrefix}-author`}
-            className="mb-2 block text-sm font-semibold text-slate-700"
+            className="mb-1.5 block text-sm font-semibold text-slate-800"
           >
             Author or Brand
           </label>
@@ -375,7 +375,7 @@ function ProductForm({
         <div>
           <label
             htmlFor={`${idPrefix}-publisher`}
-            className="mb-2 block text-sm font-semibold text-slate-700"
+            className="mb-1.5 block text-sm font-semibold text-slate-800"
           >
             Publisher or Brand
           </label>
@@ -398,7 +398,7 @@ function ProductForm({
             Categories (select multiple)
           </legend>
           <details className="mt-1" open={selectedCategoryIds.length === 0}>
-            <summary className="cursor-pointer text-sm font-semibold text-emerald-800">
+            <summary className="cursor-pointer text-sm font-semibold text-brand-800">
               {selectedCategoryIds.length} selected — Open list
             </summary>
             <div className="mt-3 max-h-72 space-y-1 overflow-y-auto rounded-lg border border-slate-100 p-2">
@@ -444,7 +444,7 @@ function ProductForm({
       <div>
         <label
           htmlFor={`${idPrefix}-description`}
-          className="mb-2 block text-sm font-semibold text-slate-700"
+          className="mb-1.5 block text-sm font-semibold text-slate-800"
         >
           Description
         </label>
@@ -464,12 +464,12 @@ function ProductForm({
           name="isPublished"
           value="true"
           defaultChecked={product?.is_published ?? false}
-          className="size-4 rounded border-slate-300 text-emerald-700"
+          className="size-4 rounded border-slate-300 text-brand-700"
         />
         Publish in public catalog
       </label>
 
-      <AdminSubmitButton pendingLabel="Saving product…" className="w-fit rounded-lg bg-emerald-700 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-emerald-800">{product ? "Update Product" : "Add Product"}</AdminSubmitButton>
+      <AdminSubmitButton pendingLabel="Saving product…" className="min-h-11 w-fit rounded-xl bg-brand-700 px-5 text-sm font-semibold text-white transition hover:bg-brand-800">{product ? "Update Product" : "Add Product"}</AdminSubmitButton>
     </AdminAutoDraftForm>
   );
 }
@@ -658,11 +658,11 @@ async function AdminContent({
   );
 
   return (
-    <main lang="en" className="min-h-screen bg-[#f3f7f5] px-4 py-6 text-slate-900 sm:px-7 sm:py-8 xl:px-10">
+    <main lang="en" className="min-h-screen bg-[#f4f6fa] px-4 py-6 text-slate-900 sm:px-7 sm:py-8 xl:px-10">
       <div className="mx-auto max-w-[1500px]">
         <header className="flex flex-wrap items-end justify-between gap-4">
           <div className="min-w-0">
-            <p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-800">Catalog</p>
+            <p className="text-xs font-bold uppercase tracking-[0.14em] text-brand-800">Catalog</p>
             <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900">
               Products &amp; Affiliate Links
             </h1>
@@ -697,43 +697,41 @@ async function AdminContent({
               { href: "/admin/affiliates", label: "Affiliate Accounts", icon: "affiliates" as const, note: "Manage partner accounts" },
               { href: "/admin/users", label: "Manage Users", icon: "customers" as const, note: "View customer accounts" },
             ].map((action) => (
-              <Link key={action.href} href={action.href} className="group flex min-h-[92px] items-center gap-4 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-[0_8px_24px_-20px_rgba(15,55,42,0.45)] transition hover:-translate-y-0.5 hover:border-emerald-300 hover:shadow-lg">
-                <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-800 transition group-hover:bg-[#0a5748] group-hover:text-white"><AdminIcon name={action.icon} /></span>
+              <Link key={action.href} href={action.href} className="group flex min-h-[92px] items-center gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-lg">
+                <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-800 transition group-hover:bg-[#1f44ae] group-hover:text-white"><AdminIcon name={action.icon} /></span>
                 <span className="min-w-0">
                   <span className="block text-sm font-extrabold text-slate-900">{action.label}</span>
                   <span className="mt-1 block text-xs text-slate-500">{action.note}</span>
                 </span>
-                <span className="ml-auto text-lg text-slate-300 transition group-hover:translate-x-1 group-hover:text-emerald-700">→</span>
+                <span className="ml-auto text-lg text-slate-300 transition group-hover:translate-x-1 group-hover:text-brand-700">→</span>
               </Link>
             ))}
           </section>
         )}
 
         {role === "admin" && (
-          <section aria-label="Catalog overview" className="mt-7 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_8px_24px_-20px_rgba(15,55,42,0.45)]">
-              <p className="text-sm text-slate-600">Total Products</p>
-              <p className="mt-1 text-2xl font-extrabold tabular-nums">{products.length}</p>
-            </div>
-            <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_8px_24px_-20px_rgba(15,55,42,0.45)]">
-              <p className="text-sm text-slate-600">Published Products</p>
-              <p className="mt-1 text-2xl font-extrabold tabular-nums">{products.filter((product) => product.is_published && !product.archived_at).length}</p>
-            </div>
-            <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_8px_24px_-20px_rgba(15,55,42,0.45)]">
-              <p className="text-sm text-slate-600">Draft Products</p>
-              <p className="mt-1 text-2xl font-extrabold tabular-nums">{products.filter((product) => !product.is_published && !product.archived_at).length}</p>
-            </div>
-            <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_8px_24px_-20px_rgba(15,55,42,0.45)]">
-              <p className="text-sm text-slate-600">Active Affiliate Links</p>
-              <p className="mt-1 text-2xl font-extrabold tabular-nums">{links.filter((link) => link.is_active).length}</p>
-            </div>
+          <section aria-label="Catalog overview" className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            {[
+              { label: "Total products", value: products.length, icon: "products" as const },
+              { label: "Published products", value: products.filter((product) => product.is_published && !product.archived_at).length, icon: "view" as const },
+              { label: "Draft products", value: products.filter((product) => !product.is_published && !product.archived_at).length, icon: "edit" as const },
+              { label: "Active affiliate links", value: links.filter((link) => link.is_active).length, icon: "affiliates" as const },
+            ].map((card) => (
+              <div key={card.label} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                <div className="flex items-center justify-between gap-3">
+                  <p className="text-sm font-semibold text-slate-600">{card.label}</p>
+                  <span className="flex size-10 items-center justify-center rounded-xl bg-brand-50 text-brand-700"><AdminIcon name={card.icon} /></span>
+                </div>
+                <p className="mt-4 text-3xl font-bold tracking-tight tabular-nums text-slate-900">{card.value}</p>
+              </div>
+            ))}
           </section>
         )}
 
         {statusMessage && (
           <p
             role="status"
-            className="mt-6 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 font-medium text-emerald-900"
+            className="mt-6 rounded-xl border border-brand-200 bg-brand-50 px-4 py-3 font-medium text-brand-900"
           >
             {statusMessage}
           </p>
@@ -744,7 +742,7 @@ async function AdminContent({
         {role === "admin" && (
         <section
           id="product-catalog"
-          className="mt-7 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_8px_30px_-18px_rgba(15,55,42,0.22)] sm:p-7"
+          className="mt-7 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6"
         >
           <h2 className="text-xl font-bold">Product Catalog</h2>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
@@ -753,11 +751,12 @@ async function AdminContent({
           </p>
 
           {role === "admin" && (
-            <details className="mt-5 rounded-xl border border-slate-200 p-4">
-              <summary className="cursor-pointer font-bold text-emerald-900">
-                Add a Product to Catalog
+            <details className="group mt-5 rounded-xl border border-slate-200 bg-white open:bg-slate-50/70">
+              <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 px-4 text-sm font-semibold text-brand-800 [&::-webkit-details-marker]:hidden">
+                <span className="inline-flex items-center gap-2"><AdminIcon name="add" className="size-4" />Add a product to catalog</span>
+                <AdminIcon name="chevron" className="size-4 transition group-open:rotate-180" />
               </summary>
-              <div className="mt-4">
+              <div className="border-t border-slate-200 p-4">
                 <ProductForm
                   idPrefix="new-product"
                   productTypes={productTypes}
@@ -771,12 +770,12 @@ async function AdminContent({
             action="/admin"
             method="get"
             role="search"
-            className="mt-5 grid gap-3 rounded-xl bg-slate-50 p-4 sm:grid-cols-[minmax(0,1fr)_9rem_9rem_9rem_auto] sm:items-end"
+            className="mt-5 grid gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4 sm:grid-cols-[minmax(0,1fr)_9rem_9rem_9rem_auto] sm:items-end"
           >
             <div>
               <label
                 htmlFor="admin-product-query"
-                className="mb-2 block text-sm font-semibold text-slate-700"
+                className="mb-1.5 block text-sm font-semibold text-slate-800"
               >
                 Search name, slug, category, author, publisher, or description
               </label>
@@ -785,13 +784,13 @@ async function AdminContent({
                 name="productQuery"
                 type="search"
                 defaultValue={productQueryInput}
-                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5"
+                className="w-full min-h-11 rounded-lg border border-slate-300 bg-white px-3 text-sm"
               />
             </div>
             <div>
               <label
                 htmlFor="admin-product-type"
-                className="mb-2 block text-sm font-semibold text-slate-700"
+                className="mb-1.5 block text-sm font-semibold text-slate-800"
               >
                 Product Type
               </label>
@@ -799,7 +798,7 @@ async function AdminContent({
                 id="admin-product-type"
                 name="productTypeFilter"
                 defaultValue={productTypeFilter}
-                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5"
+                className="w-full min-h-11 rounded-lg border border-slate-300 bg-white px-3 text-sm"
               >
                 <option value="all">All Types</option>
                 {productTypes.map((type) => (
@@ -812,7 +811,7 @@ async function AdminContent({
             <div>
               <label
                 htmlFor="admin-product-archive"
-                className="mb-2 block text-sm font-semibold text-slate-700"
+                className="mb-1.5 block text-sm font-semibold text-slate-800"
               >
                 Archive Status
               </label>
@@ -820,7 +819,7 @@ async function AdminContent({
                 id="admin-product-archive"
                 name="archivedFilter"
                 defaultValue={archivedFilter}
-                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5"
+                className="w-full min-h-11 rounded-lg border border-slate-300 bg-white px-3 text-sm"
               >
                 <option value="all">All Products</option>
                 <option value="active">Not Archived</option>
@@ -830,7 +829,7 @@ async function AdminContent({
             <div>
               <label
                 htmlFor="admin-product-publication"
-                className="mb-2 block text-sm font-semibold text-slate-700"
+                className="mb-1.5 block text-sm font-semibold text-slate-800"
               >
                 Publication Status
               </label>
@@ -838,7 +837,7 @@ async function AdminContent({
                 id="admin-product-publication"
                 name="publicationFilter"
                 defaultValue={publicationFilter}
-                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5"
+                className="w-full min-h-11 rounded-lg border border-slate-300 bg-white px-3 text-sm"
               >
                 <option value="all">All Statuses</option>
                 <option value="published">Published</option>
@@ -847,14 +846,14 @@ async function AdminContent({
             </div>
             <button
               type="submit"
-              className="min-h-11 rounded-lg bg-emerald-700 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-emerald-800"
+              className="min-h-11 rounded-xl bg-brand-700 px-5 text-sm font-semibold text-white transition hover:bg-brand-800"
             >
               Apply Filters
             </button>
             {hasProductFilters && (
               <Link
                 href="/admin#product-catalog"
-                className="min-h-11 content-center text-sm font-semibold text-emerald-800 underline underline-offset-2 sm:col-span-full"
+                className="min-h-11 content-center text-sm font-semibold text-brand-800 underline underline-offset-2 sm:col-span-full"
               >
                 Clear Filters
               </Link>
@@ -865,133 +864,104 @@ async function AdminContent({
             Showing {filteredProducts.length} products · {products.length} total
           </p>
 
-          <div className="mt-6 grid gap-5 lg:grid-cols-2">
+          <div className="mt-6 grid gap-8">
             {productGroups.map(({ slug, title, entries }) => (
               <section key={slug} aria-label={`${title} catalog`}>
-                <h3 className="font-bold">
-                  {title} · {entries.length}
-                </h3>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-base font-bold text-slate-900">{title}</h3>
+                  <span className="inline-flex h-6 min-w-6 items-center justify-center rounded-full bg-slate-100 px-2 text-xs font-bold text-slate-700">{entries.length}</span>
+                </div>
                 {entries.length === 0 ? (
-                  <p className="mt-2 rounded-lg bg-slate-50 px-3 py-4 text-sm text-slate-600">
+                  <p className="mt-3 rounded-xl border border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-center text-sm text-slate-600">
                     {hasProductFilters
                       ? `No ${title} match the selected filters.`
                       : `No ${title} have been added yet.`}
                   </p>
                 ) : (
-                  <ul className="mt-3 grid gap-3">
-                    {entries.map((product) => (
-                      <li
-                        key={product.id}
-                        className="rounded-xl border border-slate-200 p-4"
-                      >
-                        <div className="mb-3 flex flex-wrap justify-between gap-2">
-                          <p className="font-semibold">
-                            {product.title}{" "}
-                            <span className="font-normal text-slate-500">
-                              · {product.slug}
-                            </span>
-                          </p>
-                          <span className="text-xs font-bold text-slate-600">
-                            {product.archived_at
-                              ? "Archived"
-                              : product.is_published
-                                ? "Published"
-                                : "Draft"}
-                            {product.commerce_mode
-                              ? ` · ${
-                                  product.commerce_mode === "affiliate"
-                                    ? "affiliate"
-                                    : "Direct sale"
-                                }`
-                              : " · Sales type required"}
-                          </span>
-                        </div>
-                        <article
-                          aria-label={`${product.title} product preview`}
-                          className="mt-3 flex max-w-sm gap-3 rounded-xl border border-slate-200 bg-white p-3"
-                        >
-                          {product.image_url ? (
-                            <Image
-                              src={product.image_url}
-                              alt={`${product.title} cover image`}
-                              width={72}
-                              height={96}
-                              unoptimized
-                              className="h-24 w-[4.5rem] shrink-0 rounded-lg bg-slate-100 object-cover"
-                            />
-                          ) : (
-                            <div
-                              role="img"
-                              aria-label={`${product.title} image unavailable`}
-                              className="flex h-24 w-[4.5rem] shrink-0 items-center justify-center rounded-lg bg-emerald-50 px-1 text-center text-xs text-emerald-900"
-                            >
-                              No image
+                  <ul className="mt-3 divide-y divide-slate-100 overflow-hidden rounded-xl border border-slate-200 bg-white">
+                    {entries.map((product) => {
+                      const state = product.archived_at ? "Archived" : product.is_published ? "Published" : "Draft";
+                      const stateClass = product.archived_at
+                        ? "bg-slate-200 text-slate-800"
+                        : product.is_published
+                          ? "bg-green-100 text-green-800"
+                          : "bg-amber-100 text-amber-900";
+                      const channel = product.commerce_mode
+                        ? product.commerce_mode === "affiliate"
+                          ? { label: "Affiliate", className: "bg-violet-100 text-violet-800" }
+                          : { label: "Direct sale", className: "bg-sky-100 text-sky-800" }
+                        : { label: "Sales type required", className: "bg-rose-100 text-rose-800" };
+                      return (
+                        <li key={product.id} className="p-4 sm:p-5">
+                          <div className="flex gap-4">
+                            {product.image_url ? (
+                              <Image
+                                src={product.image_url}
+                                alt={`${product.title} cover image`}
+                                width={56}
+                                height={76}
+                                unoptimized
+                                className="h-[76px] w-14 shrink-0 rounded-lg bg-slate-100 object-cover"
+                              />
+                            ) : (
+                              <div
+                                role="img"
+                                aria-label={`${product.title} image unavailable`}
+                                className="flex h-[76px] w-14 shrink-0 items-center justify-center rounded-lg border border-dashed border-slate-300 bg-slate-50 px-1 text-center text-[10px] font-semibold leading-3 text-slate-500"
+                              >
+                                No image
+                              </div>
+                            )}
+                            <div className="min-w-0 flex-1">
+                              <div className="flex flex-wrap items-center gap-2">
+                                <p className="font-semibold text-slate-900">{product.title}</p>
+                                <span className={`inline-flex h-6 items-center rounded-full px-2.5 text-xs font-semibold ${stateClass}`}>{state}</span>
+                                <span className={`inline-flex h-6 items-center rounded-full px-2.5 text-xs font-semibold ${channel.className}`}>{channel.label}</span>
+                              </div>
+                              {product.category && (
+                                <p className="mt-1 text-sm font-medium text-brand-700">{product.category}</p>
+                              )}
+                              {(product.author || product.publisher) && (
+                                <p className="mt-0.5 line-clamp-1 text-sm text-slate-600">
+                                  {[product.author, product.publisher].filter(Boolean).join(" · ")}
+                                </p>
+                              )}
+                              <p className="mt-1 break-all font-mono text-xs text-slate-500">{product.slug}</p>
+                            </div>
+                          </div>
+                          {role === "admin" && (
+                            <div className="mt-4 flex flex-wrap items-start gap-2">
+                              <details className="group min-w-0 flex-1 basis-64 rounded-xl border border-slate-200 bg-white open:bg-slate-50/70">
+                                <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 px-4 text-sm font-semibold text-brand-800 [&::-webkit-details-marker]:hidden">
+                                  <span className="inline-flex items-center gap-2"><AdminIcon name="edit" className="size-4" />Edit product details</span>
+                                  <AdminIcon name="chevron" className="size-4 transition group-open:rotate-180" />
+                                </summary>
+                                <div className="border-t border-slate-200 p-4">
+                                  <ProductForm
+                                    product={product}
+                                    idPrefix={`product-${product.id}`}
+                                    productTypes={productTypes}
+                                    categoryOptions={categoryOptions}
+                                    selectedCategoryIds={selectedByProduct.get(product.id) ?? []}
+                                    primaryCategoryId={primaryByProduct.get(product.id) ?? ""}
+                                  />
+                                </div>
+                              </details>
+                              <form action={setProductArchiveStatus} className="shrink-0">
+                                <input type="hidden" name="id" value={product.id} />
+                                <input type="hidden" name="archive" value={product.archived_at ? "false" : "true"} />
+                                <AdminSubmitButton
+                                  pendingLabel={product.archived_at ? "Restoring…" : "Archiving…"}
+                                  className="min-h-11 rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                                >
+                                  {product.archived_at ? "Restore from archive" : "Archive product"}
+                                </AdminSubmitButton>
+                              </form>
                             </div>
                           )}
-                          <div className="min-w-0">
-                            {product.category && (
-                              <p className="text-xs font-semibold text-emerald-700">
-                                {product.category}
-                              </p>
-                            )}
-                            <p className="mt-1 line-clamp-2 font-bold">
-                              {product.title}
-                            </p>
-                            {(product.author || product.publisher) && (
-                              <p className="mt-1 line-clamp-1 text-xs text-slate-500">
-                                {[product.author, product.publisher]
-                                  .filter(Boolean)
-                                  .join(" · ")}
-                              </p>
-                            )}
-                          </div>
-                        </article>
-                        {role === "admin" && (
-                          <>
-                            <details>
-                              <summary className="cursor-pointer text-sm font-semibold text-emerald-800">
-                                Edit
-                              </summary>
-                              <div className="mt-4">
-                                <ProductForm
-                                  product={product}
-                                  idPrefix={`product-${product.id}`}
-                                  productTypes={productTypes}
-                                  categoryOptions={categoryOptions}
-                                  selectedCategoryIds={
-                                    selectedByProduct.get(product.id) ?? []
-                                  }
-                                  primaryCategoryId={
-                                    primaryByProduct.get(product.id) ?? ""
-                                  }
-                                />
-                              </div>
-                            </details>
-                            <form
-                              action={setProductArchiveStatus}
-                              className="mt-3"
-                            >
-                              <input
-                                type="hidden"
-                                name="id"
-                                value={product.id}
-                              />
-                              <input
-                                type="hidden"
-                                name="archive"
-                                value={product.archived_at ? "false" : "true"}
-                              />
-                              <AdminSubmitButton
-                                pendingLabel={product.archived_at ? "Restoring…" : "Archiving…"}
-                                className="min-h-11 rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
-                              >
-                                {product.archived_at ? "Restore from Archive" : "Archive Product"}
-                              </AdminSubmitButton>
-                            </form>
-                          </>
-                        )}
-                      </li>
-                    ))}
+                        </li>
+                      );
+                    })}
                   </ul>
                 )}
               </section>
@@ -1001,7 +971,7 @@ async function AdminContent({
         )}
 
         {role === "admin" && (
-          <section className="mt-7 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_8px_30px_-18px_rgba(15,55,42,0.22)] sm:p-7">
+          <section className="mt-7 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
             <h2 className="text-xl font-bold">Add Product Type</h2>
             <p className="mt-2 text-sm leading-6 text-slate-600">
               New types become available in product forms. Types already in use
@@ -1014,7 +984,7 @@ async function AdminContent({
               <div>
                 <label
                   htmlFor="new-product-type-label"
-                  className="mb-2 block text-sm font-semibold text-slate-700"
+                  className="mb-1.5 block text-sm font-semibold text-slate-800"
                 >
                   Type Name
                 </label>
@@ -1023,13 +993,13 @@ async function AdminContent({
                   name="label"
                   required
                   maxLength={120}
-                  className="w-full rounded-lg border border-slate-300 px-3 py-2.5"
+                  className="w-full min-h-11 rounded-lg border border-slate-300 bg-white px-3 text-sm"
                 />
               </div>
               <div>
                 <label
                   htmlFor="new-product-type-slug"
-                  className="mb-2 block text-sm font-semibold text-slate-700"
+                  className="mb-1.5 block text-sm font-semibold text-slate-800"
                 >
                   URL slug
                 </label>
@@ -1039,12 +1009,12 @@ async function AdminContent({
                   required
                   maxLength={80}
                   pattern="[a-z0-9]+(?:-[a-z0-9]+)*"
-                  className="w-full rounded-lg border border-slate-300 px-3 py-2.5"
+                  className="w-full min-h-11 rounded-lg border border-slate-300 bg-white px-3 text-sm"
                 />
               </div>
               <button
                 type="submit"
-                className="min-h-11 rounded-lg bg-emerald-700 px-4 py-2.5 text-sm font-bold text-white hover:bg-emerald-800"
+                className="min-h-11 rounded-xl bg-brand-700 px-5 text-sm font-semibold text-white hover:bg-brand-800"
               >
                 Add Type
               </button>
@@ -1052,7 +1022,7 @@ async function AdminContent({
           </section>
         )}
 
-        <section className="mt-7 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_8px_30px_-18px_rgba(15,55,42,0.22)] sm:p-7">
+        <section className="mt-7 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
           <h2 className="text-xl font-bold">Create Affiliate Link</h2>
           {affiliateProducts.length === 0 ? (
             <p className="mt-4 rounded-xl bg-amber-50 px-4 py-3 leading-6 text-amber-900">
@@ -1064,7 +1034,7 @@ async function AdminContent({
                 <div>
                   <label
                     htmlFor="new-product"
-                    className="mb-2 block text-sm font-semibold text-slate-700"
+                    className="mb-1.5 block text-sm font-semibold text-slate-800"
                   >
                     Product
                   </label>
@@ -1073,7 +1043,7 @@ async function AdminContent({
                     name="productId"
                     required
                     defaultValue=""
-                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5"
+                    className="w-full min-h-11 rounded-lg border border-slate-300 bg-white px-3 text-sm"
                   >
                     <option value="" disabled>
                       Select a product
@@ -1089,7 +1059,7 @@ async function AdminContent({
                 <div>
                   <label
                     htmlFor="new-partner"
-                    className="mb-2 block text-sm font-semibold text-slate-700"
+                    className="mb-1.5 block text-sm font-semibold text-slate-800"
                   >
                     Affiliate Partner
                   </label>
@@ -1098,7 +1068,7 @@ async function AdminContent({
                     name="partner"
                     required
                     defaultValue=""
-                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5"
+                    className="w-full min-h-11 rounded-lg border border-slate-300 bg-white px-3 text-sm"
                   >
                     <option value="" disabled>
                       Select a partner
@@ -1115,7 +1085,7 @@ async function AdminContent({
               <div>
                 <label
                   htmlFor="new-url"
-                  className="mb-2 block text-sm font-semibold text-slate-700"
+                  className="mb-1.5 block text-sm font-semibold text-slate-800"
                 >
                   Approved Affiliate URL (HTTPS)
                 </label>
@@ -1127,13 +1097,13 @@ async function AdminContent({
                   required
                   maxLength={2048}
                   placeholder="https://..."
-                  className="w-full rounded-lg border border-slate-300 px-3 py-2.5"
+                  className="w-full min-h-11 rounded-lg border border-slate-300 bg-white px-3 text-sm"
                 />
               </div>
 
               <button
                 type="submit"
-                className="w-fit rounded-lg bg-emerald-700 px-5 py-2.5 font-bold text-white transition hover:bg-emerald-800"
+                className="w-fit min-h-11 rounded-xl bg-brand-700 px-5 text-sm font-semibold text-white transition hover:bg-brand-800"
               >
                 Create Link
               </button>
@@ -1141,170 +1111,147 @@ async function AdminContent({
           )}
         </section>
 
-        <section className="mt-8">
-          <div className="flex flex-wrap items-end justify-between gap-3">
-            <div>
-              <h2 className="text-xl font-bold">Saved Affiliate Links</h2>
-              <p className="mt-1 text-sm text-slate-600">
-                {links.length} links total
-              </p>
-            </div>
+        <section className="mt-7 rounded-2xl border border-slate-200 bg-white shadow-sm">
+          <div className="px-5 pt-5 sm:px-6 sm:pt-6">
+            <h2 className="text-xl font-bold">Saved Affiliate Links</h2>
+            <p className="mt-1 text-sm text-slate-600">{links.length} links total</p>
           </div>
 
           {links.length === 0 ? (
-            <p className="mt-4 rounded-2xl border border-dashed border-slate-300 bg-white px-5 py-10 text-center text-slate-600">
+            <p className="m-5 rounded-xl border border-dashed border-slate-300 bg-slate-50 px-5 py-10 text-center text-slate-600 sm:m-6">
               No affiliate links have been created yet.
             </p>
           ) : (
-            <ul className="mt-4 grid gap-4">
+            <ul className="mt-4 divide-y divide-slate-100 border-t border-slate-100">
               {links.map((link) => {
                 const partnerName = getPartnerName(link.partner);
+                // A many-to-one embed returns one object, not an array.
+                const embedded = link.products as
+                  | { title?: string }
+                  | { title?: string }[]
+                  | null
+                  | undefined;
+                const embeddedTitle = Array.isArray(embedded) ? embedded[0]?.title : embedded?.title;
+                const linkedTitle =
+                  embeddedTitle ??
+                  products.find((p) => p.id === link.product_id)?.title ??
+                  "Product not found";
 
                 return (
-                  <li
-                    key={link.id}
-                    className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_8px_24px_-20px_rgba(15,55,42,0.45)] sm:p-6"
-                  >
-                    <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-                      <div>
-                        <h3 className="font-bold">
-                          {(() => {
-                            // A many-to-one embed returns one object, not an array.
-                            const embedded = link.products as
-                              | { title?: string }
-                              | { title?: string }[]
-                              | null
-                              | undefined;
-                            const embeddedTitle = Array.isArray(embedded)
-                              ? embedded[0]?.title
-                              : embedded?.title;
-                            return (
-                              embeddedTitle ??
-                              products.find((p) => p.id === link.product_id)?.title ??
-                              "Product not found"
-                            );
-                          })()}
-                        </h3>
-                        <p className="mt-1 break-all text-sm text-slate-600">
-                          {partnerName ?? "Select a partner"} · {link.url}
-                        </p>
+                  <li key={link.id} className="px-5 py-4 sm:px-6">
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
+                      <div className="min-w-0 flex-1 basis-64">
+                        <p className="font-semibold text-slate-900">{linkedTitle}</p>
+                        <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-slate-600">
+                          <span className="rounded-md bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-700">
+                            {partnerName ?? "No partner"}
+                          </span>
+                          {link.url.startsWith("https://") ? (
+                            <a
+                              href={link.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="min-w-0 max-w-full truncate font-mono text-xs text-brand-700 hover:underline"
+                            >
+                              {link.url}
+                            </a>
+                          ) : (
+                            <span className="min-w-0 max-w-full truncate font-mono text-xs">{link.url}</span>
+                          )}
+                        </div>
                       </div>
                       <span
-                        className={`rounded-full px-3 py-1 text-sm font-bold ${
-                          link.is_active
-                            ? "bg-emerald-100 text-emerald-800"
-                            : "bg-slate-100 text-slate-600"
+                        className={`inline-flex h-6 items-center rounded-full px-2.5 text-xs font-semibold ${
+                          link.is_active ? "bg-green-100 text-green-800" : "bg-slate-200 text-slate-700"
                         }`}
                       >
                         {link.is_active ? "Active" : "Inactive"}
                       </span>
+                      <form action={setAffiliateLinkStatus}>
+                        <input type="hidden" name="id" value={link.id} />
+                        <input type="hidden" name="isActive" value={link.is_active ? "false" : "true"} />
+                        <button
+                          type="submit"
+                          className="min-h-11 rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                        >
+                          {link.is_active ? "Deactivate" : "Activate"}
+                        </button>
+                      </form>
                     </div>
 
-                    <form
-                      action={saveAffiliateLink}
-                      className="grid gap-4 border-t border-slate-100 pt-4"
-                    >
-                      <input type="hidden" name="id" value={link.id} />
-                      <div className="grid gap-4 md:grid-cols-2">
-                        <div>
-                          <label
-                            htmlFor={`product-${link.id}`}
-                            className="mb-2 block text-sm font-semibold text-slate-700"
-                          >
-                            Products
-                          </label>
-                          <select
-                            id={`product-${link.id}`}
-                            name="productId"
-                            required
-                            defaultValue={link.product_id}
-                            className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5"
-                          >
-                            {products.map((product) => (
-                              <option key={product.id} value={product.id}>
-                                {product.product_type === "course"
-                                  ? "Course"
-                                  : "Book"}
-                                : {product.title} · {product.slug}
+                    <details className="group mt-3 rounded-xl border border-slate-200 bg-white open:bg-slate-50/70">
+                      <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 px-4 text-sm font-semibold text-brand-800 [&::-webkit-details-marker]:hidden">
+                        <span className="inline-flex items-center gap-2"><AdminIcon name="edit" className="size-4" />Edit link</span>
+                        <AdminIcon name="chevron" className="size-4 transition group-open:rotate-180" />
+                      </summary>
+                      <form action={saveAffiliateLink} className="grid gap-4 border-t border-slate-200 p-4">
+                        <input type="hidden" name="id" value={link.id} />
+                        <div className="grid gap-4 md:grid-cols-2">
+                          <div>
+                            <label htmlFor={`product-${link.id}`} className="mb-1.5 block text-sm font-semibold text-slate-800">
+                              Products
+                            </label>
+                            <select
+                              id={`product-${link.id}`}
+                              name="productId"
+                              required
+                              defaultValue={link.product_id}
+                              className="w-full min-h-11 rounded-lg border border-slate-300 bg-white px-3 text-sm"
+                            >
+                              {products.map((product) => (
+                                <option key={product.id} value={product.id}>
+                                  {product.product_type === "course" ? "Course" : "Book"}: {product.title} · {product.slug}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                          <div>
+                            <label htmlFor={`partner-${link.id}`} className="mb-1.5 block text-sm font-semibold text-slate-800">
+                              Affiliate Partner
+                            </label>
+                            <select
+                              id={`partner-${link.id}`}
+                              name="partner"
+                              required
+                              defaultValue={link.partner ?? ""}
+                              className="w-full min-h-11 rounded-lg border border-slate-300 bg-white px-3 text-sm"
+                            >
+                              <option value="" disabled>
+                                Select a partner
                               </option>
-                            ))}
-                          </select>
-                        </div>
-
-                        <div>
-                          <label
-                            htmlFor={`partner-${link.id}`}
-                            className="mb-2 block text-sm font-semibold text-slate-700"
-                          >
-                            Affiliate Partner
-                          </label>
-                          <select
-                            id={`partner-${link.id}`}
-                            name="partner"
-                            required
-                            defaultValue={link.partner ?? ""}
-                            className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5"
-                          >
-                            <option value="" disabled>
-                              Select a partner
-                            </option>
-                            {Object.entries(partnerNames).map(
-                              ([value, name]) => (
+                              {Object.entries(partnerNames).map(([value, name]) => (
                                 <option key={value} value={value}>
                                   {name}
                                 </option>
-                              ),
-                            )}
-                          </select>
+                              ))}
+                            </select>
+                          </div>
                         </div>
-                      </div>
-
-                      <div>
-                        <label
-                          htmlFor={`url-${link.id}`}
-                          className="mb-2 block text-sm font-semibold text-slate-700"
-                        >
-                          Affiliate URL (HTTPS)
-                        </label>
-                        <input
-                          id={`url-${link.id}`}
-                          name="url"
-                          type="url"
-                          inputMode="url"
-                          required
-                          maxLength={2048}
-                          defaultValue={link.url}
-                          className="w-full rounded-lg border border-slate-300 px-3 py-2.5"
-                        />
-                      </div>
-
-                      <div className="flex flex-wrap gap-3">
-                        <button
-                          type="submit"
-                          className="rounded-lg bg-emerald-700 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-emerald-800"
-                        >
-                          Save Changes
-                        </button>
-                      </div>
-                    </form>
-
-                    <form
-                      action={setAffiliateLinkStatus}
-                      className="mt-3"
-                    >
-                      <input type="hidden" name="id" value={link.id} />
-                      <input
-                        type="hidden"
-                        name="isActive"
-                        value={link.is_active ? "false" : "true"}
-                      />
-                      <button
-                        type="submit"
-                        className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
-                      >
-                        {link.is_active ? "Deactivate" : "Activate"}
-                      </button>
-                    </form>
+                        <div>
+                          <label htmlFor={`url-${link.id}`} className="mb-1.5 block text-sm font-semibold text-slate-800">
+                            Affiliate URL (HTTPS)
+                          </label>
+                          <input
+                            id={`url-${link.id}`}
+                            name="url"
+                            type="url"
+                            inputMode="url"
+                            required
+                            maxLength={2048}
+                            defaultValue={link.url}
+                            className="w-full min-h-11 rounded-lg border border-slate-300 bg-white px-3 text-sm"
+                          />
+                        </div>
+                        <div>
+                          <button
+                            type="submit"
+                            className="min-h-11 rounded-xl bg-brand-700 px-5 text-sm font-semibold text-white transition hover:bg-brand-800"
+                          >
+                            Save changes
+                          </button>
+                        </div>
+                      </form>
+                    </details>
                   </li>
                 );
               })}
@@ -1322,7 +1269,7 @@ export default function AdminPage({
   return (
     <Suspense
       fallback={
-        <main lang="en" className="min-h-screen bg-[#f3f7f5] px-5 py-10 text-slate-900 sm:px-8 sm:py-14">
+        <main lang="en" className="min-h-screen bg-[#f4f6fa] px-5 py-10 text-slate-900 sm:px-8 sm:py-14">
           <div className="mx-auto max-w-5xl animate-pulse rounded-2xl bg-white p-8">
             <div className="h-8 w-64 rounded bg-slate-100" />
             <div className="mt-8 h-40 rounded-xl bg-slate-100" />

@@ -150,14 +150,24 @@ function CategoryGlyph({ name }: { name: string }) {
 const iconButtonClass =
   "inline-flex size-11 shrink-0 items-center justify-center rounded-xl text-slate-700 transition hover:bg-emerald-50 hover:text-emerald-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700";
 
+type TopBar = {
+  helpline: string;
+  note: string;
+  brandName?: string;
+  tagline?: string;
+  logoUrl?: string;
+  announcement?: string;
+  announcementLink?: string;
+};
+
 export function SiteHeader({
   identity,
   categoryMenu = { books: [], products: [] },
-  topBar = { helpline: "", note: "" },
+  topBar = { helpline: "", note: "" } as TopBar,
 }: {
   identity: SiteIdentity;
   categoryMenu?: CategoryMenu;
-  topBar?: { helpline: string; note: string };
+  topBar?: TopBar;
 }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
@@ -252,6 +262,15 @@ export function SiteHeader({
   return (
     <>
       <header className="sticky top-0 z-30 border-b border-emerald-100 bg-white/95 shadow-sm backdrop-blur">
+        {topBar.announcement && (
+          <div className="bg-amber-100 px-4 py-2 text-center text-[13px] font-semibold text-amber-950">
+            {topBar.announcementLink ? (
+              <Link href={topBar.announcementLink} className="hover:underline">{topBar.announcement} →</Link>
+            ) : (
+              <span>{topBar.announcement}</span>
+            )}
+          </div>
+        )}
         {/* Slim top bar (desktop): only links to pages that exist; no unverified claims. */}
         <div className="hidden bg-emerald-800 text-[11px] text-white sm:block">
           <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-1 lg:px-8">
@@ -287,16 +306,23 @@ export function SiteHeader({
               aria-label="Sikkha Nogori — Home"
               className="flex min-w-0 items-center gap-2 rounded-xl p-1 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700"
             >
-              <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[#006b4f] text-base font-extrabold text-white">
-                শি
-              </span>
+              {topBar.logoUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={topBar.logoUrl} alt="" className="size-10 shrink-0 rounded-xl object-contain" />
+              ) : (
+                <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[#006b4f] text-base font-extrabold text-white">
+                  {(topBar.brandName || "শিক্ষা নগরী").slice(0, 1)}
+                </span>
+              )}
               <span className="min-w-0">
                 <span className="block truncate text-base font-extrabold leading-tight text-[#064b3b] sm:text-lg">
-                  শিক্ষা নগরী
+                  {topBar.brandName || "শিক্ষা নগরী"}
                 </span>
-                <span className="hidden text-[11px] font-medium text-slate-500 min-[390px]:block">
-                  Sikkha Nogori
-                </span>
+                {(topBar.tagline || !topBar.brandName) && (
+                  <span className="hidden max-w-[16rem] truncate text-[11px] font-medium text-slate-500 min-[390px]:block">
+                    {topBar.tagline || "Sikkha Nogori"}
+                  </span>
+                )}
               </span>
             </Link>
           </div>

@@ -87,10 +87,10 @@ export default async function ReportsPage() {
   ];
 
   return (
-    <main lang="en" className="min-h-screen bg-[#f3f6f5] px-4 py-6 text-slate-900 sm:px-7 sm:py-8 xl:px-10">
+    <main lang="en" className="min-h-screen bg-[#f4f6fa] px-4 py-6 text-slate-900 sm:px-7 sm:py-8 xl:px-10">
       <div className="mx-auto max-w-[1500px]">
         <header className="min-w-0">
-          <p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-800">Business intelligence</p>
+          <p className="text-xs font-bold uppercase tracking-[0.14em] text-brand-800">Business intelligence</p>
           <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900">Reports &amp; Analytics</h1>
           <p className="mt-1.5 max-w-2xl text-[15px] leading-6 text-slate-600">
             Live summaries from orders, catalog and publishing data.
@@ -102,7 +102,7 @@ export default async function ReportsPage() {
             <article key={card.label} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
               <div className="flex items-center justify-between gap-3">
                 <p className="text-sm font-semibold text-slate-600">{card.label}</p>
-                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-800">
+                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50 text-brand-800">
                   <Icon name={card.icon} />
                 </span>
               </div>
@@ -130,7 +130,7 @@ export default async function ReportsPage() {
                   </div>
                   <div className="mt-2 h-2 rounded-full bg-slate-100">
                     <div
-                      className="h-2 rounded-full bg-emerald-700"
+                      className="h-2 rounded-full bg-brand-700"
                       style={{ width: `${Math.max(4, (total / grand) * 100)}%` }}
                     />
                   </div>
@@ -139,7 +139,7 @@ export default async function ReportsPage() {
             </ul>
           ) : (
             <div className="mt-5 flex flex-col items-center gap-3 rounded-xl border border-dashed border-slate-300 bg-slate-50 px-4 py-10 text-center">
-              <span className="flex h-14 w-14 items-center justify-center rounded-full bg-emerald-50 text-emerald-800">
+              <span className="flex h-14 w-14 items-center justify-center rounded-full bg-brand-50 text-brand-800">
                 <Icon name="chart" className="h-6 w-6" />
               </span>
               <p className="text-base font-bold">No paid orders recorded yet</p>
