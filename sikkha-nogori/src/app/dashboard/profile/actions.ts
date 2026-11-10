@@ -18,14 +18,15 @@ export async function updateCustomerProfile(formData: FormData) {
   const validDate = !dateOfBirth || (/^\d{4}-\d{2}-\d{2}$/.test(dateOfBirth) && !Number.isNaN(Date.parse(`${dateOfBirth}T00:00:00.000Z`)) && new Date(`${dateOfBirth}T00:00:00.000Z`).toISOString().slice(0, 10) === dateOfBirth && dateOfBirth <= new Date().toISOString().slice(0, 10));
   if (!displayName || displayName.length > 100 || !validDate || !validGender) redirect("/dashboard/profile?status=invalid");
 
-  const { error } = await supabase.from("profiles").update({
+  const { data: updatedProfile, error } = await supabase.from("profiles").update({
     display_name: displayName,
     date_of_birth: dateOfBirth || null,
     gender: gender || null,
     updated_at: new Date().toISOString(),
-  }).eq("id", user.id);
+  }).eq("id", user.id).select("id, date_of_birth, gender").maybeSingle();
 
   if (error) throw new Error("Unable to update your profile.", { cause: error });
+  if (!updatedProfile) throw new Error("Your profile record was not found, so the changes could not be saved.");
   revalidatePath("/dashboard");
   revalidatePath("/dashboard/profile");
   redirect("/dashboard/profile?status=saved");
