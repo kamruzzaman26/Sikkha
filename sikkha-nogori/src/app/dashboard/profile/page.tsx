@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { connection } from "next/server";
 import { updateCustomerProfile, updateCustomerPassword } from "./actions";
 import { ProfileDetailsForm } from "./profile-details-form";
+import { ProfileAvatarUploader } from "./profile-avatar-uploader";
 import { requireCustomer } from "@/lib/supabase/auth";
 
 export const metadata: Metadata = {
@@ -24,7 +25,7 @@ async function ProfileContent({ searchParams }: { searchParams: Promise<{ status
   const { supabase, user } = await requireCustomer();
   const params = await searchParams;
   const status = Array.isArray(params.status) ? params.status[0] : params.status;
-  const { data: profile, error } = await supabase.from("profiles").select("display_name, date_of_birth, gender").eq("id", user.id).maybeSingle();
+  const { data: profile, error } = await supabase.from("profiles").select("display_name, date_of_birth, gender, avatar_url").eq("id", user.id).maybeSingle();
   if (error) throw new Error("Unable to load your profile.", { cause: error });
   const name = profile?.display_name?.trim() || "Your Name";
   const email = user.email || user.phone || "Not provided";
@@ -41,7 +42,7 @@ async function ProfileContent({ searchParams }: { searchParams: Promise<{ status
         {message && <p role="status" className={`mb-5 rounded-xl border px-4 py-3 text-sm font-semibold ${status?.startsWith("password") && status !== "password" || status === "invalid" ? "border-amber-200 bg-amber-50 text-amber-800" : "border-green-200 bg-green-50 text-green-800"}`}>{message}</p>}
         <div className="grid gap-5 lg:grid-cols-[280px_minmax(0,1fr)]">
           <aside className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-            <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-blue-50 text-4xl font-bold text-blue-700">{name.charAt(0).toUpperCase()}</div>
+            <ProfileAvatarUploader userId={user.id} avatarUrl={profile?.avatar_url ?? null} />
             <h2 className="mt-4 text-center text-xl font-extrabold">{name}</h2><p className="mt-1 break-all text-center text-sm text-slate-500">{email}</p>
             <div className="mt-6 rounded-xl bg-green-50 p-4"><div className="flex items-center justify-between text-sm font-bold text-green-800"><span>Profile Completion</span><span>{completion}%</span></div><div className="mt-3 h-2 overflow-hidden rounded-full bg-green-100"><div className="h-full rounded-full bg-green-600" style={{ width: completion + "%" }} /></div><p className="mt-2 text-xs text-green-800">{completion === 100 ? "Your available profile details are complete." : "Add your name, date of birth, gender, and email to complete your profile."}</p></div>
             <div className="mt-5 space-y-2 border-t border-slate-100 pt-4 text-sm"><p className="font-semibold text-slate-700">✓ Active account</p><p className="text-slate-500">Signed in securely</p></div>
