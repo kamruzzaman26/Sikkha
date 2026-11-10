@@ -241,7 +241,7 @@ async function BookDetails({
           ) : book.commerceMode === "affiliate" && availableAffiliateLinks.length > 0 ? (
             <section aria-label="Purchase options" className="mt-4 space-y-2">
               {availableAffiliateLinks.map((affiliateLink) => <a key={affiliateLink.id} href={affiliateLink.url} target="_blank" rel="sponsored nofollow noopener noreferrer" className={`${buyButtonClass} w-full`}><CartIcon />{partnerBuyLabel(affiliateLink.partner)}</a>)}
-              <p className="text-xs leading-5 text-slate-500">This is an affiliate link; check the price on the seller's site. <Link href="/affiliate-disclosure" className="font-semibold text-emerald-800 underline">Details</Link></p>
+              <p className="text-xs leading-5 text-slate-500">This is an affiliate link; check the price on the seller&apos;s site. <Link href="/affiliate-disclosure" className="font-semibold text-emerald-800 underline">Details</Link></p>
             </section>
           ) : (
             <p className="mt-4 rounded-lg bg-slate-50 px-4 py-3 text-sm text-slate-600">{book.productId ? "এই পণ্যের জন্য বর্তমানে কোনো যাচাইকৃত কেনার লিংক নেই।" : "এটি নমুনা বই; বর্তমানে সরাসরি অর্ডার করা যাচ্ছে না।"}</p>
