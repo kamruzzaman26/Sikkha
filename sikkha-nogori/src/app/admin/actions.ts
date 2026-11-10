@@ -602,6 +602,35 @@ async function syncProductEntityRelations(
       if (error) throw new Error(`Unable to save product ${config.kind}.`, { cause: error });
     }
   }
+
+  // Keep legacy public product-detail fields in sync with the selected primary
+  // author/publisher so existing storefront components continue to display them.
+  const legacyValues: Record<string, string | null> = {};
+  const primaryAuthorId = selections.authors.includes(primaryIds.authors)
+    ? primaryIds.authors
+    : selections.authors[0];
+  const primaryPublisherId = selections.publishers.includes(primaryIds.publishers)
+    ? primaryIds.publishers
+    : selections.publishers[0];
+
+  if (primaryAuthorId) {
+    const { data, error } = await db.from("authors").select("name").eq("id", primaryAuthorId).maybeSingle();
+    if (error) throw new Error("Unable to load the primary author.", { cause: error });
+    legacyValues.author = data?.name ?? null;
+  }
+  if (primaryPublisherId) {
+    const { data, error } = await db.from("publishers").select("name").eq("id", primaryPublisherId).maybeSingle();
+    if (error) throw new Error("Unable to load the primary publisher.", { cause: error });
+    legacyValues.publisher = data?.name ?? null;
+  }
+
+  if (Object.keys(legacyValues).length > 0) {
+    const { error } = await supabase
+      .from("products")
+      .update({ ...legacyValues, updated_at: new Date().toISOString() })
+      .eq("id", productId);
+    if (error) throw new Error("Unable to synchronize legacy product details.", { cause: error });
+  }
 }
 
 async function syncProductCategories(
