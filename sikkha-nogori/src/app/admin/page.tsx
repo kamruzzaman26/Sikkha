@@ -97,6 +97,59 @@ type ProductFormValue = {
 };
 
 type CategoryOption = { id: string; label: string; group: string };
+type EntityKind = "authors" | "publishers" | "brands" | "creators";
+type EntityOption = { id: string; name: string };
+type EntityOptions = Record<EntityKind, EntityOption[]>;
+type EntitySelections = Record<EntityKind, string[]>;
+type EntityPrimaries = Record<EntityKind, string>;
+
+function EntitySelector({
+  kind,
+  label,
+  options,
+  selectedIds,
+  primaryId,
+  idPrefix,
+}: {
+  kind: EntityKind;
+  label: string;
+  options: EntityOption[];
+  selectedIds: string[];
+  primaryId: string;
+  idPrefix: string;
+}) {
+  const inputName = `${kind}Ids`;
+  const primaryName = `${kind}PrimaryId`;
+  return (
+    <fieldset className="rounded-xl border border-slate-200 p-4">
+      <legend className="px-1 text-sm font-semibold text-slate-800">{label}</legend>
+      {options.length === 0 ? (
+        <p className="text-xs text-slate-500">No active entries. Add them in Catalog Entities.</p>
+      ) : (
+        <>
+          <div className="mt-2 grid max-h-48 gap-2 overflow-y-auto sm:grid-cols-2">
+            {options.map((option) => (
+              <label key={option.id} className="flex min-h-9 items-start gap-2 text-sm">
+                <input type="checkbox" name={inputName} value={option.id} defaultChecked={selectedIds.includes(option.id)} className="mt-1 size-4" />
+                <span>{option.name}</span>
+              </label>
+            ))}
+          </div>
+          <label className="mt-3 grid gap-1 text-xs font-semibold text-slate-600">
+            Primary {label.replace(/s$/, "")}
+            <select name={primaryName} defaultValue={primaryId} className="min-h-10 rounded-lg border border-slate-300 bg-white px-3 text-sm font-normal">
+              <option value="">First selected</option>
+              {options.filter((option) => selectedIds.includes(option.id)).map((option) => (
+                <option key={option.id} value={option.id}>{option.name}</option>
+              ))}
+            </select>
+          </label>
+        </>
+      )}
+      <input type="hidden" name="entityRelationsSubmitted" value="1" />
+    </fieldset>
+  );
+}
 
 function ProductForm({
   product,
@@ -105,6 +158,9 @@ function ProductForm({
   categoryOptions = [],
   selectedCategoryIds = [],
   primaryCategoryId = "",
+  entityOptions,
+  selectedEntityIds,
+  primaryEntityIds,
 }: {
   product?: ProductFormValue;
   idPrefix: string;
@@ -112,6 +168,9 @@ function ProductForm({
   categoryOptions?: CategoryOption[];
   selectedCategoryIds?: string[];
   primaryCategoryId?: string;
+  entityOptions: EntityOptions;
+  selectedEntityIds: EntitySelections;
+  primaryEntityIds: EntityPrimaries;
 }) {
   const inputClass =
     "w-full min-h-11 rounded-lg border border-slate-300 bg-white px-3 text-sm";
@@ -366,7 +425,7 @@ function ProductForm({
             htmlFor={`${idPrefix}-author`}
             className="mb-1.5 block text-sm font-semibold text-slate-800"
           >
-            Author or Brand
+            Legacy Author Text
           </label>
           <input
             id={`${idPrefix}-author`}
@@ -381,7 +440,7 @@ function ProductForm({
             htmlFor={`${idPrefix}-publisher`}
             className="mb-1.5 block text-sm font-semibold text-slate-800"
           >
-            Publisher or Brand
+            Legacy Publisher Text
           </label>
           <input
             id={`${idPrefix}-publisher`}
@@ -393,7 +452,30 @@ function ProductForm({
         </div>
       </div>
 
-      <ProductImageUpload idPrefix={idPrefix} initialUrl={product?.image_url ?? ""} />
+      <div className="grid gap-3">
+        <p className="text-sm font-semibold text-slate-800">Catalog Relationships</p>
+        <p className="text-xs text-slate-500">Select multiple entities and choose a primary entry where needed. Legacy text fields above remain for compatibility.</p>
+        <div className="grid gap-3 md:grid-cols-2">
+          {([
+            ["authors", "Authors"],
+            ["publishers", "Publishers"],
+            ["brands", "Brands"],
+            ["creators", "Creators / Instructors"],
+          ] as Array<[EntityKind, string]>).map(([kind, label]) => (
+            <EntitySelector
+              key={kind}
+              kind={kind}
+              label={label}
+              options={entityOptions[kind]}
+              selectedIds={selectedEntityIds[kind]}
+              primaryId={primaryEntityIds[kind]}
+              idPrefix={idPrefix}
+            />
+          ))}
+        </div>
+      </div>
+
+            <ProductImageUpload idPrefix={idPrefix} initialUrl={product?.image_url ?? ""} />
 
       {categoryOptions.length > 0 && (
         <fieldset className="rounded-xl border border-slate-200 p-4">
@@ -483,6 +565,7 @@ async function AdminContent({
 }: Pick<PageProps<"/admin">, "searchParams">) {
   await connection();
   const { supabase, role } = await requireAdmin("admin");
+  const db = supabase as unknown as { from: (table: string) => any };
   const [
     productsResult,
     linksResult,
@@ -490,6 +573,14 @@ async function AdminContent({
     productTypesResult,
     categoriesResult,
     productCategoriesResult,
+    authorsResult,
+    publishersResult,
+    brandsResult,
+    creatorsResult,
+    productAuthorsResult,
+    productPublishersResult,
+    productBrandsResult,
+    productCreatorsResult,
   ] = await Promise.all([
     supabase
       .from("products")
@@ -523,6 +614,14 @@ async function AdminContent({
       .from("product_categories")
       .select("product_id, category_id, is_primary")
       .limit(10000),
+    db.from("authors").select("id, name").eq("is_active", true).order("name"),
+    db.from("publishers").select("id, name").eq("is_active", true).order("name"),
+    db.from("brands").select("id, name").eq("is_active", true).order("name"),
+    db.from("creators").select("id, name").eq("is_active", true).order("name"),
+    db.from("product_authors").select("product_id, author_id, is_primary").limit(10000),
+    db.from("product_publishers").select("product_id, publisher_id, is_primary").limit(10000),
+    db.from("product_brands").select("product_id, brand_id, is_primary").limit(10000),
+    db.from("product_creators").select("product_id, creator_id, is_primary").limit(10000),
   ]);
 
   if (productsResult.error) {
@@ -539,6 +638,14 @@ async function AdminContent({
     throw new Error("Unable to load product types.", {
       cause: productTypesResult.error,
     });
+  }
+  const entityResults = [
+    authorsResult, publishersResult, brandsResult, creatorsResult,
+    productAuthorsResult, productPublishersResult, productBrandsResult, productCreatorsResult,
+  ];
+  const entityError = entityResults.find((result) => result.error)?.error;
+  if (entityError) {
+    throw new Error("Unable to load catalog relationships.", { cause: entityError });
   }
 
   if (categoriesResult.error || productCategoriesResult.error) {
@@ -569,6 +676,41 @@ async function AdminContent({
         label: `${groupLabelsForForm[row.category_group] ?? row.category_group} › ${names.join(" › ")}`,
       };
     });
+  const entityOptions: EntityOptions = {
+    authors: authorsResult.data ?? [],
+    publishers: publishersResult.data ?? [],
+    brands: brandsResult.data ?? [],
+    creators: creatorsResult.data ?? [],
+  };
+  const selectedEntityIds: EntitySelections = {
+    authors: [], publishers: [], brands: [], creators: [],
+  };
+  const primaryEntityIds: EntityPrimaries = {
+    authors: "", publishers: "", brands: "", creators: "",
+  };
+  const selectedEntitiesByProduct: Record<EntityKind, Map<string, string[]>> = {
+    authors: new Map(), publishers: new Map(), brands: new Map(), creators: new Map(),
+  };
+  const primaryEntitiesByProduct: Record<EntityKind, Map<string, string>> = {
+    authors: new Map(), publishers: new Map(), brands: new Map(), creators: new Map(),
+  };
+  const addEntityRelations = (
+    kind: EntityKind,
+    rows: Array<{ product_id: string; entity_id: string; is_primary: boolean }>,
+  ) => {
+    for (const row of rows) {
+      selectedEntitiesByProduct[kind].set(row.product_id, [
+        ...(selectedEntitiesByProduct[kind].get(row.product_id) ?? []),
+        row.entity_id,
+      ]);
+      if (row.is_primary) primaryEntitiesByProduct[kind].set(row.product_id, row.entity_id);
+    }
+  };
+  addEntityRelations("authors", (productAuthorsResult.data ?? []).map((row: any) => ({ product_id: row.product_id, entity_id: row.author_id, is_primary: row.is_primary })));
+  addEntityRelations("publishers", (productPublishersResult.data ?? []).map((row: any) => ({ product_id: row.product_id, entity_id: row.publisher_id, is_primary: row.is_primary })));
+  addEntityRelations("brands", (productBrandsResult.data ?? []).map((row: any) => ({ product_id: row.product_id, entity_id: row.brand_id, is_primary: row.is_primary })));
+  addEntityRelations("creators", (productCreatorsResult.data ?? []).map((row: any) => ({ product_id: row.product_id, entity_id: row.creator_id, is_primary: row.is_primary })));
+
   const selectedByProduct = new Map<string, string[]>();
   const primaryByProduct = new Map<string, string>();
   for (const link of productCategoriesResult.data ?? []) {
@@ -773,6 +915,9 @@ async function AdminContent({
                   idPrefix="new-product"
                   productTypes={productTypes}
                   categoryOptions={categoryOptions}
+                  entityOptions={entityOptions}
+                  selectedEntityIds={{ authors: [], publishers: [], brands: [], creators: [] }}
+                  primaryEntityIds={{ authors: "", publishers: "", brands: "", creators: "" }}
                 />
               </div>
             </details>
@@ -956,6 +1101,19 @@ async function AdminContent({
                                     categoryOptions={categoryOptions}
                                     selectedCategoryIds={selectedByProduct.get(product.id) ?? []}
                                     primaryCategoryId={primaryByProduct.get(product.id) ?? ""}
+                                    entityOptions={entityOptions}
+                                    selectedEntityIds={{
+                                      authors: selectedEntitiesByProduct.authors.get(product.id) ?? [],
+                                      publishers: selectedEntitiesByProduct.publishers.get(product.id) ?? [],
+                                      brands: selectedEntitiesByProduct.brands.get(product.id) ?? [],
+                                      creators: selectedEntitiesByProduct.creators.get(product.id) ?? [],
+                                    }}
+                                    primaryEntityIds={{
+                                      authors: primaryEntitiesByProduct.authors.get(product.id) ?? "",
+                                      publishers: primaryEntitiesByProduct.publishers.get(product.id) ?? "",
+                                      brands: primaryEntitiesByProduct.brands.get(product.id) ?? "",
+                                      creators: primaryEntitiesByProduct.creators.get(product.id) ?? "",
+                                    }}
                                   />
                                 </div>
                               </details>
