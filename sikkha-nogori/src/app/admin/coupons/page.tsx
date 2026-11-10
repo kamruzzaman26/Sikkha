@@ -60,6 +60,8 @@ export default async function CouponsPage({ searchParams }: { searchParams: Prom
   const { data, error } = await supabase.from("coupons").select("*").order("created_at", { ascending: false }).limit(200);
   if (error) throw new Error("Unable to load coupons.", { cause: error });
   const coupons = (data ?? []) as Coupon[];
+  // This is a request-time server-render value; the page is dynamic via connection().
+  // eslint-disable-next-line react-hooks/purity
   const now = Date.now();
   const bad = status === "invalid" || status === "duplicate";
 
