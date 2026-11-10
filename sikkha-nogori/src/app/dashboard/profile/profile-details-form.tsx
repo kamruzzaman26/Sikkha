@@ -54,7 +54,9 @@ export function ProfileDetailsForm({
   const [dirty, setDirty] = useState(false);
 
   useEffect(() => {
-    if (isSaved) setDirty(false);
+    if (!isSaved) return;
+    const frame = window.requestAnimationFrame(() => setDirty(false));
+    return () => window.cancelAnimationFrame(frame);
   }, [isSaved]);
 
   return (
