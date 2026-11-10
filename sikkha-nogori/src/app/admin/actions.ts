@@ -178,6 +178,7 @@ export async function saveAffiliateLink(formData: FormData) {
       .from("affiliate_links")
       .update({ ...values, updated_at: new Date().toISOString() })
       .eq("id", id)
+      .is("deleted_at", null)
       .select("id")
       .maybeSingle();
 
@@ -218,6 +219,7 @@ export async function setAffiliateLinkStatus(formData: FormData) {
       .from("affiliate_links")
       .select("partner, url, product_id")
       .eq("id", id)
+      .is("deleted_at", null)
       .maybeSingle();
 
     if (linkError) {
@@ -280,6 +282,7 @@ export async function setAffiliateLinkStatus(formData: FormData) {
       updated_at: new Date().toISOString(),
     })
     .eq("id", id)
+    .is("deleted_at", null)
     .select("id")
     .maybeSingle();
 
@@ -293,6 +296,341 @@ export async function setAffiliateLinkStatus(formData: FormData) {
   }
 
   finishAction(isActiveValue === "true" ? "activated" : "deactivated");
+}
+
+export async function softDeleteAffiliateLink(formData: FormData) {
+  const { supabase } = await requireAdmin("admin");
+  const id = getFormValue(formData, "id");
+  const reason = getFormValue(formData, "reason");
+
+  if (!isUuid(id) || reason.length > 300) {
+    redirect("/admin?status=invalid");
+  }
+
+  const { data: link, error: linkError } = await supabase
+    .from("affiliate_links")
+    .select("id, product_id, partner, deleted_at")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (linkError) {
+    throw new Error("Unable to verify the affiliate link before deletion.", {
+      cause: linkError,
+    });
+  }
+  if (!link || link.deleted_at) {
+    redirect("/admin?status=link-not-found");
+  }
+
+  const { data: { user } } = await supabase.auth.getUser();
+  const { error } = await supabase
+    .from("affiliate_links")
+    .update({
+      deleted_at: new Date().toISOString(),
+      deleted_by: user?.id ?? null,
+      delete_reason: reason || null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", id)
+    .is("deleted_at", null);
+
+  if (error) {
+    throw new Error("Unable to move the affiliate link to deleted items.", {
+      cause: error,
+    });
+  }
+
+  await logActivity(supabase, "affiliate_link_deleted", "affiliate_link", id, {
+    product_id: link.product_id,
+    partner: link.partner,
+    reason: reason || null,
+  });
+  finishAction("link-deleted");
+}
+
+export async function restoreAffiliateLink(formData: FormData) {
+  const { supabase } = await requireAdmin("admin");
+  const id = getFormValue(formData, "id");
+
+  if (!isUuid(id)) {
+    redirect("/admin?status=invalid");
+  }
+
+  const { data: link, error: linkError } = await supabase
+    .from("affiliate_links")
+    .select("id, product_id, partner, deleted_at")
+    .eq("id", id)
+    .not("deleted_at", "is", null)
+    .maybeSingle();
+
+  if (linkError) {
+    throw new Error("Unable to verify the deleted affiliate link.", {
+      cause: linkError,
+    });
+  }
+  if (!link) {
+    redirect("/admin?status=link-not-found");
+  }
+
+  const { error } = await supabase
+    .from("affiliate_links")
+    .update({
+      deleted_at: null,
+      deleted_by: null,
+      delete_reason: null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", id)
+    .not("deleted_at", "is", null);
+
+  if (error) {
+    throw new Error("Unable to restore the affiliate link.", { cause: error });
+  }
+
+  await logActivity(supabase, "affiliate_link_restored", "affiliate_link", id, {
+    product_id: link.product_id,
+    partner: link.partner,
+  });
+  finishAction("link-restored");
+}
+
+const catalogEntityTables = {
+  authors: "authors",
+  publishers: "publishers",
+  brands: "brands",
+  creators: "creators",
+} as const;
+
+type CatalogEntityKind = keyof typeof catalogEntityTables;
+
+function isCatalogEntityKind(value: string): value is CatalogEntityKind {
+  return Object.hasOwn(catalogEntityTables, value);
+}
+
+function finishCatalogEntityAction(status: string): never {
+  revalidatePath("/admin/catalog-entities");
+  revalidatePath("/admin");
+  revalidatePath("/");
+  redirect(`/admin/catalog-entities?status=${status}`);
+}
+
+export async function saveCatalogEntity(formData: FormData) {
+  const { supabase } = await requirePermission("manage_products");
+  const kind = getFormValue(formData, "entityType");
+  const id = getFormValue(formData, "id");
+  const name = getFormValue(formData, "name");
+  const nameEn = getFormValue(formData, "nameEn");
+  const slug = getFormValue(formData, "slug");
+
+  if (
+    !isCatalogEntityKind(kind) ||
+    (id && !isUuid(id)) ||
+    !name ||
+    name.length > 160 ||
+    nameEn.length > 160 ||
+    !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug) ||
+    slug.length > 160
+  ) {
+    finishCatalogEntityAction("invalid");
+  }
+
+  const values: Record<string, unknown> = {
+    name,
+    name_en: nameEn || null,
+    slug,
+    updated_at: new Date().toISOString(),
+  };
+
+  if (kind === "authors") {
+    const biography = getFormValue(formData, "biography");
+    const imageUrlValue = getFormValue(formData, "imageUrl");
+    const imageUrl = imageUrlValue ? parseProductImageUrl(imageUrlValue) : null;
+    if (biography.length > 5000 || (imageUrlValue && !imageUrl)) finishCatalogEntityAction("invalid");
+    values.biography = biography || null;
+    values.image_url = imageUrl;
+  } else if (kind === "publishers" || kind === "brands") {
+    const description = getFormValue(formData, "description");
+    const logoUrlValue = getFormValue(formData, "imageUrl");
+    const logoUrl = logoUrlValue ? parseProductImageUrl(logoUrlValue) : null;
+    const websiteUrl = getFormValue(formData, "websiteUrl");
+    if (description.length > 5000 || (logoUrlValue && !logoUrl) || (websiteUrl && (!websiteUrl.startsWith("https://") || websiteUrl.length > 2048))) finishCatalogEntityAction("invalid");
+    values.description = description || null;
+    values.logo_url = logoUrl;
+    values.website_url = websiteUrl || null;
+  } else {
+    const creatorType = getFormValue(formData, "creatorType") || "other";
+    const biography = getFormValue(formData, "biography");
+    const imageUrlValue = getFormValue(formData, "imageUrl");
+    const imageUrl = imageUrlValue ? parseProductImageUrl(imageUrlValue) : null;
+    const websiteUrl = getFormValue(formData, "websiteUrl");
+    if (
+      !["author", "instructor", "content_creator", "artist", "other"].includes(creatorType) ||
+      biography.length > 5000 ||
+      (imageUrlValue && !imageUrl) ||
+      (websiteUrl && (!websiteUrl.startsWith("https://") || websiteUrl.length > 2048))
+    ) finishCatalogEntityAction("invalid");
+    values.creator_type = creatorType;
+    values.biography = biography || null;
+    values.profile_image_url = imageUrl;
+    values.website_url = websiteUrl || null;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- table names are constrained by the local allowlist.
+  const db = supabase as unknown as { from: (table: string) => any };
+  const table = catalogEntityTables[kind];
+  const query = id
+    ? db.from(table).update(values).eq("id", id).select("id").maybeSingle()
+    : db.from(table).insert({ ...values, is_active: true }).select("id").single();
+  const { data, error } = await query;
+
+  if (error) {
+    if (error.code === "23505") finishCatalogEntityAction("exists");
+    throw new Error("Unable to save the catalog entity.", { cause: error });
+  }
+  if (!data) finishCatalogEntityAction("not-found");
+
+  await logActivity(
+    supabase,
+    id ? "catalog_entity_updated" : "catalog_entity_created",
+    kind,
+    id || data.id,
+    { name, slug },
+  );
+  finishCatalogEntityAction("saved");
+}
+
+export async function setCatalogEntityStatus(formData: FormData) {
+  const { supabase } = await requirePermission("manage_products");
+  const kind = getFormValue(formData, "entityType");
+  const id = getFormValue(formData, "id");
+  const activeValue = getFormValue(formData, "isActive");
+
+  if (!isCatalogEntityKind(kind) || !isUuid(id) || !["true", "false"].includes(activeValue)) {
+    finishCatalogEntityAction("invalid");
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- table names are constrained by the local allowlist.
+  const db = supabase as unknown as { from: (table: string) => any };
+  const { data, error } = await db
+    .from(catalogEntityTables[kind])
+    .update({ is_active: activeValue === "true", updated_at: new Date().toISOString() })
+    .eq("id", id)
+    .select("id")
+    .maybeSingle();
+
+  if (error) throw new Error("Unable to update catalog entity status.", { cause: error });
+  if (!data) finishCatalogEntityAction("not-found");
+
+  await logActivity(supabase, activeValue === "true" ? "catalog_entity_activated" : "catalog_entity_deactivated", kind, id);
+  finishCatalogEntityAction("saved");
+}
+
+function getUuidList(formData: FormData, name: string): string[] {
+  return [
+    ...new Set(
+      formData
+        .getAll(name)
+        .filter((value): value is string => typeof value === "string")
+        .map((value) => value.trim()),
+    ),
+  ];
+}
+
+type ProductEntityKind = "authors" | "publishers" | "brands" | "creators";
+type ProductEntitySelections = Record<ProductEntityKind, string[]>;
+
+async function syncProductEntityRelations(
+  supabase: Awaited<ReturnType<typeof requirePermission>>["supabase"],
+  productId: string,
+  selections: ProductEntitySelections,
+  primaryIds: Record<ProductEntityKind, string>,
+) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- table names are constrained by the local allowlist.
+  const db = supabase as unknown as { from: (table: string) => any };
+  const configs: Array<{
+    kind: ProductEntityKind;
+    table: string;
+    foreignKey: string;
+  }> = [
+    { kind: "authors", table: "product_authors", foreignKey: "author_id" },
+    { kind: "publishers", table: "product_publishers", foreignKey: "publisher_id" },
+    { kind: "brands", table: "product_brands", foreignKey: "brand_id" },
+    { kind: "creators", table: "product_creators", foreignKey: "creator_id" },
+  ];
+
+  for (const config of configs) {
+    const ids = selections[config.kind];
+    const primary = ids.includes(primaryIds[config.kind])
+      ? primaryIds[config.kind]
+      : ids[0];
+
+    const { data: existing, error: readError } = await db
+      .from(config.table)
+      .select(config.foreignKey)
+      .eq("product_id", productId);
+    if (readError) throw new Error(`Unable to read product ${config.kind}.`, { cause: readError });
+
+    const removed = (existing ?? [])
+      .map((row: Record<string, string>) => row[config.foreignKey])
+      .filter((id: string) => !ids.includes(id));
+    if (removed.length > 0) {
+      const { error } = await db
+        .from(config.table)
+        .delete()
+        .eq("product_id", productId)
+        .in(config.foreignKey, removed);
+      if (error) throw new Error(`Unable to remove product ${config.kind}.`, { cause: error });
+    }
+
+    const { error: clearError } = await db
+      .from(config.table)
+      .update({ is_primary: false })
+      .eq("product_id", productId);
+    if (clearError) {
+      throw new Error(`Unable to reset primary product ${config.kind}.`, { cause: clearError });
+    }
+
+    if (ids.length > 0) {
+      const { error } = await db.from(config.table).upsert(
+        ids.map((entityId) => ({
+          product_id: productId,
+          [config.foreignKey]: entityId,
+          is_primary: entityId === primary,
+        })),
+        { onConflict: `product_id,${config.foreignKey}` },
+      );
+      if (error) throw new Error(`Unable to save product ${config.kind}.`, { cause: error });
+    }
+  }
+
+  // Keep legacy public product-detail fields in sync with the selected primary
+  // author/publisher so existing storefront components continue to display them.
+  const legacyValues: Record<string, string | null> = {};
+  const primaryAuthorId = selections.authors.includes(primaryIds.authors)
+    ? primaryIds.authors
+    : selections.authors[0];
+  const primaryPublisherId = selections.publishers.includes(primaryIds.publishers)
+    ? primaryIds.publishers
+    : selections.publishers[0];
+
+  if (primaryAuthorId) {
+    const { data, error } = await db.from("authors").select("name").eq("id", primaryAuthorId).maybeSingle();
+    if (error) throw new Error("Unable to load the primary author.", { cause: error });
+    legacyValues.author = data?.name ?? null;
+  }
+  if (primaryPublisherId) {
+    const { data, error } = await db.from("publishers").select("name").eq("id", primaryPublisherId).maybeSingle();
+    if (error) throw new Error("Unable to load the primary publisher.", { cause: error });
+    legacyValues.publisher = data?.name ?? null;
+  }
+
+  if (Object.keys(legacyValues).length > 0) {
+    const { error } = await supabase
+      .from("products")
+      .update({ ...legacyValues, updated_at: new Date().toISOString() })
+      .eq("id", productId);
+    if (error) throw new Error("Unable to synchronize legacy product details.", { cause: error });
+  }
 }
 
 async function syncProductCategories(
@@ -410,9 +748,24 @@ export async function saveProduct(formData: FormData) {
     ),
   ];
   const primaryCategoryId = getFormValue(formData, "primaryCategoryId");
+  const entityRelationsSubmitted = getFormValue(formData, "entityRelationsSubmitted") === "1";
+  const entitySelections: ProductEntitySelections = {
+    authors: getUuidList(formData, "authorsIds"),
+    publishers: getUuidList(formData, "publishersIds"),
+    brands: getUuidList(formData, "brandsIds"),
+    creators: getUuidList(formData, "creatorsIds"),
+  };
+  const entityPrimaryIds: Record<ProductEntityKind, string> = {
+    authors: getFormValue(formData, "authorsPrimaryId"),
+    publishers: getFormValue(formData, "publishersPrimaryId"),
+    brands: getFormValue(formData, "brandsPrimaryId"),
+    creators: getFormValue(formData, "creatorsPrimaryId"),
+  };
 
   if (
     categoryIds.length > 30 ||
+    Object.values(entitySelections).some((ids) => ids.length > 30 || ids.some((entityId) => !isUuid(entityId))) ||
+    Object.values(entityPrimaryIds).some((entityId) => entityId !== "" && !isUuid(entityId)) ||
     categoryIds.some((categoryId) => !isUuid(categoryId)) ||
     (primaryCategoryId !== "" && !isUuid(primaryCategoryId)) ||
     edition.length > 80 ||
@@ -532,6 +885,9 @@ export async function saveProduct(formData: FormData) {
     if (categoriesSubmitted) {
       await syncProductCategories(supabase, id, categoryIds, primaryCategoryId);
     }
+    if (entityRelationsSubmitted) {
+      await syncProductEntityRelations(supabase, id, entitySelections, entityPrimaryIds);
+    }
     if (!oldProduct || Number(oldProduct.price ?? -1) !== Number(price ?? -1) || Number(oldProduct.cost_price ?? -1) !== Number(costPrice ?? -1)) {
       const { data: { user } } = await supabase.auth.getUser();
       const { error: historyError } = await supabase.from("product_price_history").insert({
@@ -563,6 +919,9 @@ export async function saveProduct(formData: FormData) {
 
   if (categoriesSubmitted && created) {
     await syncProductCategories(supabase, created.id, categoryIds, primaryCategoryId);
+  }
+  if (entityRelationsSubmitted && created) {
+    await syncProductEntityRelations(supabase, created.id, entitySelections, entityPrimaryIds);
   }
   if (price !== null) {
     const { data: { user } } = await supabase.auth.getUser();

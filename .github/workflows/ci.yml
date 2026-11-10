@@ -7,9 +7,6 @@ on:
 jobs:
   verify:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: sikkha-nogori
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -22,22 +19,25 @@ jobs:
           cache-dependency-path: sikkha-nogori/package-lock.json
 
       - name: Install dependencies
-        run: npm ci
+        run: |
+          test -f "$GITHUB_WORKSPACE/sikkha-nogori/package.json"
+          test -f "$GITHUB_WORKSPACE/sikkha-nogori/package-lock.json"
+          npm ci --prefix "$GITHUB_WORKSPACE/sikkha-nogori" --package-lock=true --include=dev
 
       - name: Run ESLint
-        run: npm run lint
+        run: npm run lint --prefix "$GITHUB_WORKSPACE/sikkha-nogori"
 
       - name: Generate Next.js types
-        run: npx next typegen
+        run: cd "$GITHUB_WORKSPACE/sikkha-nogori" && npx next typegen
 
       - name: Type-check
-        run: npx tsc --noEmit
+        run: cd "$GITHUB_WORKSPACE/sikkha-nogori" && ./node_modules/.bin/tsc --noEmit
 
       - name: Run tests
-        run: npm test
+        run: npm test --prefix "$GITHUB_WORKSPACE/sikkha-nogori"
 
       - name: Build production app
-        run: npm run build
+        run: npm run build --prefix "$GITHUB_WORKSPACE/sikkha-nogori"
         env:
           NEXT_PUBLIC_SUPABASE_URL: https://ci-placeholder.supabase.co
           NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_ci_placeholder

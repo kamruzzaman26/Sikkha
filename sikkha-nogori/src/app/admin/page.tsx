@@ -15,6 +15,8 @@ import {
   saveProduct,
   setAffiliateLinkStatus,
   setProductArchiveStatus,
+  softDeleteAffiliateLink,
+  restoreAffiliateLink,
 } from "./actions";
 import { requireAdmin } from "@/lib/supabase/admin";
 
@@ -46,6 +48,8 @@ const statusMessages: Record<string, string> = {
   invalid:
     "Please verify the HTTPS URL, approved partner domain, and selected product.",
   "link-not-found": "The link was not found or is no longer editable.",
+  "link-deleted": "Affiliate link moved to Deleted Links. It can be restored.",
+  "link-restored": "Affiliate link restored. Its previous active/inactive status is preserved.",
   "partner-domain-unconfigured":
     "No approved hostname is configured for this partner. Add a verified hostname in the database.",
   "product-created": "Product added to the catalog.",
@@ -93,6 +97,57 @@ type ProductFormValue = {
 };
 
 type CategoryOption = { id: string; label: string; group: string };
+type EntityKind = "authors" | "publishers" | "brands" | "creators";
+type EntityOption = { id: string; name: string; is_active: boolean };
+type EntityOptions = Record<EntityKind, EntityOption[]>;
+type EntitySelections = Record<EntityKind, string[]>;
+type EntityPrimaries = Record<EntityKind, string>;
+
+function EntitySelector({
+  kind,
+  label,
+  options,
+  selectedIds,
+  primaryId,
+}: {
+  kind: EntityKind;
+  label: string;
+  options: EntityOption[];
+  selectedIds: string[];
+  primaryId: string;
+}) {
+  const inputName = `${kind}Ids`;
+  const primaryName = `${kind}PrimaryId`;
+  return (
+    <fieldset className="rounded-xl border border-slate-200 p-4">
+      <legend className="px-1 text-sm font-semibold text-slate-800">{label}</legend>
+      {options.length === 0 ? (
+        <p className="text-xs text-slate-500">No active entries. Add them in Catalog Entities.</p>
+      ) : (
+        <>
+          <div className="mt-2 grid max-h-48 gap-2 overflow-y-auto sm:grid-cols-2">
+            {options.map((option) => (
+              <label key={option.id} className="flex min-h-9 items-start gap-2 text-sm">
+                <input type="checkbox" name={inputName} value={option.id} defaultChecked={selectedIds.includes(option.id)} className="mt-1 size-4" />
+                <span>{option.name}{option.is_active ? "" : " (Inactive)"}</span>
+              </label>
+            ))}
+          </div>
+          <label className="mt-3 grid gap-1 text-xs font-semibold text-slate-600">
+            Primary selection
+            <select name={primaryName} defaultValue={primaryId} className="min-h-10 rounded-lg border border-slate-300 bg-white px-3 text-sm font-normal">
+              <option value="">First selected</option>
+              {options.map((option) => (
+                <option key={option.id} value={option.id}>{option.name}</option>
+              ))}
+            </select>
+          </label>
+        </>
+      )}
+      <input type="hidden" name="entityRelationsSubmitted" value="1" />
+    </fieldset>
+  );
+}
 
 function ProductForm({
   product,
@@ -101,6 +156,9 @@ function ProductForm({
   categoryOptions = [],
   selectedCategoryIds = [],
   primaryCategoryId = "",
+  entityOptions,
+  selectedEntityIds,
+  primaryEntityIds,
 }: {
   product?: ProductFormValue;
   idPrefix: string;
@@ -108,6 +166,9 @@ function ProductForm({
   categoryOptions?: CategoryOption[];
   selectedCategoryIds?: string[];
   primaryCategoryId?: string;
+  entityOptions: EntityOptions;
+  selectedEntityIds: EntitySelections;
+  primaryEntityIds: EntityPrimaries;
 }) {
   const inputClass =
     "w-full min-h-11 rounded-lg border border-slate-300 bg-white px-3 text-sm";
@@ -362,7 +423,7 @@ function ProductForm({
             htmlFor={`${idPrefix}-author`}
             className="mb-1.5 block text-sm font-semibold text-slate-800"
           >
-            Author or Brand
+            Legacy Author Text
           </label>
           <input
             id={`${idPrefix}-author`}
@@ -377,7 +438,7 @@ function ProductForm({
             htmlFor={`${idPrefix}-publisher`}
             className="mb-1.5 block text-sm font-semibold text-slate-800"
           >
-            Publisher or Brand
+            Legacy Publisher Text
           </label>
           <input
             id={`${idPrefix}-publisher`}
@@ -389,7 +450,29 @@ function ProductForm({
         </div>
       </div>
 
-      <ProductImageUpload idPrefix={idPrefix} initialUrl={product?.image_url ?? ""} />
+      <div className="grid gap-3">
+        <p className="text-sm font-semibold text-slate-800">Catalog Relationships</p>
+        <p className="text-xs text-slate-500">Select multiple entities and choose a primary entry where needed. Legacy text fields above remain for compatibility.</p>
+        <div className="grid gap-3 md:grid-cols-2">
+          {([
+            ["authors", "Authors"],
+            ["publishers", "Publishers"],
+            ["brands", "Brands"],
+            ["creators", "Creators / Instructors"],
+          ] as Array<[EntityKind, string]>).map(([kind, label]) => (
+            <EntitySelector
+              key={kind}
+              kind={kind}
+              label={label}
+              options={entityOptions[kind]}
+              selectedIds={selectedEntityIds[kind]}
+              primaryId={primaryEntityIds[kind]}
+            />
+          ))}
+        </div>
+      </div>
+
+            <ProductImageUpload idPrefix={idPrefix} initialUrl={product?.image_url ?? ""} />
 
       {categoryOptions.length > 0 && (
         <fieldset className="rounded-xl border border-slate-200 p-4">
@@ -479,12 +562,23 @@ async function AdminContent({
 }: Pick<PageProps<"/admin">, "searchParams">) {
   await connection();
   const { supabase, role } = await requireAdmin("admin");
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- table names are fixed by the catalog entity schema.
+  const db = supabase as unknown as { from: (table: string) => any };
   const [
     productsResult,
     linksResult,
+    deletedLinksResult,
     productTypesResult,
     categoriesResult,
     productCategoriesResult,
+    authorsResult,
+    publishersResult,
+    brandsResult,
+    creatorsResult,
+    productAuthorsResult,
+    productPublishersResult,
+    productBrandsResult,
+    productCreatorsResult,
   ] = await Promise.all([
     supabase
       .from("products")
@@ -497,7 +591,13 @@ async function AdminContent({
       .select(
         "id, product_id, url, partner, is_active, created_at, products(title, slug)",
       )
+      .is("deleted_at", null)
       .order("created_at", { ascending: false }),
+    supabase
+      .from("affiliate_links")
+      .select("id, product_id, url, partner, is_active, created_at, deleted_at, delete_reason, products(title, slug)")
+      .not("deleted_at", "is", null)
+      .order("deleted_at", { ascending: false }),
     supabase
       .from("product_types")
       .select("slug, label, is_active")
@@ -512,6 +612,14 @@ async function AdminContent({
       .from("product_categories")
       .select("product_id, category_id, is_primary")
       .limit(10000),
+    db.from("authors").select("id, name, is_active").order("name"),
+    db.from("publishers").select("id, name, is_active").order("name"),
+    db.from("brands").select("id, name, is_active").order("name"),
+    db.from("creators").select("id, name, is_active").order("name"),
+    db.from("product_authors").select("product_id, author_id, is_primary").limit(10000),
+    db.from("product_publishers").select("product_id, publisher_id, is_primary").limit(10000),
+    db.from("product_brands").select("product_id, brand_id, is_primary").limit(10000),
+    db.from("product_creators").select("product_id, creator_id, is_primary").limit(10000),
   ]);
 
   if (productsResult.error) {
@@ -519,15 +627,23 @@ async function AdminContent({
       cause: productsResult.error,
     });
   }
-  if (linksResult.error) {
+  if (linksResult.error || deletedLinksResult.error) {
     throw new Error("Unable to load affiliate links.", {
-      cause: linksResult.error,
+      cause: linksResult.error ?? deletedLinksResult.error,
     });
   }
   if (productTypesResult.error) {
     throw new Error("Unable to load product types.", {
       cause: productTypesResult.error,
     });
+  }
+  const entityResults = [
+    authorsResult, publishersResult, brandsResult, creatorsResult,
+    productAuthorsResult, productPublishersResult, productBrandsResult, productCreatorsResult,
+  ];
+  const entityError = entityResults.find((result) => result.error)?.error;
+  if (entityError) {
+    throw new Error("Unable to load catalog relationships.", { cause: entityError });
   }
 
   if (categoriesResult.error || productCategoriesResult.error) {
@@ -558,6 +674,35 @@ async function AdminContent({
         label: `${groupLabelsForForm[row.category_group] ?? row.category_group} › ${names.join(" › ")}`,
       };
     });
+  const entityOptions: EntityOptions = {
+    authors: authorsResult.data ?? [],
+    publishers: publishersResult.data ?? [],
+    brands: brandsResult.data ?? [],
+    creators: creatorsResult.data ?? [],
+  };
+  const selectedEntitiesByProduct: Record<EntityKind, Map<string, string[]>> = {
+    authors: new Map(), publishers: new Map(), brands: new Map(), creators: new Map(),
+  };
+  const primaryEntitiesByProduct: Record<EntityKind, Map<string, string>> = {
+    authors: new Map(), publishers: new Map(), brands: new Map(), creators: new Map(),
+  };
+  const addEntityRelations = (
+    kind: EntityKind,
+    rows: Array<{ product_id: string; entity_id: string; is_primary: boolean }>,
+  ) => {
+    for (const row of rows) {
+      selectedEntitiesByProduct[kind].set(row.product_id, [
+        ...(selectedEntitiesByProduct[kind].get(row.product_id) ?? []),
+        row.entity_id,
+      ]);
+      if (row.is_primary) primaryEntitiesByProduct[kind].set(row.product_id, row.entity_id);
+    }
+  };
+  addEntityRelations("authors", (productAuthorsResult.data ?? []).map((row: { product_id: string; author_id: string; is_primary: boolean }) => ({ product_id: row.product_id, entity_id: row.author_id, is_primary: row.is_primary })));
+  addEntityRelations("publishers", (productPublishersResult.data ?? []).map((row: { product_id: string; publisher_id: string; is_primary: boolean }) => ({ product_id: row.product_id, entity_id: row.publisher_id, is_primary: row.is_primary })));
+  addEntityRelations("brands", (productBrandsResult.data ?? []).map((row: { product_id: string; brand_id: string; is_primary: boolean }) => ({ product_id: row.product_id, entity_id: row.brand_id, is_primary: row.is_primary })));
+  addEntityRelations("creators", (productCreatorsResult.data ?? []).map((row: { product_id: string; creator_id: string; is_primary: boolean }) => ({ product_id: row.product_id, entity_id: row.creator_id, is_primary: row.is_primary })));
+
   const selectedByProduct = new Map<string, string[]>();
   const primaryByProduct = new Map<string, string>();
   for (const link of productCategoriesResult.data ?? []) {
@@ -580,6 +725,7 @@ async function AdminContent({
       : undefined;
   const products = productsResult.data;
   const links = linksResult.data;
+  const deletedLinks = deletedLinksResult.data;
   const productQueryValue = Array.isArray(params.productQuery)
     ? params.productQuery[0]
     : params.productQuery;
@@ -761,6 +907,9 @@ async function AdminContent({
                   idPrefix="new-product"
                   productTypes={productTypes}
                   categoryOptions={categoryOptions}
+                  entityOptions={entityOptions}
+                  selectedEntityIds={{ authors: [], publishers: [], brands: [], creators: [] }}
+                  primaryEntityIds={{ authors: "", publishers: "", brands: "", creators: "" }}
                 />
               </div>
             </details>
@@ -944,6 +1093,19 @@ async function AdminContent({
                                     categoryOptions={categoryOptions}
                                     selectedCategoryIds={selectedByProduct.get(product.id) ?? []}
                                     primaryCategoryId={primaryByProduct.get(product.id) ?? ""}
+                                    entityOptions={entityOptions}
+                                    selectedEntityIds={{
+                                      authors: selectedEntitiesByProduct.authors.get(product.id) ?? [],
+                                      publishers: selectedEntitiesByProduct.publishers.get(product.id) ?? [],
+                                      brands: selectedEntitiesByProduct.brands.get(product.id) ?? [],
+                                      creators: selectedEntitiesByProduct.creators.get(product.id) ?? [],
+                                    }}
+                                    primaryEntityIds={{
+                                      authors: primaryEntitiesByProduct.authors.get(product.id) ?? "",
+                                      publishers: primaryEntitiesByProduct.publishers.get(product.id) ?? "",
+                                      brands: primaryEntitiesByProduct.brands.get(product.id) ?? "",
+                                      creators: primaryEntitiesByProduct.creators.get(product.id) ?? "",
+                                    }}
                                   />
                                 </div>
                               </details>
@@ -1177,6 +1339,16 @@ async function AdminContent({
                           {link.is_active ? "Deactivate" : "Activate"}
                         </button>
                       </form>
+                                            <details className="shrink-0 rounded-xl border border-rose-200 bg-white">
+                        <summary className="flex min-h-11 cursor-pointer items-center px-4 text-sm font-semibold text-rose-700">Delete</summary>
+                        <form action={softDeleteAffiliateLink} className="grid gap-2 border-t border-rose-100 p-3">
+                          <input type="hidden" name="id" value={link.id} />
+                          <label htmlFor={`delete-reason-${link.id}`} className="text-xs font-semibold text-slate-700">Reason (optional)</label>
+                          <input id={`delete-reason-${link.id}`} name="reason" maxLength={300} className="min-h-10 rounded-lg border border-slate-300 px-3 text-sm" />
+                          <p className="text-xs text-slate-500">This moves the link to Deleted Links; it does not permanently erase it.</p>
+                          <button type="submit" className="min-h-10 rounded-lg bg-rose-700 px-3 text-sm font-semibold text-white">Confirm delete</button>
+                        </form>
+                      </details>
                     </div>
 
                     <details className="group mt-3 rounded-xl border border-slate-200 bg-white open:bg-slate-50/70">
@@ -1252,6 +1424,37 @@ async function AdminContent({
                         </div>
                       </form>
                     </details>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </section>
+
+        <section className="mt-7 rounded-2xl border border-rose-200 bg-white shadow-sm">
+          <div className="px-5 pt-5 sm:px-6 sm:pt-6">
+            <h2 className="text-xl font-bold">Deleted Affiliate Links</h2>
+            <p className="mt-1 text-sm text-slate-600">{deletedLinks.length} deleted links · Restoring keeps the previous active/inactive state.</p>
+          </div>
+          {deletedLinks.length === 0 ? (
+            <p className="m-5 rounded-xl border border-dashed border-slate-300 bg-slate-50 px-5 py-8 text-center text-sm text-slate-600 sm:m-6">No deleted affiliate links.</p>
+          ) : (
+            <ul className="mt-4 divide-y divide-slate-100 border-t border-slate-100">
+              {deletedLinks.map((link) => {
+                const embedded = link.products as { title?: string } | { title?: string }[] | null | undefined;
+                const title = Array.isArray(embedded) ? embedded[0]?.title : embedded?.title;
+                return (
+                  <li key={link.id} className="flex flex-wrap items-center justify-between gap-3 px-5 py-4 sm:px-6">
+                    <div className="min-w-0 flex-1">
+                      <p className="font-semibold text-slate-900">{title ?? "Product not found"}</p>
+                      <p className="mt-1 break-all text-xs text-slate-500">{getPartnerName(link.partner) ?? "No partner"} · {link.url}</p>
+                      {link.delete_reason && <p className="mt-1 text-xs text-slate-500">Reason: {link.delete_reason}</p>}
+                      <p className="mt-1 text-xs text-slate-500">Deleted {link.deleted_at ? new Date(link.deleted_at).toLocaleString("en-GB") : "Date unavailable"}</p>
+                    </div>
+                    <form action={restoreAffiliateLink}>
+                      <input type="hidden" name="id" value={link.id} />
+                      <button type="submit" className="min-h-11 rounded-xl border border-emerald-300 bg-white px-4 text-sm font-semibold text-emerald-800 hover:bg-emerald-50">Restore</button>
+                    </form>
                   </li>
                 );
               })}

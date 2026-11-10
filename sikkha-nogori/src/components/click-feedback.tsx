@@ -23,7 +23,11 @@ export function ClickFeedback() {
   }
 
   useEffect(() => {
-    clearMarks();
+    marked.current.forEach((el) => el.removeAttribute("data-pending"));
+    marked.current.clear();
+    window.clearTimeout(timer.current);
+    const frame = window.requestAnimationFrame(() => setBusy(false));
+    return () => window.cancelAnimationFrame(frame);
   }, [pathname]);
 
   useEffect(() => {
