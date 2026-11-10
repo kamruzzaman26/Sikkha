@@ -138,7 +138,7 @@ async function SiteExtras() {
         name: general.siteName,
         inLanguage: "bn",
         publisher: { "@id": `${origin}/#organization` },
-        potentialAction: { "@type": "SearchAction", target: { "@type": "EntryPoint", urlTemplate: `${origin}/books?q={search_term_string}` }, "query-input": "required name=search_term_string" },
+        potentialAction: { "@type": "SearchAction", target: { "@type": "EntryPoint", urlTemplate: `${origin}/search?q={search_term_string}` }, "query-input": "required name=search_term_string" },
       },
     ],
   };
