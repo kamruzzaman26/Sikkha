@@ -109,14 +109,12 @@ function EntitySelector({
   options,
   selectedIds,
   primaryId,
-  idPrefix,
 }: {
   kind: EntityKind;
   label: string;
   options: EntityOption[];
   selectedIds: string[];
   primaryId: string;
-  idPrefix: string;
 }) {
   const inputName = `${kind}Ids`;
   const primaryName = `${kind}PrimaryId`;
@@ -139,7 +137,7 @@ function EntitySelector({
             Primary {label.replace(/s$/, "")}
             <select name={primaryName} defaultValue={primaryId} className="min-h-10 rounded-lg border border-slate-300 bg-white px-3 text-sm font-normal">
               <option value="">First selected</option>
-              {options.filter((option) => selectedIds.includes(option.id)).map((option) => (
+              {options.map((option) => (
                 <option key={option.id} value={option.id}>{option.name}</option>
               ))}
             </select>
@@ -469,7 +467,6 @@ function ProductForm({
               options={entityOptions[kind]}
               selectedIds={selectedEntityIds[kind]}
               primaryId={primaryEntityIds[kind]}
-              idPrefix={idPrefix}
             />
           ))}
         </div>
@@ -681,9 +678,6 @@ async function AdminContent({
     publishers: publishersResult.data ?? [],
     brands: brandsResult.data ?? [],
     creators: creatorsResult.data ?? [],
-  };
-  const selectedEntityIds: EntitySelections = {
-    authors: [], publishers: [], brands: [], creators: [],
   };
   const primaryEntityIds: EntityPrimaries = {
     authors: "", publishers: "", brands: "", creators: "",
