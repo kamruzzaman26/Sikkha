@@ -475,6 +475,7 @@ export async function saveCatalogEntity(formData: FormData) {
     values.website_url = websiteUrl || null;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- table names are constrained by the local allowlist.
   const db = supabase as unknown as { from: (table: string) => any };
   const table = catalogEntityTables[kind];
   const query = id
@@ -508,6 +509,7 @@ export async function setCatalogEntityStatus(formData: FormData) {
     finishCatalogEntityAction("invalid");
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- table names are constrained by the local allowlist.
   const db = supabase as unknown as { from: (table: string) => any };
   const { data, error } = await db
     .from(catalogEntityTables[kind])
@@ -543,6 +545,7 @@ async function syncProductEntityRelations(
   selections: ProductEntitySelections,
   primaryIds: Record<ProductEntityKind, string>,
 ) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- table names are constrained by the local allowlist.
   const db = supabase as unknown as { from: (table: string) => any };
   const configs: Array<{
     kind: ProductEntityKind;
