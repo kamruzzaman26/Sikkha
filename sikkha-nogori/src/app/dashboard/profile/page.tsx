@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 };
 
 const messages: Record<string, string> = {
-  invalid: "Please check your name and date of birth and try again.",
+  invalid: "Please check your name, gender, and date of birth and try again.",
   saved: "✓ Saved successfully!",
   password: "✓ Password updated successfully!",
   passwordInvalid: "Password must contain at least 8 characters.",
@@ -24,11 +24,11 @@ async function ProfileContent({ searchParams }: { searchParams: Promise<{ status
   const { supabase, user } = await requireCustomer();
   const params = await searchParams;
   const status = Array.isArray(params.status) ? params.status[0] : params.status;
-  const { data: profile, error } = await supabase.from("profiles").select("display_name, date_of_birth").eq("id", user.id).maybeSingle();
+  const { data: profile, error } = await supabase.from("profiles").select("display_name, date_of_birth, gender").eq("id", user.id).maybeSingle();
   if (error) throw new Error("Unable to load your profile.", { cause: error });
   const name = profile?.display_name?.trim() || "Your Name";
   const email = user.email || user.phone || "Not provided";
-  const completion = Math.round(([Boolean(profile?.display_name?.trim()), Boolean(user.email), Boolean(profile?.date_of_birth)].filter(Boolean).length / 3) * 100);
+  const completion = Math.round(([Boolean(profile?.display_name?.trim()), Boolean(user.email), Boolean(profile?.date_of_birth), Boolean(profile?.gender)].filter(Boolean).length / 4) * 100);
   const message = status ? messages[status] : undefined;
 
   return (
@@ -43,7 +43,7 @@ async function ProfileContent({ searchParams }: { searchParams: Promise<{ status
           <aside className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
             <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-blue-50 text-4xl font-bold text-blue-700">{name.charAt(0).toUpperCase()}</div>
             <h2 className="mt-4 text-center text-xl font-extrabold">{name}</h2><p className="mt-1 break-all text-center text-sm text-slate-500">{email}</p>
-            <div className="mt-6 rounded-xl bg-green-50 p-4"><div className="flex items-center justify-between text-sm font-bold text-green-800"><span>Profile Completion</span><span>{completion}%</span></div><div className="mt-3 h-2 overflow-hidden rounded-full bg-green-100"><div className="h-full rounded-full bg-green-600" style={{ width: completion + "%" }} /></div><p className="mt-2 text-xs text-green-800">{completion === 100 ? "Your available profile details are complete." : "Add your name, date of birth, and email to complete your profile."}</p></div>
+            <div className="mt-6 rounded-xl bg-green-50 p-4"><div className="flex items-center justify-between text-sm font-bold text-green-800"><span>Profile Completion</span><span>{completion}%</span></div><div className="mt-3 h-2 overflow-hidden rounded-full bg-green-100"><div className="h-full rounded-full bg-green-600" style={{ width: completion + "%" }} /></div><p className="mt-2 text-xs text-green-800">{completion === 100 ? "Your available profile details are complete." : "Add your name, date of birth, gender, and email to complete your profile."}</p></div>
             <div className="mt-5 space-y-2 border-t border-slate-100 pt-4 text-sm"><p className="font-semibold text-slate-700">✓ Active account</p><p className="text-slate-500">Signed in securely</p></div>
           </aside>
           <div className="space-y-5">
@@ -53,6 +53,7 @@ async function ProfileContent({ searchParams }: { searchParams: Promise<{ status
                 action={updateCustomerProfile}
                 defaultName={profile?.display_name ?? ""}
                 defaultDateOfBirth={profile?.date_of_birth ?? ""}
+                defaultGender={profile?.gender ?? ""}
                 email={email}
                 isSaved={status === "saved"}
                 maxDate={new Date().toISOString().slice(0, 10)}
