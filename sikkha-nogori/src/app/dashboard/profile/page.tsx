@@ -2,98 +2,77 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { connection } from "next/server";
-import { updateCustomerProfile } from "./actions";
+import { updateCustomerProfile, updateCustomerPassword } from "./actions";
 import { requireCustomer } from "@/lib/supabase/auth";
 
 export const metadata: Metadata = {
-  title: "আমার প্রোফাইল | শিক্ষা নগরী",
+  title: "My Profile | Sikkha Nogori",
   robots: { index: false, follow: false },
 };
 
-const messages = {
-  invalid: "নাম যাচাই করুন।",
-  saved: "আপনার প্রোফাইল হালনাগাদ হয়েছে।",
-} as const;
+const messages: Record<string, string> = {
+  invalid: "Please check your name and try again.",
+  saved: "✓ Saved successfully!",
+  password: "✓ Password updated successfully!",
+  passwordInvalid: "Password must contain at least 8 characters.",
+};
 
-async function ProfileContent({
-  searchParams,
-}: {
-  searchParams: Promise<{ status?: string | string[] }>;
-}) {
+async function ProfileContent({ searchParams }: { searchParams: Promise<{ status?: string | string[] }> }) {
   await connection();
   const { supabase, user } = await requireCustomer();
   const params = await searchParams;
   const status = Array.isArray(params.status) ? params.status[0] : params.status;
-  const { data: profile, error } = await supabase
-    .from("profiles")
-    .select("display_name")
-    .eq("id", user.id)
-    .maybeSingle();
-
-  if (error) {
-    throw new Error("Unable to load your profile.", { cause: error });
-  }
-
-  const message =
-    status && Object.hasOwn(messages, status)
-      ? messages[status as keyof typeof messages]
-      : undefined;
+  const { data: profile, error } = await supabase.from("profiles").select("display_name").eq("id", user.id).maybeSingle();
+  if (error) throw new Error("Unable to load your profile.", { cause: error });
+  const name = profile?.display_name?.trim() || "Your Name";
+  const email = user.email || user.phone || "Not provided";
+  const completion = profile?.display_name?.trim() && user.email ? 100 : profile?.display_name?.trim() || user.email ? 50 : 0;
+  const message = status ? messages[status] : undefined;
 
   return (
-    <main className="min-h-screen bg-[#f7faf8] px-5 py-10 text-slate-900 sm:px-8 sm:py-14">
-      <section className="mx-auto max-w-2xl rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-        <Link href="/dashboard" className="font-semibold text-emerald-700">
-          ← ড্যাশবোর্ড
-        </Link>
-        <h1 className="mt-8 text-3xl font-extrabold">আমার প্রোফাইল</h1>
-        <p className="mt-2 break-all text-slate-600">{user.email || user.phone}</p>
-        {message && (
-          <p role="status" className="mt-5 rounded-lg bg-emerald-50 px-4 py-3">
-            {message}
-          </p>
-        )}
-        <form action={updateCustomerProfile} className="mt-6 grid gap-4">
-          <div>
-            <label htmlFor="profile-name" className="mb-2 block font-semibold">
-              নাম
-            </label>
-            <input
-              id="profile-name"
-              name="displayName"
-              maxLength={100}
-              defaultValue={profile?.display_name ?? ""}
-              className="w-full rounded-lg border border-slate-300 px-3 py-2.5"
-            />
+    <main className="min-h-screen bg-slate-50 px-3 py-6 text-slate-800 sm:px-6 sm:py-10">
+      <div className="mx-auto max-w-6xl">
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+          <div><p className="text-sm font-semibold text-blue-700">SIKKHA NOGORI / ACCOUNT</p><h1 className="mt-1 text-2xl font-black sm:text-3xl">My Profile</h1><p className="mt-1 text-sm text-slate-500">Manage your personal information and account security.</p></div>
+          <Link href="/dashboard" className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-semibold hover:bg-slate-100">← Dashboard</Link>
+        </div>
+        {message && <p role="status" className={`mb-5 rounded-xl border px-4 py-3 text-sm font-semibold ${status?.startsWith("password") && status !== "password" || status === "invalid" ? "border-amber-200 bg-amber-50 text-amber-800" : "border-green-200 bg-green-50 text-green-800"}`}>{message}</p>}
+        <div className="grid gap-5 lg:grid-cols-[280px_minmax(0,1fr)]">
+          <aside className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-blue-50 text-4xl font-bold text-blue-700">{name.charAt(0).toUpperCase()}</div>
+            <h2 className="mt-4 text-center text-xl font-extrabold">{name}</h2><p className="mt-1 break-all text-center text-sm text-slate-500">{email}</p>
+            <div className="mt-6 rounded-xl bg-green-50 p-4"><div className="flex items-center justify-between text-sm font-bold text-green-800"><span>Profile Completion</span><span>{completion}%</span></div><div className="mt-3 h-2 overflow-hidden rounded-full bg-green-100"><div className="h-full rounded-full bg-green-600" style={{ width: completion + "%" }} /></div><p className="mt-2 text-xs text-green-800">{completion === 100 ? "Your available profile details are complete." : "Add your name and verify your email to complete your profile."}</p></div>
+            <div className="mt-5 space-y-2 border-t border-slate-100 pt-4 text-sm"><p className="font-semibold text-slate-700">✓ Active account</p><p className="text-slate-500">Signed in securely</p></div>
+          </aside>
+          <div className="space-y-5">
+            <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+              <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50 px-5 py-4"><div><h2 className="font-bold">Personal Information</h2><p className="mt-1 text-xs text-slate-500">Update the name shown on your account.</p></div><span className="text-xl">♙</span></div>
+              <form action={updateCustomerProfile} className="space-y-4 p-5">
+                <div><label htmlFor="profile-name" className="mb-2 block text-sm font-semibold">Full Name</label><input id="profile-name" name="displayName" maxLength={100} required defaultValue={profile?.display_name ?? ""} placeholder="Enter your full name" className="w-full rounded-lg border border-slate-300 px-3 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100" /></div>
+                <div><label className="mb-2 block text-sm font-semibold">Email Address</label><div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-3 text-sm text-slate-600">{email}</div><p className="mt-1 text-xs text-slate-500">Your sign-in email is managed by your authentication account.</p></div>
+                <div className="flex justify-end"><button type="submit" className="rounded-lg bg-blue-600 px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-100">Save Changes</button></div>
+              </form>
+            </section>
+            <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+              <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50 px-5 py-4"><div><h2 className="font-bold">Contact Information</h2><p className="mt-1 text-xs text-slate-500">Your registered account contact.</p></div><span className="text-xl">✉</span></div>
+              <div className="space-y-3 p-5"><div className="flex flex-wrap items-center justify-between gap-2"><span className="text-sm text-slate-500">Email / Phone</span><strong className="break-all text-sm">{email}</strong></div><div className="flex items-center justify-between gap-2"><span className="text-sm text-slate-500">Account status</span><span className="rounded-full bg-green-50 px-3 py-1 text-xs font-bold text-green-700">✓ Active</span></div></div>
+            </section>
+            <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+              <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50 px-5 py-4"><div><h2 className="font-bold">Password</h2><p className="mt-1 text-xs text-slate-500">Keep your account secure with a strong password.</p></div><span className="text-xl">🔒</span></div>
+              <form action={updateCustomerPassword} className="space-y-4 p-5">
+                <div><label htmlFor="new-password" className="mb-2 block text-sm font-semibold">New Password</label><input id="new-password" name="newPassword" type="password" minLength={8} autoComplete="new-password" required className="w-full rounded-lg border border-slate-300 px-3 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100" placeholder="At least 8 characters" /></div>
+                <div><label htmlFor="confirm-password" className="mb-2 block text-sm font-semibold">Confirm New Password</label><input id="confirm-password" name="confirmPassword" type="password" minLength={8} autoComplete="new-password" required className="w-full rounded-lg border border-slate-300 px-3 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100" placeholder="Enter the password again" /></div>
+                <div className="flex justify-end"><button type="submit" className="rounded-lg bg-blue-600 px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-100">Update Password</button></div>
+              </form>
+            </section>
           </div>
-          <button
-            type="submit"
-            className="min-h-11 rounded-lg bg-emerald-700 px-4 py-2.5 font-bold text-white hover:bg-emerald-800"
-          >
-            সংরক্ষণ করুন
-          </button>
-        </form>
-      </section>
+        </div>
+        <p className="mt-6 text-center text-xs text-slate-400">Sikkha Nogori · Your learning account</p>
+      </div>
     </main>
   );
 }
 
-export default function ProfilePage({
-  searchParams,
-}: {
-  searchParams: Promise<{ status?: string | string[] }>;
-}) {
-  return (
-    <Suspense
-      fallback={
-        <main className="min-h-screen bg-[#f7faf8] px-5 py-10 sm:px-8 sm:py-14">
-          <div className="mx-auto max-w-2xl animate-pulse rounded-2xl bg-white p-8">
-            <div className="h-8 w-64 rounded bg-slate-100" />
-            <div className="mt-8 h-56 rounded-xl bg-slate-100" />
-          </div>
-        </main>
-      }
-    >
-      <ProfileContent searchParams={searchParams} />
-    </Suspense>
-  );
+export default function ProfilePage({ searchParams }: { searchParams: Promise<{ status?: string | string[] }> }) {
+  return <Suspense fallback={<main className="min-h-screen bg-slate-50 p-8"><div className="mx-auto max-w-5xl animate-pulse rounded-2xl bg-white p-10"><div className="h-8 w-56 rounded bg-slate-200" /><div className="mt-8 h-64 rounded-xl bg-slate-100" /></div></main>}><ProfileContent searchParams={searchParams} /></Suspense>;
 }
