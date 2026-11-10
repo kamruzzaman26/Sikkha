@@ -57,8 +57,10 @@ textarea {
 
 /* Keep public navigation out of the admin workspace without client-side routing hooks. */
 body:has([data-admin-route]) > .site-header-slot,
-body:has([data-admin-route]) > .site-footer-slot {
-  display: none;
+body:has([data-admin-route]) > .site-footer-slot,
+body:has([data-admin-route]) > nav[aria-label="Bottom navigation"],
+body:has([data-admin-route]) .whatsapp-float {
+  display: none !important;
 }
 
 .site-footer-slot {
