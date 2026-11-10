@@ -391,6 +391,135 @@ export async function restoreAffiliateLink(formData: FormData) {
   finishAction("link-restored");
 }
 
+const catalogEntityTables = {
+  authors: "authors",
+  publishers: "publishers",
+  brands: "brands",
+  creators: "creators",
+} as const;
+
+type CatalogEntityKind = keyof typeof catalogEntityTables;
+
+function isCatalogEntityKind(value: string): value is CatalogEntityKind {
+  return Object.hasOwn(catalogEntityTables, value);
+}
+
+function finishCatalogEntityAction(status: string): never {
+  revalidatePath("/admin/catalog-entities");
+  revalidatePath("/admin");
+  revalidatePath("/");
+  redirect(`/admin/catalog-entities?status=${status}`);
+}
+
+export async function saveCatalogEntity(formData: FormData) {
+  const { supabase } = await requirePermission("manage_products");
+  const kind = getFormValue(formData, "entityType");
+  const id = getFormValue(formData, "id");
+  const name = getFormValue(formData, "name");
+  const nameEn = getFormValue(formData, "nameEn");
+  const slug = getFormValue(formData, "slug");
+
+  if (
+    !isCatalogEntityKind(kind) ||
+    (id && !isUuid(id)) ||
+    !name ||
+    name.length > 160 ||
+    nameEn.length > 160 ||
+    !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug) ||
+    slug.length > 160
+  ) {
+    finishCatalogEntityAction("invalid");
+  }
+
+  const values: Record<string, unknown> = {
+    name,
+    name_en: nameEn || null,
+    slug,
+    updated_at: new Date().toISOString(),
+  };
+
+  if (kind === "authors") {
+    const biography = getFormValue(formData, "biography");
+    const imageUrlValue = getFormValue(formData, "imageUrl");
+    const imageUrl = imageUrlValue ? parseProductImageUrl(imageUrlValue) : null;
+    if (biography.length > 5000 || (imageUrlValue && !imageUrl)) finishCatalogEntityAction("invalid");
+    values.biography = biography || null;
+    values.image_url = imageUrl;
+  } else if (kind === "publishers" || kind === "brands") {
+    const description = getFormValue(formData, "description");
+    const logoUrlValue = getFormValue(formData, "imageUrl");
+    const logoUrl = logoUrlValue ? parseProductImageUrl(logoUrlValue) : null;
+    const websiteUrl = getFormValue(formData, "websiteUrl");
+    if (description.length > 5000 || (logoUrlValue && !logoUrl) || (websiteUrl && (!websiteUrl.startsWith("https://") || websiteUrl.length > 2048))) finishCatalogEntityAction("invalid");
+    values.description = description || null;
+    values.logo_url = logoUrl;
+    values.website_url = websiteUrl || null;
+  } else {
+    const creatorType = getFormValue(formData, "creatorType") || "other";
+    const biography = getFormValue(formData, "biography");
+    const imageUrlValue = getFormValue(formData, "imageUrl");
+    const imageUrl = imageUrlValue ? parseProductImageUrl(imageUrlValue) : null;
+    const websiteUrl = getFormValue(formData, "websiteUrl");
+    if (
+      !["author", "instructor", "content_creator", "artist", "other"].includes(creatorType) ||
+      biography.length > 5000 ||
+      (imageUrlValue && !imageUrl) ||
+      (websiteUrl && (!websiteUrl.startsWith("https://") || websiteUrl.length > 2048))
+    ) finishCatalogEntityAction("invalid");
+    values.creator_type = creatorType;
+    values.biography = biography || null;
+    values.profile_image_url = imageUrl;
+    values.website_url = websiteUrl || null;
+  }
+
+  const db = supabase as unknown as { from: (table: string) => any };
+  const table = catalogEntityTables[kind];
+  const query = id
+    ? db.from(table).update(values).eq("id", id).select("id").maybeSingle()
+    : db.from(table).insert({ ...values, is_active: true }).select("id").single();
+  const { data, error } = await query;
+
+  if (error) {
+    if (error.code === "23505") finishCatalogEntityAction("exists");
+    throw new Error("Unable to save the catalog entity.", { cause: error });
+  }
+  if (!data) finishCatalogEntityAction("not-found");
+
+  await logActivity(
+    supabase,
+    id ? "catalog_entity_updated" : "catalog_entity_created",
+    kind,
+    id || data.id,
+    { name, slug },
+  );
+  finishCatalogEntityAction("saved");
+}
+
+export async function setCatalogEntityStatus(formData: FormData) {
+  const { supabase } = await requirePermission("manage_products");
+  const kind = getFormValue(formData, "entityType");
+  const id = getFormValue(formData, "id");
+  const activeValue = getFormValue(formData, "isActive");
+
+  if (!isCatalogEntityKind(kind) || !isUuid(id) || !["true", "false"].includes(activeValue)) {
+    finishCatalogEntityAction("invalid");
+  }
+
+  const db = supabase as unknown as { from: (table: string) => any };
+  const { data, error } = await db
+    .from(catalogEntityTables[kind])
+    .update({ is_active: activeValue === "true", updated_at: new Date().toISOString() })
+    .eq("id", id)
+    .select("id")
+    .maybeSingle();
+
+  if (error) throw new Error("Unable to update catalog entity status.", { cause: error });
+  if (!data) finishCatalogEntityAction("not-found");
+
+  await logActivity(supabase, activeValue === "true" ? "catalog_entity_activated" : "catalog_entity_deactivated", kind, id);
+  finishCatalogEntityAction("saved");
+}
+
 async function syncProductCategories(
   supabase: Awaited<ReturnType<typeof requirePermission>>["supabase"],
   productId: string,
