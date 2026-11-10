@@ -1299,7 +1299,7 @@ async function AdminContent({
                       <p className="font-semibold text-slate-900">{title ?? "Product not found"}</p>
                       <p className="mt-1 break-all text-xs text-slate-500">{getPartnerName(link.partner) ?? "No partner"} · {link.url}</p>
                       {link.delete_reason && <p className="mt-1 text-xs text-slate-500">Reason: {link.delete_reason}</p>}
-                      <p className="mt-1 text-xs text-slate-500">Deleted {new Date(link.deleted_at).toLocaleString("en-GB")}</p>
+                      <p className="mt-1 text-xs text-slate-500">Deleted {link.deleted_at ? new Date(link.deleted_at).toLocaleString("en-GB") : "Date unavailable"}</p>
                     </div>
                     <form action={restoreAffiliateLink}>
                       <input type="hidden" name="id" value={link.id} />
