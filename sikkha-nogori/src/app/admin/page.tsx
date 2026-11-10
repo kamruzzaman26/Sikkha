@@ -680,9 +680,6 @@ async function AdminContent({
     brands: brandsResult.data ?? [],
     creators: creatorsResult.data ?? [],
   };
-  const primaryEntityIds: EntityPrimaries = {
-    authors: "", publishers: "", brands: "", creators: "",
-  };
   const selectedEntitiesByProduct: Record<EntityKind, Map<string, string[]>> = {
     authors: new Map(), publishers: new Map(), brands: new Map(), creators: new Map(),
   };
