@@ -19,22 +19,25 @@ jobs:
           cache-dependency-path: sikkha-nogori/package-lock.json
 
       - name: Install dependencies
-        run: cd sikkha-nogori && npm ci
+        run: |
+          test -f "$GITHUB_WORKSPACE/sikkha-nogori/package.json"
+          test -f "$GITHUB_WORKSPACE/sikkha-nogori/package-lock.json"
+          npm ci --prefix "$GITHUB_WORKSPACE/sikkha-nogori" --package-lock=true
 
       - name: Run ESLint
-        run: cd sikkha-nogori && npm run lint
+        run: npm run lint --prefix "$GITHUB_WORKSPACE/sikkha-nogori"
 
       - name: Generate Next.js types
-        run: cd sikkha-nogori && npx next typegen
+        run: npx --prefix "$GITHUB_WORKSPACE/sikkha-nogori" next typegen
 
       - name: Type-check
-        run: cd sikkha-nogori && npx tsc --noEmit
+        run: npx --prefix "$GITHUB_WORKSPACE/sikkha-nogori" tsc --noEmit
 
       - name: Run tests
-        run: cd sikkha-nogori && npm test
+        run: npm test --prefix "$GITHUB_WORKSPACE/sikkha-nogori"
 
       - name: Build production app
-        run: cd sikkha-nogori && npm run build
+        run: npm run build --prefix "$GITHUB_WORKSPACE/sikkha-nogori"
         env:
           NEXT_PUBLIC_SUPABASE_URL: https://ci-placeholder.supabase.co
           NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_ci_placeholder
