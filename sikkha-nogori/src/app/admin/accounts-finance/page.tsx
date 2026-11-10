@@ -23,9 +23,6 @@ const labels: Record<string, string> = {
   partner_payable: "পার্টনারের পাওনা", partner_payment: "পার্টনারকে পরিশোধ",
   owner_capital: "মালিকের মূলধন", refund: "রিফান্ড", adjustment: "সমন্বয়",
 };
-const icons: Record<string, AdminIconName> = {
-  own_business: "wallet", partnership: "handshake",
-};
 const money = (value: number) => formatBDT(value);
 
 
