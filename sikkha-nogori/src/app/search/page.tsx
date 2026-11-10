@@ -11,6 +11,8 @@ import {
 } from "@/lib/catalog";
 import { WishlistButton } from "@/components/wishlist-button";
 
+export const instant = false;
+
 export const metadata: Metadata = {
   title: "Search | শিক্ষা নগরী",
   description: "বই, কোর্স ও শিক্ষা উপকরণ একসঙ্গে খুঁজুন।",
