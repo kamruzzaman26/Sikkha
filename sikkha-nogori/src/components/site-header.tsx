@@ -3,8 +3,12 @@
 import { CartCount } from "@/components/cart-count";
 import Link from "next/link";
 import { createPortal } from "react-dom";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { signOutCustomer } from "@/app/login/actions";
+
+const subscribeToNothing = () => () => {};
+const getClientSnapshot = () => true;
+const getServerSnapshot = () => false;
 
 type SiteIdentity = {
   displayName: string;
@@ -171,7 +175,11 @@ export function SiteHeader({
   topBar?: TopBar;
 }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [portalReady, setPortalReady] = useState(false);
+  const portalReady = useSyncExternalStore(
+    subscribeToNothing,
+    getClientSnapshot,
+    getServerSnapshot,
+  );
   const [accountOpen, setAccountOpen] = useState(false);
   const drawerRef = useRef<HTMLElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
@@ -179,10 +187,6 @@ export function SiteHeader({
   const accountRef = useRef<HTMLDivElement>(null);
   const accountButtonRef = useRef<HTMLButtonElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
-
-  useEffect(() => {
-    setPortalReady(true);
-  }, []);
 
   useEffect(() => {
     if (!drawerOpen) {
