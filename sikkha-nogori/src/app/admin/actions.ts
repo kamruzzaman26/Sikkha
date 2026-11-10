@@ -579,10 +579,13 @@ async function syncProductEntityRelations(
       if (error) throw new Error(`Unable to remove product ${config.kind}.`, { cause: error });
     }
 
-    await db
+    const { error: clearError } = await db
       .from(config.table)
       .update({ is_primary: false })
       .eq("product_id", productId);
+    if (clearError) {
+      throw new Error(`Unable to reset primary product ${config.kind}.`, { cause: clearError });
+    }
 
     if (ids.length > 0) {
       const { error } = await db.from(config.table).upsert(
