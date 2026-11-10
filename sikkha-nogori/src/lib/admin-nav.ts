@@ -19,6 +19,7 @@ export const adminNav: AdminNavGroup[] = [
     items: [
       { label: "Dashboard", icon: "dashboard", href: "/admin/dashboard" },
       { label: "Products & Affiliate Links", icon: "products", href: "/admin" },
+      { label: "Catalog Entities", icon: "products", href: "/admin/catalog-entities" },
       { label: "Categories", icon: "categories", href: "/admin/categories" },
       { label: "Orders", icon: "orders", href: "/admin/orders" },
       { label: "Customers", icon: "customers", href: "/admin/users" },
