@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Hind_Siliguri } from "next/font/google";
 import { SiteShell } from "@/components/site-shell";
 import { DEFAULT_DESCRIPTION, getSiteSettings, resolveSiteOrigin } from "@/lib/site-settings";
@@ -9,6 +9,13 @@ const hindSiliguri = Hind_Siliguri({
   subsets: ["bengali", "latin"],
   weight: ["400", "500", "600", "700"],
 });
+
+// Explicit mobile viewport: prevent browsers/webviews from using a desktop-width layout.
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+};
 
 export async function generateMetadata(): Promise<Metadata> {
   const { general, seo } = await getSiteSettings();
@@ -23,7 +30,6 @@ export async function generateMetadata(): Promise<Metadata> {
     applicationName: general.siteName,
     ...(seo.keywords ? { keywords: seo.keywords.split(",").map((k) => k.trim()).filter(Boolean) } : {}),
     robots: { index: seo.index, follow: seo.follow },
-    // Every page gets its own canonical address (its own path, no query).
     alternates: { canonical: "./" },
     openGraph: {
       type: "website",
@@ -51,7 +57,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="bn" className={`${hindSiliguri.variable} h-full antialiased`}>
-      <body className="flex min-h-full flex-col">
+      <body className="flex min-h-full w-full flex-col">
         <SiteShell>{children}</SiteShell>
       </body>
     </html>
