@@ -134,7 +134,7 @@ function EntitySelector({
             ))}
           </div>
           <label className="mt-3 grid gap-1 text-xs font-semibold text-slate-600">
-            Primary {label.replace(/s$/, "")}
+            Primary selection
             <select name={primaryName} defaultValue={primaryId} className="min-h-10 rounded-lg border border-slate-300 bg-white px-3 text-sm font-normal">
               <option value="">First selected</option>
               {options.map((option) => (
@@ -612,9 +612,9 @@ async function AdminContent({
       .select("product_id, category_id, is_primary")
       .limit(10000),
     db.from("authors").select("id, name, is_active").order("name"),
-    db.from("publishers").select("id, name").eq("is_active", true).order("name"),
-    db.from("brands").select("id, name").eq("is_active", true).order("name"),
-    db.from("creators").select("id, name").eq("is_active", true).order("name"),
+    db.from("publishers").select("id, name, is_active").order("name"),
+    db.from("brands").select("id, name, is_active").order("name"),
+    db.from("creators").select("id, name, is_active").order("name"),
     db.from("product_authors").select("product_id, author_id, is_primary").limit(10000),
     db.from("product_publishers").select("product_id, publisher_id, is_primary").limit(10000),
     db.from("product_brands").select("product_id, brand_id, is_primary").limit(10000),
