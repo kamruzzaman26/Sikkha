@@ -114,6 +114,7 @@ export default async function CatalogEntitiesPage({
 }) {
   await connection();
   const { supabase } = await requirePermission("manage_products");
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- table names are fixed by the catalog entity schema.
   const db = supabase as unknown as { from: (table: string) => any };
   const [authors, publishers, brands, creators] = await Promise.all([
     db.from("authors").select("*").order("name"),
