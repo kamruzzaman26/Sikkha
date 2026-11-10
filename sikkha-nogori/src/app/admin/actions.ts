@@ -178,6 +178,7 @@ export async function saveAffiliateLink(formData: FormData) {
       .from("affiliate_links")
       .update({ ...values, updated_at: new Date().toISOString() })
       .eq("id", id)
+      .is("deleted_at", null)
       .select("id")
       .maybeSingle();
 
@@ -218,6 +219,7 @@ export async function setAffiliateLinkStatus(formData: FormData) {
       .from("affiliate_links")
       .select("partner, url, product_id")
       .eq("id", id)
+      .is("deleted_at", null)
       .maybeSingle();
 
     if (linkError) {
@@ -280,6 +282,7 @@ export async function setAffiliateLinkStatus(formData: FormData) {
       updated_at: new Date().toISOString(),
     })
     .eq("id", id)
+    .is("deleted_at", null)
     .select("id")
     .maybeSingle();
 
