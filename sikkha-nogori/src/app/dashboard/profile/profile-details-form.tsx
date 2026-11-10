@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useFormStatus } from "react-dom";
 
 function SaveButton({ isSaved, dirty }: { isSaved: boolean; dirty: boolean }) {
@@ -52,6 +52,10 @@ export function ProfileDetailsForm({
   maxDate: string;
 }) {
   const [dirty, setDirty] = useState(false);
+
+  useEffect(() => {
+    if (isSaved) setDirty(false);
+  }, [isSaved]);
 
   return (
     <form action={action} onChange={() => setDirty(true)} className="space-y-4 p-5">
