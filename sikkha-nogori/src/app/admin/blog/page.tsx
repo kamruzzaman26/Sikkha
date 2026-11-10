@@ -34,6 +34,10 @@ function dhakaLocal(value: string | null) {
   return value ? new Date(new Date(value).getTime() + 6 * 3600_000).toISOString().slice(0, 16) : "";
 }
 
+async function getCurrentTimestamp() {
+  return Date.now();
+}
+
 const statusStyle = {
   published: "bg-green-100 text-green-800",
   draft: "bg-amber-100 text-amber-800",
@@ -73,7 +77,7 @@ export default async function AdminBlogPage({ searchParams }: { searchParams: Pr
   };
   const visible = filter === "all" ? posts : posts.filter((p) => p.status === filter);
   const notice = statusParam && messages[statusParam] ? messages[statusParam] : null;
-  const now = Date.now();
+  const now = await getCurrentTimestamp();
 
   return (
     <main lang="en" className="mx-auto min-h-screen max-w-[1500px] bg-canvas px-4 py-6 text-slate-900 sm:px-7 sm:py-8 xl:px-10">
