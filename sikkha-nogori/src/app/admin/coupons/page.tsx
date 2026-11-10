@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { connection } from "next/server";
 import { AdminSubmitButton } from "@/components/admin-submit-button";
 import { requirePermission } from "@/lib/supabase/admin";
-import { createCoupon, updateCouponFlag } from "./actions";
+import { ConfirmDeleteButton } from "@/components/confirm-delete-button";
+import { createCoupon, deleteCoupon, updateCouponFlag } from "./actions";
 
 export const metadata: Metadata = { title: "Coupons | Sikkha Nogori Admin", robots: { index: false, follow: false } };
 
@@ -15,6 +16,8 @@ type Coupon = {
 const messages: Record<string, string> = {
   created: "Coupon created.",
   updated: "Coupon updated.",
+  deleted: "Coupon deleted.",
+  archived: "This coupon was already used on orders, so it was switched off and hidden instead of deleted (order history stays intact).",
   invalid: "Please check the fields: code 3–20 letters/digits, discount 1–90%, and an expiry date in the future.",
   duplicate: "That coupon code already exists. Choose a different code.",
 };
@@ -67,7 +70,7 @@ export default async function CouponsPage({ searchParams }: { searchParams: Prom
         <h1 className="mt-1 text-3xl font-bold tracking-tight">Coupons</h1>
         <p className="mt-1.5 max-w-2xl text-[15px] leading-6 text-slate-600">Create percentage-off coupons — with an expiry date for campaigns, or without one for a standing offer. Switch any coupon on or off, and choose whether it is advertised on the checkout page.</p>
       </header>
-      {status && messages[status] && <p role="status" className={`mt-5 rounded-xl border px-4 py-3 text-sm font-semibold ${bad ? "border-rose-200 bg-rose-50 text-rose-900" : "border-brand-200 bg-brand-50 text-brand-900"}`}>{messages[status]}</p>}
+      {status && messages[status] && <p role="status" aria-live="polite" className={`mt-5 rounded-xl border px-4 py-3 text-sm font-semibold ${bad ? "border-rose-200 bg-rose-50 text-rose-900" : "border-brand-200 bg-brand-50 text-brand-900"}`}>{messages[status]}</p>}
 
       <div className="mt-6 grid items-start gap-6 xl:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
         <section className="rounded-2xl border border-slate-200 bg-white shadow-sm">
@@ -89,6 +92,10 @@ export default async function CouponsPage({ searchParams }: { searchParams: Prom
                       <div className="flex flex-wrap gap-2">
                         <Toggle id={c.id} field="is_active" value={c.is_active} on="Coupon active" onLabel="Active" offLabel="Turned off" />
                         <Toggle id={c.id} field="show_publicly" value={c.show_publicly} on="Shown on checkout" onLabel="Shown on checkout" offLabel="Hidden from checkout" />
+                        <form action={deleteCoupon}>
+                          <input type="hidden" name="id" value={c.id} />
+                          <ConfirmDeleteButton message={`Delete coupon ${c.code}? This cannot be undone.`}>Delete</ConfirmDeleteButton>
+                        </form>
                       </div>
                     </div>
                     {c.description && <p className="mt-2 text-sm text-slate-600">{c.description}</p>}

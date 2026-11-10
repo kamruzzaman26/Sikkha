@@ -75,3 +75,25 @@ export async function updateCouponFlag(form: FormData) {
   revalidatePath("/checkout");
   redirect(`${BASE}?status=updated`);
 }
+
+export async function deleteCoupon(form: FormData) {
+  const { supabase } = await requirePermission("manage_marketing", "/admin/dashboard");
+  const id = text(form, "id");
+  if (!/^[0-9a-f-]{36}$/i.test(id)) redirect(`${BASE}?status=invalid`);
+  const { error } = await supabase.from("coupons").delete().eq("id", id);
+  if (error) {
+    // Already used on an order: keep the history, just switch it off and hide it.
+    if (error.code === "23503") {
+      await supabase.from("coupons").update({ is_active: false, show_publicly: false, updated_at: new Date().toISOString() }).eq("id", id);
+      await logActivity(supabase, "coupon_archived", "coupons", id);
+      revalidatePath(BASE);
+      revalidatePath("/checkout");
+      redirect(`${BASE}?status=archived`);
+    }
+    throw new Error("Unable to delete the coupon.", { cause: error });
+  }
+  await logActivity(supabase, "coupon_deleted", "coupons", id);
+  revalidatePath(BASE);
+  revalidatePath("/checkout");
+  redirect(`${BASE}?status=deleted`);
+}
