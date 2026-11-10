@@ -38,6 +38,7 @@ export function ProfileDetailsForm({
   action,
   defaultName,
   defaultDateOfBirth,
+  defaultGender,
   email,
   isSaved,
   maxDate,
@@ -45,6 +46,7 @@ export function ProfileDetailsForm({
   action: (formData: FormData) => Promise<void>;
   defaultName: string;
   defaultDateOfBirth: string;
+  defaultGender: string;
   email: string;
   isSaved: boolean;
   maxDate: string;
@@ -61,6 +63,15 @@ export function ProfileDetailsForm({
         <label htmlFor="date-of-birth" className="mb-2 block text-sm font-semibold">Date of Birth</label>
         <input id="date-of-birth" name="dateOfBirth" type="date" max={maxDate} defaultValue={defaultDateOfBirth} className="w-full rounded-lg border border-slate-300 px-3 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100" />
         <p className="mt-1 text-xs text-slate-500">Optional · Your date of birth is visible only in your account profile.</p>
+      </div>
+      <div>
+        <label htmlFor="profile-gender" className="mb-2 block text-sm font-semibold">Gender</label>
+        <select id="profile-gender" name="gender" defaultValue={defaultGender} className="w-full rounded-lg border border-slate-300 bg-white px-3 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100">
+          <option value="">Select gender (optional)</option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+          <option value="Prefer not to say">Prefer not to say</option>
+        </select>
       </div>
       <div>
         <label className="mb-2 block text-sm font-semibold">Email Address</label>
