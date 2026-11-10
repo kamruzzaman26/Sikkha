@@ -337,13 +337,13 @@ export function SiteHeader({
           </div>
 
           <form
-            action="/books"
+            action="/search"
             method="get"
             role="search"
             className="order-3 w-full lg:order-none lg:min-w-0 lg:flex-1"
           >
             <label className="sr-only" htmlFor="site-search">
-              Search books, authors, or categories
+              Search books, courses, products, or authors
             </label>
             <div className="flex min-h-11 rounded-xl border border-slate-200 bg-[#f8faf9] p-1 transition focus-within:border-emerald-600 focus-within:ring-2 focus-within:ring-emerald-100">
               <span className="flex items-center pl-2.5 text-slate-500">
@@ -353,7 +353,7 @@ export function SiteHeader({
                 id="site-search"
                 name="q"
                 type="search"
-                placeholder="Search books, authors, or categories"
+                placeholder="Search books, courses, products, or authors"
                 className="min-w-0 flex-1 bg-transparent px-2 text-sm text-slate-800 outline-none placeholder:text-slate-500"
               />
               <button
