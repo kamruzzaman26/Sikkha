@@ -12,6 +12,17 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
+function dhakaDateKey(value: string) {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Asia/Dhaka",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(new Date(value));
+  const part = (type: string) => parts.find((item) => item.type === type)?.value ?? "";
+  return `${part("year")}-${part("month")}-${part("day")}`;
+}
+
 const orderStatusLabels: Record<string, string> = {
   pending: "Pending",
   confirmed: "Confirmed",
@@ -26,7 +37,7 @@ const statusStyles: Record<string, string> = {
   confirmed: "bg-sky-100 text-sky-900",
   processing: "bg-sky-100 text-sky-900",
   shipped: "bg-indigo-100 text-indigo-900",
-  delivered: "bg-green-100 text-green-800",
+  delivered: "bg-emerald-100 text-emerald-900",
   cancelled: "bg-rose-100 text-rose-900",
 };
 
@@ -142,13 +153,13 @@ function Card({
   tone?: "green" | "amber" | "rose" | "slate";
 }) {
   const tones = {
-    green: "bg-brand-50 text-brand-800",
+    green: "bg-blue-50 text-blue-800",
     amber: "bg-amber-50 text-amber-900",
     rose: "bg-rose-50 text-rose-900",
     slate: "bg-slate-100 text-slate-700",
   };
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+    <div className="rounded-2xl border border-blue-100 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
       <div className="flex items-center justify-between gap-3">
         <p className="text-sm font-semibold text-slate-600">{label}</p>
         <span className={`flex h-10 w-10 items-center justify-center rounded-xl ${tones[tone]}`}>
@@ -191,7 +202,7 @@ async function DashboardContent() {
   await connection();
   const { supabase } = await requireAdmin("admin");
 
-  const [productsResult, ordersResult, usersResult] = await Promise.all([
+  const [productsResult, ordersResult, usersResult, affiliateLinksResult] = await Promise.all([
     supabase.from("products").select("id, is_published, archived_at"),
     supabase
       .from("orders")
@@ -201,6 +212,7 @@ async function DashboardContent() {
       .order("created_at", { ascending: false })
       .limit(1000),
     supabase.rpc("admin_list_users"),
+    supabase.from("affiliate_links").select("id, is_active, partner"),
   ]);
 
   const orders = ordersResult.data ?? [];
@@ -221,29 +233,42 @@ async function DashboardContent() {
       : { data: [], error: null };
   const top = bestSellers(itemsResult.data ?? []);
   const topMax = Math.max(1, ...top.map((item) => Number(item.quantity) || 0));
+  const dhakaNow = new Date(Date.now() + 6 * 60 * 60 * 1000);
+  const dhakaTodayUtc = Date.UTC(dhakaNow.getUTCFullYear(), dhakaNow.getUTCMonth(), dhakaNow.getUTCDate());
+  const salesDays = Array.from({ length: 7 }, (_, index) => {
+    const date = new Date(dhakaTodayUtc - (6 - index) * 86400000);
+    const key = date.toISOString().slice(0, 10);
+    const amount = orders.reduce((sum, order) => (
+      order.payment_status === "verified" && dhakaDateKey(order.created_at) === key
+        ? sum + (Number(order.total_amount) || 0)
+        : sum
+    ), 0);
+    return { key, label: date.toLocaleDateString("en-US", { weekday: "short", timeZone: "UTC" }), amount };
+  });
+  const maxDailySales = Math.max(1, ...salesDays.map((day) => day.amount));
 
   return (
-    <main lang="en" className="min-h-screen bg-[#f4f6fa] px-4 py-6 text-slate-900 sm:px-7 sm:py-8 xl:px-10">
+    <main lang="en" className="min-h-screen bg-[#f4f7ff] px-4 py-6 text-slate-900 sm:px-7 sm:py-8 xl:px-10">
       <div className="mx-auto max-w-[1500px]">
-        <header className="flex flex-wrap items-end justify-between gap-4">
+        <header className="relative flex flex-wrap items-end justify-between gap-4 overflow-hidden rounded-[26px] bg-[#101b35] px-6 py-7 text-white shadow-xl sm:px-8 sm:py-8">
           <div className="min-w-0">
-            <p className="text-xs font-bold uppercase tracking-[0.14em] text-brand-800">Overview</p>
-            <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900">Dashboard</h1>
-            <p className="mt-1.5 max-w-2xl text-[15px] leading-6 text-slate-600">
-              Live store performance at a glance. Sales include only payment-verified orders (today and month are based on Dhaka time).
+            <p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-800">Overview</p>
+            <h1 className="mt-1 text-3xl font-extrabold tracking-tight text-white">Welcome back, Admin!</h1>
+            <p className="mt-1.5 max-w-2xl text-[15px] leading-6 text-blue-100/85">
+              Here’s what is happening with your website today. Sales include only payment-verified orders (today and month are based on Dhaka time).
             </p>
           </div>
           <div className="flex flex-wrap gap-2.5">
             <Link
               href="/admin/orders"
-              className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-800 transition hover:bg-slate-50"
+              className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-white/25 bg-white/10 px-4 text-sm font-semibold text-white transition hover:bg-slate-50"
             >
               <Icon name="orders" className="h-[18px] w-[18px]" />
               Manage orders
             </Link>
             <Link
               href="/admin"
-              className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-brand-800 px-4 text-sm font-semibold text-white transition hover:bg-brand-900"
+              className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-blue-600 px-4 text-sm font-semibold text-white transition hover:bg-blue-800"
             >
               <Icon name="box" className="h-[18px] w-[18px]" />
               Open product catalog
@@ -251,10 +276,35 @@ async function DashboardContent() {
           </div>
         </header>
 
-        <SectionTitle title="Sales overview" />
+        <SectionTitle title="Sales Overview" hint="Verified sales and order activity" />
         {ordersResult.error ? (
           <Unavailable what="order data" />
         ) : (
+          <>
+          <div className="grid gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(260px,1fr)]">
+            <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div><h2 className="text-lg font-bold tracking-tight text-slate-900">Sales Overview</h2><p className="mt-1 text-xs text-slate-500">Verified order revenue · Last 7 days</p></div>
+                <span className="rounded-lg bg-blue-50 px-3 py-2 text-xs font-bold text-blue-800">7D</span>
+              </div>
+              <div className="mt-6 grid grid-cols-[auto_1fr] gap-3">
+                <div className="flex h-52 flex-col justify-between pb-7 text-[10px] text-slate-400"><span>{formatBDT(maxDailySales)}</span><span>{formatBDT(maxDailySales * .66)}</span><span>{formatBDT(maxDailySales * .33)}</span><span>৳0</span></div>
+                <div className="relative h-52 border-b border-slate-200">
+                  <div className="pointer-events-none absolute inset-0 flex flex-col justify-between pb-7"><span className="border-t border-dashed border-slate-200" /><span className="border-t border-dashed border-slate-200" /><span className="border-t border-dashed border-slate-200" /><span className="border-t border-slate-200" /></div>
+                  <div className="relative flex h-full items-end justify-around gap-2 px-2 pb-7">
+                    {salesDays.map((day) => <div key={day.key} className="flex h-full min-w-0 flex-1 flex-col items-center justify-end gap-2"><div title={formatBDT(day.amount)} className="w-full max-w-12 rounded-t-lg bg-blue-600 transition hover:bg-blue-700" style={{ height: day.amount > 0 ? `${Math.max(4, day.amount / maxDailySales * 82)}%` : "3px" }} /><span className="absolute bottom-0 text-[10px] font-medium text-slate-500">{day.label}</span></div>)}
+                  </div>
+                </div>
+              </div>
+              {salesDays.every((day) => day.amount === 0) && <p className="mt-2 text-center text-xs text-slate-500">No verified sales recorded in the last 7 days.</p>}
+            </section>
+            <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+              <h2 className="text-lg font-bold tracking-tight text-slate-900">Quick Actions</h2>
+              <div className="mt-4 grid gap-2">
+                {[{label:"Add Product",href:"/admin#products"},{label:"Manage Affiliate Links",href:"/admin#affiliate-links"},{label:"Manage Orders",href:"/admin/orders"},{label:"Manage Payments",href:"/admin/payments"},{label:"Manage Users",href:"/admin/users"}].map((action) => <Link key={action.label} href={action.href} className="flex min-h-12 items-center justify-between rounded-xl bg-slate-50 px-4 text-sm font-semibold text-slate-700 transition hover:bg-blue-50 hover:text-blue-800"><span>{action.label}</span><span aria-hidden="true">→</span></Link>)}
+              </div>
+            </section>
+          </div>
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             <Card label="Total sales" value={formatBDT(orderStats.totalSales)} icon="cash" />
             <Card label="Today's sales" value={formatBDT(orderStats.todaySales)} icon="today" />
@@ -264,9 +314,10 @@ async function DashboardContent() {
             <Card label="Completed orders" value={String(orderStats.completed)} icon="check" />
             <Card label="Cancelled orders" value={String(orderStats.cancelled)} icon="x" tone="rose" />
           </div>
+          </>
         )}
 
-        <SectionTitle title="Catalog and customers" />
+        <SectionTitle title="Catalog, Customers & Affiliates" hint="Current catalog, registered accounts, and partner link activity" />
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {productsResult.error ? (
             <div className="sm:col-span-2 xl:col-span-4">
@@ -298,6 +349,14 @@ async function DashboardContent() {
               tone="slate"
             />
           )}
+          {affiliateLinksResult.error ? (
+            <div className="sm:col-span-2"><Unavailable what="affiliate link data" /></div>
+          ) : (
+            <>
+              <Card label="Active affiliate links" value={String((affiliateLinksResult.data ?? []).filter((link) => link.is_active).length)} note="Enabled partner product links" icon="publish" />
+              <Card label="Inactive affiliate links" value={String((affiliateLinksResult.data ?? []).filter((link) => !link.is_active).length)} note="Links currently disabled" icon="alert" tone="slate" />
+            </>
+          )}
         </div>
         <div className="mt-4 flex items-start gap-3 rounded-xl border border-dashed border-slate-300 bg-white px-4 py-3 text-sm leading-6 text-slate-700">
           <Icon name="alert" className="mt-0.5 h-5 w-5 text-slate-500" />
@@ -308,12 +367,12 @@ async function DashboardContent() {
         </div>
 
         <div className="mt-8 grid gap-6 lg:grid-cols-2">
-          <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+          <section className="rounded-2xl border border-blue-100 bg-white p-5 shadow-sm sm:p-6">
             <div className="flex items-center justify-between gap-3">
               <h2 className="text-lg font-bold tracking-tight">Recent orders</h2>
               <Link
                 href="/admin/orders"
-                className="inline-flex min-h-11 items-center rounded-lg px-3 text-sm font-semibold text-brand-800 transition hover:bg-brand-50"
+                className="inline-flex min-h-11 items-center rounded-lg px-3 text-sm font-semibold text-emerald-800 transition hover:bg-emerald-50"
               >
                 View all
               </Link>
@@ -362,7 +421,7 @@ async function DashboardContent() {
               <ol className="mt-3 flex flex-col gap-4">
                 {top.map((item, index) => (
                   <li key={item.title} className="flex items-center gap-3 text-sm">
-                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-xs font-bold text-brand-800">
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-xs font-bold text-emerald-800">
                       {index + 1}
                     </span>
                     <div className="min-w-0 flex-1">
@@ -372,7 +431,7 @@ async function DashboardContent() {
                       </div>
                       <div className="mt-1.5 h-2 rounded-full bg-slate-100">
                         <div
-                          className="h-2 rounded-full bg-brand-700"
+                          className="h-2 rounded-full bg-blue-600"
                           style={{ width: `${Math.max(4, ((Number(item.quantity) || 0) / topMax) * 100)}%` }}
                         />
                       </div>
@@ -397,7 +456,7 @@ export default function AdminDashboardPage() {
   return (
     <Suspense
       fallback={
-        <main className="min-h-screen bg-[#f4f6fa] px-5 py-8">
+        <main className="min-h-screen bg-[#f3f6f5] px-5 py-8">
           <div className="mx-auto h-64 max-w-6xl animate-pulse rounded-2xl bg-white" />
         </main>
       }
