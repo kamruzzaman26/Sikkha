@@ -15,6 +15,7 @@ const messages: Record<string, string> = {
   saved: "✓ Saved successfully!",
   password: "✓ Password updated successfully!",
   passwordInvalid: "Password must contain at least 8 characters.",
+  passwordMismatch: "The passwords do not match. Please try again.",
 };
 
 async function ProfileContent({ searchParams }: { searchParams: Promise<{ status?: string | string[] }> }) {
