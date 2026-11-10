@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { type ChangeEvent, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { saveCustomerAvatar } from "./actions";
@@ -18,7 +18,7 @@ export function ProfileAvatarUploader({
   const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState("");
 
-  async function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
+  async function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     if (!file) return;
 
