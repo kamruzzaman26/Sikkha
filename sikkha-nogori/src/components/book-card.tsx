@@ -29,7 +29,7 @@ export default function BookCard({
   const savings = getSavings(book.price, book.listPrice);
 
   return (
-    <article className="group flex h-full min-w-0 flex-col overflow-hidden rounded-xl border border-slate-100 bg-white shadow-sm transition duration-200 hover:border-emerald-200 hover:shadow-md">
+    <article className="group relative flex h-full min-w-0 flex-col overflow-hidden rounded-xl border border-slate-100 bg-white shadow-sm transition duration-200 hover:border-emerald-200 hover:shadow-md">
       <Link
         href={`/books/${book.slug}`}
         aria-label={`Book details: ${book.title}`}
