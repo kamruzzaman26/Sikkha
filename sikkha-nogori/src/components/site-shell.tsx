@@ -85,7 +85,10 @@ async function getCategoryMenu() {
     }
     return {
       books: buildCategoryMenu(data, "books"),
-      products: buildCategoryMenu(data, "products"),
+      products: [
+        ...buildCategoryMenu(data, "products"),
+        ...buildCategoryMenu(data, "electronics"),
+      ],
     };
   } catch {
     return { books: [], products: [] };

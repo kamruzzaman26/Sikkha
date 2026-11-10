@@ -167,6 +167,7 @@ type TopBar = {
 
 export function SiteHeader({
   identity,
+  categoryMenu,
   topBar = { helpline: "", note: "" } as TopBar,
 }: {
   identity: SiteIdentity;
@@ -494,28 +495,57 @@ export function SiteHeader({
               <DrawerLink icon="history" href="/account/orders" onClick={closeDrawer}>Buy Again</DrawerLink>
               <DrawerLink icon="article" href="/books?category=বই%20মেলা%202026" onClick={closeDrawer}>বই মেলা ২০২৬</DrawerLink>
 
-              <NavigationGroup title="বই" href="/books" onNavigate={closeDrawer} items={[
-                "লেখক", "বিষয়", "প্রকাশনী", "অতিরিক্ত ছাড়ের বই", "একাডেমিক বই",
-                "একাদশ ও দ্বাদশ শ্রেণির বই", "ভর্তি প্রস্তুতি", "বইমেলা ২০২৬"
-              ]} basePath="/books" />
+              {categoryMenu?.books.length ? (
+                <details className="group border-b border-slate-100">
+                  <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 rounded-lg px-3 text-sm font-bold text-slate-800 outline-none hover:bg-emerald-50 focus-visible:ring-2 focus-visible:ring-emerald-700 [&::-webkit-details-marker]:hidden">
+                    <span className="flex items-center gap-3"><CategoryGlyph name="বই" />বই</span>
+                    <span aria-hidden="true" className="transition group-open:rotate-180">⌄</span>
+                  </summary>
+                  <div className="pb-2 pl-5">
+                    <DrawerLink icon="book" href="/books" onClick={closeDrawer}>সব বই</DrawerLink>
+                    <CategoryTree items={categoryMenu.books} basePath="/books" onNavigate={closeDrawer} />
+                  </div>
+                </details>
+              ) : (
+                <NavigationGroup title="বই" href="/books" onNavigate={closeDrawer} items={[
+                  "লেখক", "বিষয়", "প্রকাশনী", "অতিরিক্ত ছাড়ের বই", "একাডেমিক বই",
+                  "একাদশ ও দ্বাদশ শ্রেণির বই", "ভর্তি প্রস্তুতি", "বইমেলা ২০২৬"
+                ]} basePath="/books" />
+              )}
               <DrawerLink icon="book" href="/products?category=ই-বুক" onClick={closeDrawer}>ই-বুক</DrawerLink>
 
-              <NavigationGroup title="সুপার স্টোর" href="/products" onNavigate={closeDrawer} items={[
-                "Weekly Bestseller", "Islamic Accessories", "Stationery", "Organic Food",
-                "Buy 1 Get 1 Offer", "Beauty & Personal Care", "Voucher", "Diary/Notebook",
-                "Calculator", "Groceries", "Fan and Ventilator", "Drawing & Art Supplies"
-              ]} basePath="/products" />
+              {categoryMenu?.products.length ? (
+                <details className="group border-b border-slate-100">
+                  <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 rounded-lg px-3 text-sm font-bold text-slate-800 outline-none hover:bg-emerald-50 focus-visible:ring-2 focus-visible:ring-emerald-700 [&::-webkit-details-marker]:hidden">
+                    <span className="flex items-center gap-3"><CategoryGlyph name="সুপার স্টোর" />সুপার স্টোর</span>
+                    <span aria-hidden="true" className="transition group-open:rotate-180">⌄</span>
+                  </summary>
+                  <div className="pb-2 pl-5">
+                    <DrawerLink icon="book" href="/products" onClick={closeDrawer}>সব পণ্য</DrawerLink>
+                    <CategoryTree items={categoryMenu.products} basePath="/products" onNavigate={closeDrawer} />
+                  </div>
+                </details>
+              ) : (
+                <>
+                  <NavigationGroup title="সুপার স্টোর" href="/products" onNavigate={closeDrawer} items={[
+                    "Weekly Bestseller", "Islamic Accessories", "Stationery", "Organic Food",
+                    "Buy 1 Get 1 Offer", "Beauty & Personal Care", "Voucher", "Diary/Notebook",
+                    "Calculator", "Groceries", "Fan and Ventilator", "Drawing & Art Supplies"
+                  ]} basePath="/products" />
+                  <NavigationGroup title="ইলেকট্রনিক্স" href="/products" onNavigate={closeDrawer} items={[
+                    "Computer & Accessories", "Mobile & Accessories", "Office Equipment", "Gaming Zone",
+                    "Networking", "Sound System", "Grooming & Lifestyle", "Appliances",
+                    "Fan and ventilator", "Science Kit"
+                  ]} basePath="/products" />
+                  <NavigationGroup title="কিডস জোন" href="/products" onNavigate={closeDrawer} items={[
+                    "Diaper & Potty", "Feeding", "Kids Toys", "Lotions & Creams", "Teethers & Pacifier",
+                    "Grooming", "Oral & Health", "Body Wash", "Mum Pot & Cups", "Bathing"
+                  ]} basePath="/products" />
+                </>
+              )}
               <DrawerLink icon="article" href="/books?category=শিক্ষা%20কুইজ" onClick={closeDrawer}>শিক্ষা কুইজ</DrawerLink>
 
-              <NavigationGroup title="ইলেকট্রনিক্স" href="/products" onNavigate={closeDrawer} items={[
-                "Computer & Accessories", "Mobile & Accessories", "Office Equipment", "Gaming Zone",
-                "Networking", "Sound System", "Grooming & Lifestyle", "Appliances",
-                "Fan and ventilator", "Science Kit"
-              ]} basePath="/products" />
-              <NavigationGroup title="কিডস জোন" href="/products" onNavigate={closeDrawer} items={[
-                "Diaper & Potty", "Feeding", "Kids Toys", "Lotions & Creams", "Teethers & Pacifier",
-                "Grooming", "Oral & Health", "Body Wash", "Mum Pot & Cups", "Bathing"
-              ]} basePath="/products" />
+
 
               <div className="mt-5 border-t border-slate-200 pt-3">
                 <p className="px-3 pb-2 text-xs font-extrabold uppercase tracking-wider text-emerald-800">সহায়তা ও অন্যান্য</p>
