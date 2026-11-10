@@ -98,7 +98,7 @@ type ProductFormValue = {
 
 type CategoryOption = { id: string; label: string; group: string };
 type EntityKind = "authors" | "publishers" | "brands" | "creators";
-type EntityOption = { id: string; name: string };
+type EntityOption = { id: string; name: string; is_active: boolean };
 type EntityOptions = Record<EntityKind, EntityOption[]>;
 type EntitySelections = Record<EntityKind, string[]>;
 type EntityPrimaries = Record<EntityKind, string>;
@@ -129,7 +129,7 @@ function EntitySelector({
             {options.map((option) => (
               <label key={option.id} className="flex min-h-9 items-start gap-2 text-sm">
                 <input type="checkbox" name={inputName} value={option.id} defaultChecked={selectedIds.includes(option.id)} className="mt-1 size-4" />
-                <span>{option.name}</span>
+                <span>{option.name}{option.is_active ? "" : " (Inactive)"}</span>
               </label>
             ))}
           </div>
@@ -611,7 +611,7 @@ async function AdminContent({
       .from("product_categories")
       .select("product_id, category_id, is_primary")
       .limit(10000),
-    db.from("authors").select("id, name").eq("is_active", true).order("name"),
+    db.from("authors").select("id, name, is_active").order("name"),
     db.from("publishers").select("id, name").eq("is_active", true).order("name"),
     db.from("brands").select("id, name").eq("is_active", true).order("name"),
     db.from("creators").select("id, name").eq("is_active", true).order("name"),
