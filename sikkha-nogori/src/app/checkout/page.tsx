@@ -1,8 +1,6 @@
-import { randomUUID } from "node:crypto";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
-import { placeOrder } from "./actions";
 import { formatBDT } from "@/lib/money";
 import { getCheckoutOptions } from "@/lib/supabase/checkout";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -60,6 +58,7 @@ async function CheckoutContent({
   ]);
   const { data: couponRows } = user ? await supabase.rpc("get_public_coupons") : { data: null };
   const publicCoupons = (couponRows ?? []) as { code: string; description: string; discount_percent: number; expires_at: string | null; min_order_amount: number }[];
+  const initialCoupon = (Array.isArray(params.couponCode) ? params.couponCode[0] : params.couponCode ?? "").toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 20);
   const status = Array.isArray(params.status) ? params.status[0] : params.status;
   const message =
     status && Object.hasOwn(statusMessages, status)
@@ -76,9 +75,9 @@ async function CheckoutContent({
           ← শিক্ষা নগরী
         </Link>
         <header className="mt-8">
-          <p className="text-sm font-bold text-emerald-700">অর্ডার</p>
+          <p className="text-sm font-bold text-emerald-700">ধাপ ১ / ২</p>
           <h1 className="mt-2 text-3xl font-extrabold sm:text-4xl">
-            Checkout
+            পণ্য ও কুপন
           </h1>
           <p className="mt-3 leading-7 text-slate-600">
             অর্ডারের মূল্য সার্ভার প্রকাশিত পণ্যের বর্তমান মূল্য থেকে হিসাব
@@ -119,9 +118,7 @@ async function CheckoutContent({
             অর্ডারের জন্য কোনো প্রকাশিত পণ্য এখন উপলভ্য নেই।
           </p>
         ) : (
-          <form action={placeOrder} className="mt-7 grid gap-6">
-            <input type="hidden" name="idempotencyKey" value={randomUUID()} />
-
+          <form action="/checkout/delivery" method="get" className="mt-7 grid gap-6">
             <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
               <h2 className="text-xl font-bold">পণ্য নির্বাচন</h2>
               <ul className="mt-4 grid gap-3">
@@ -175,87 +172,8 @@ async function CheckoutContent({
               </ul>
             </section>
 
-            <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
-              <h2 className="text-xl font-bold">ডেলিভারি তথ্য</h2>
-              <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                <div>
-                  <label htmlFor="customer-name" className="mb-2 block font-semibold">
-                    গ্রাহকের নাম *
-                  </label>
-                  <input
-                    id="customer-name"
-                    name="customerName"
-                    required
-                    minLength={2}
-                    maxLength={100}
-                    autoComplete="name"
-                    placeholder="আপনার সম্পূর্ণ নাম"
-                    className="w-full rounded-lg border border-slate-300 px-3 py-2.5"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="customer-phone" className="mb-2 block font-semibold">
-                    মোবাইল নম্বর *
-                  </label>
-                  <input
-                    id="customer-phone"
-                    name="customerPhone"
-                    type="tel"
-                    required
-                    minLength={7}
-                    maxLength={25}
-                    autoComplete="tel"
-                    placeholder="01XXXXXXXXX"
-                    className="w-full rounded-lg border border-slate-300 px-3 py-2.5"
-                  />
-                </div>
-              </div>
-              <div className="mt-5 border-t border-slate-100 pt-5">
-                <h3 className="font-bold text-slate-900">ডেলিভারি ঠিকানা</h3>
-                <p className="mt-1 text-sm text-slate-500">যে ঠিকানায় বই ও পণ্য পৌঁছে দিতে হবে</p>
-                <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                  <div>
-                    <label htmlFor="delivery-division" className="mb-2 block text-sm font-semibold">বিভাগ *</label>
-                    <select id="delivery-division" name="division" required defaultValue="" className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5">
-                      <option value="" disabled>বিভাগ নির্বাচন করুন</option>
-                      {["ঢাকা","চট্টগ্রাম","রাজশাহী","খুলনা","বরিশাল","সিলেট","রংপুর","ময়মনসিংহ"].map((division) => <option key={division} value={division}>{division}</option>)}
-                    </select>
-                  </div>
-                  <div>
-                    <label htmlFor="delivery-district" className="mb-2 block text-sm font-semibold">জেলা *</label>
-                    <input id="delivery-district" name="district" required maxLength={80} placeholder="জেলার নাম লিখুন" className="w-full rounded-lg border border-slate-300 px-3 py-2.5" />
-                  </div>
-                  <div>
-                    <label htmlFor="delivery-thana" className="mb-2 block text-sm font-semibold">উপজেলা / থানা *</label>
-                    <input id="delivery-thana" name="thana" required maxLength={80} placeholder="উপজেলা বা থানার নাম" className="w-full rounded-lg border border-slate-300 px-3 py-2.5" />
-                  </div>
-                  <div>
-                    <label htmlFor="delivery-area" className="mb-2 block text-sm font-semibold">এলাকা / মহল্লা *</label>
-                    <input id="delivery-area" name="area" required maxLength={120} placeholder="এলাকা, রোড বা মহল্লা" className="w-full rounded-lg border border-slate-300 px-3 py-2.5" />
-                  </div>
-                </div>
-                <div className="mt-4">
-                  <label htmlFor="delivery-address" className="mb-2 block text-sm font-semibold">বাড়ি / ফ্ল্যাট / রোড নম্বর ও বিস্তারিত ঠিকানা *</label>
-                  <textarea
-                    id="delivery-address"
-                    name="deliveryAddress"
-                    required
-                    minLength={5}
-                    maxLength={700}
-                    autoComplete="street-address"
-                    rows={3}
-                    placeholder="বাড়ি নম্বর, ফ্ল্যাট, রোড, ল্যান্ডমার্ক ইত্যাদি লিখুন"
-                    className="w-full rounded-lg border border-slate-300 px-3 py-2.5"
-                  />
-                </div>
-                <div className="mt-4">
-                  <label htmlFor="delivery-instructions" className="mb-2 block text-sm font-semibold">ডেলিভারি নির্দেশনা (ঐচ্ছিক)</label>
-                  <input id="delivery-instructions" name="deliveryInstructions" maxLength={200} placeholder="যেমন: কল করে আসবেন" className="w-full rounded-lg border border-slate-300 px-3 py-2.5" />
-                </div>
-              </div>
-            </section>
-
             <CouponField
+              initialCode={initialCoupon}
               coupons={publicCoupons.map((c) => ({
                 code: c.code,
                 percent: Number(c.discount_percent),
@@ -265,80 +183,15 @@ async function CheckoutContent({
               }))}
             />
 
-            <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
-              <h2 className="text-xl font-bold">পেমেন্ট মেথড</h2>
-              {options.paymentMethods.length === 0 ? (
-                <p className="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-950">
-                  এখনো কোনো পেমেন্ট পদ্ধতি চালু নেই। আপনি ডেলিভারি ঠিকানা পূরণ করে দেখতে পারবেন, তবে অর্ডার জমা দিতে Admin Panel থেকে একটি পেমেন্ট পদ্ধতি সক্রিয় করতে হবে।
-                </p>
-              ) : (
-              <fieldset className="mt-4 grid gap-3">
-                <legend className="sr-only">একটি পেমেন্ট মেথড নির্বাচন করুন</legend>
-                {options.paymentMethods.map((method, index) => (
-                  <label
-                    key={method.id}
-                    className="flex cursor-pointer items-start gap-3 rounded-xl border border-slate-200 p-4 hover:border-emerald-300"
-                  >
-                    <input
-                      type="radio"
-                      name="paymentMethodId"
-                      value={method.id}
-                      required={index === 0}
-                      className="mt-1 size-4 shrink-0 text-emerald-700"
-                    />
-                    <span>
-                      <span className="block font-bold">
-                        {method.name}{" "}
-                        {method.method_type === "cod" && (
-                          <span className="text-sm font-medium text-slate-600">
-                            (COD)
-                          </span>
-                        )}
-                      </span>
-                      {method.description && (
-                        <span className="mt-1 block text-sm leading-6 text-slate-600">
-                          {method.description}
-                        </span>
-                      )}
-                      {method.instructions && (
-                        <span className="mt-1 block whitespace-pre-wrap text-sm leading-6 text-slate-600">
-                          {method.instructions}
-                        </span>
-                      )}
-                      {method.method_type === "manual" && (
-                        <span className="mt-2 block text-xs leading-5 text-amber-800">
-                          পেমেন্ট যাচাই না হওয়া পর্যন্ত অর্ডার Paid হবে না।
-                        </span>
-                      )}
-                    </span>
-                  </label>
-                ))}
-              </fieldset>
-              )}
-            </section>
-
-            <p className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-950">
-              অর্ডার জমা হলে সার্ভার পণ্যের বর্তমান মূল্য ও মোট BDT মূল্য
-              নির্ধারণ করবে। Checkout form-এর কোনো মূল্য বা payment status
-              গ্রহণ করা হয় না।
-            </p>
-
-            {options.paymentMethods.length > 0 ? (
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <Link href="/books" className="font-semibold text-emerald-800 hover:underline">← আরও বই দেখুন</Link>
               <SubmitButton
-                pendingLabel="অর্ডার জমা হচ্ছে…"
-                className="min-h-12 rounded-xl bg-emerald-700 px-5 py-3 font-bold text-white hover:bg-emerald-800"
+                pendingLabel="পরের ধাপে যাচ্ছে…"
+                className="min-h-12 rounded-xl bg-emerald-700 px-7 py-3 font-bold text-white hover:bg-emerald-800"
               >
-                অর্ডার জমা দিন
+                পরের ধাপ: ডেলিভারি ও পেমেন্ট →
               </SubmitButton>
-            ) : (
-              <button
-                type="button"
-                disabled
-                className="min-h-12 cursor-not-allowed rounded-xl bg-slate-300 px-5 py-3 font-bold text-slate-600"
-              >
-                পেমেন্ট পদ্ধতি চালু হলে অর্ডার করতে পারবেন
-              </button>
-            )}
+            </div>
           </form>
         )}
 
