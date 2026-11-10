@@ -167,7 +167,6 @@ type TopBar = {
 
 export function SiteHeader({
   identity,
-  categoryMenu = { books: [], products: [] },
   topBar = { helpline: "", note: "" } as TopBar,
 }: {
   identity: SiteIdentity;
