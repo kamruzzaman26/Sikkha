@@ -28,10 +28,10 @@ jobs:
         run: npm run lint --prefix "$GITHUB_WORKSPACE/sikkha-nogori"
 
       - name: Generate Next.js types
-        run: npx --prefix "$GITHUB_WORKSPACE/sikkha-nogori" next typegen
+        run: cd "$GITHUB_WORKSPACE/sikkha-nogori" && npx next typegen
 
       - name: Type-check
-        run: npx --prefix "$GITHUB_WORKSPACE/sikkha-nogori" tsc --noEmit
+        run: cd "$GITHUB_WORKSPACE/sikkha-nogori" && npx tsc --noEmit
 
       - name: Run tests
         run: npm test --prefix "$GITHUB_WORKSPACE/sikkha-nogori"
