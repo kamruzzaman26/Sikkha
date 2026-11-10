@@ -17,6 +17,7 @@ export function parseCheckoutForm(formData) {
   const division = value("division");
   const district = value("district");
   const thana = value("thana");
+  const union = value("union");
   const area = value("area");
   const deliveryInstructions = value("deliveryInstructions");
   const hasStructuredAddress = [division, district, thana, area].some(Boolean);
@@ -25,6 +26,7 @@ export function parseCheckoutForm(formData) {
         division && `বিভাগ: ${division}`,
         district && `জেলা: ${district}`,
         thana && `উপজেলা/থানা: ${thana}`,
+        union && `ইউনিয়ন: ${union}`,
         area && `এলাকা: ${area}`,
         streetAddress && `বিস্তারিত ঠিকানা: ${streetAddress}`,
         deliveryInstructions && `ডেলিভারি নির্দেশনা: ${deliveryInstructions}`,
@@ -49,6 +51,7 @@ export function parseCheckoutForm(formData) {
       division.length < 2 || division.length > 40 ||
       district.length < 2 || district.length > 80 ||
       thana.length < 2 || thana.length > 80 ||
+      union.length > 80 ||
       area.length < 2 || area.length > 120 ||
       streetAddress.length < 5 || streetAddress.length > 700 ||
       deliveryInstructions.length > 200

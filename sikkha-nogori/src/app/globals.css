@@ -57,8 +57,10 @@ textarea {
 
 /* Keep public navigation out of the admin workspace without client-side routing hooks. */
 body:has([data-admin-route]) > .site-header-slot,
-body:has([data-admin-route]) > .site-footer-slot {
-  display: none;
+body:has([data-admin-route]) > .site-footer-slot,
+body:has([data-admin-route]) > nav[aria-label="Bottom navigation"],
+body:has([data-admin-route]) .whatsapp-float {
+  display: none !important;
 }
 
 .site-footer-slot {
@@ -96,4 +98,83 @@ body:has([data-admin-route]) > .site-footer-slot {
 [data-admin-route] :is(a, button, summary):focus-visible {
   outline: 2px solid var(--color-brand-600);
   outline-offset: 2px;
+}
+
+/* ---- Site-wide button feedback (public + admin) ---- */
+button:not(:disabled),
+[role="button"]:not([aria-disabled="true"]),
+summary,
+input[type="submit"]:not(:disabled),
+label[for] {
+  cursor: pointer;
+  -webkit-tap-highlight-color: rgba(0, 107, 79, 0.18);
+}
+button,
+a[class*="rounded"],
+[role="button"] {
+  transition: transform 0.12s ease, filter 0.12s ease, background-color 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+}
+button:not(:disabled):hover,
+a[class*="bg-"][class*="rounded"]:hover {
+  filter: brightness(0.97);
+}
+button:not(:disabled):active,
+[role="button"]:active,
+a[class*="bg-"][class*="rounded"]:active {
+  transform: scale(0.97);
+  filter: brightness(0.92);
+}
+button:disabled,
+input[type="submit"]:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+:is(a, button, summary, [role="button"], input, select, textarea):focus-visible {
+  outline: 2px solid #006b4f;
+  outline-offset: 2px;
+}
+
+/* A pressed button or link waiting for the server. */
+[data-pending="true"] {
+  pointer-events: none;
+  cursor: progress !important;
+  opacity: 0.72;
+}
+button[data-pending="true"]:not([aria-busy])::after {
+  content: "";
+  display: inline-block;
+  width: 0.95em;
+  height: 0.95em;
+  margin-left: 0.5em;
+  vertical-align: -0.12em;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 9999px;
+  animation: click-spin 0.7s linear infinite;
+}
+@keyframes click-spin { to { transform: rotate(360deg); } }
+
+.click-progress {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 9999;
+  height: 3px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+.click-progress.is-on { opacity: 1; }
+.click-progress span {
+  display: block;
+  height: 100%;
+  width: 35%;
+  background: #00a67a;
+  border-radius: 9999px;
+  animation: admin-progress 1s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  button:not(:disabled):active { transform: none; }
+  button[data-pending="true"]:not([aria-busy])::after,
+  .click-progress span { animation: none; }
 }

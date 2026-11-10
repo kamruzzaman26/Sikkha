@@ -99,12 +99,16 @@ export function renderPostContent(content: string): { nodes: ReactNode[]; headin
       continue;
     }
 
-    const image = /^!\[([^\]]*)\]\((https:\/\/[^\s)]+)\)$/.exec(trimmed);
+    const image = /^!\[([^\]]*)\]\((https:\/\/[^\s)]+)\)(?:\{([a-z0-9=\s:/-]*)\})?$/.exec(trimmed);
     if (image) {
+      const opts = Object.fromEntries((image[3] ?? "").split(/\s+/).filter(Boolean).map((p) => p.split("=") as [string, string]));
+      const widths: Record<string, string> = { sm: "max-w-xs", md: "max-w-xl", lg: "max-w-3xl", full: "max-w-full" };
+      const aligns: Record<string, string> = { left: "mr-auto", center: "mx-auto", right: "ml-auto" };
+      const ratios: Record<string, string> = { "16:9": "aspect-video", "4:3": "aspect-[4/3]", "1:1": "aspect-square", "3:2": "aspect-[3/2]" };
       nodes.push(
-        <figure key={key} className="my-7">
+        <figure key={key} className={`my-7 w-full ${widths[opts.size] ?? "max-w-full"} ${aligns[opts.align] ?? "mx-auto"}`}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={image[2]} alt={image[1]} loading="lazy" className="w-full rounded-2xl border border-slate-200 bg-slate-100" />
+          <img src={image[2]} alt={image[1]} loading="lazy" className={`w-full rounded-2xl border border-slate-200 bg-slate-100 ${ratios[opts.ratio] ? `${ratios[opts.ratio]} object-cover` : ""}`} />
           {image[1] && <figcaption className="mt-2 text-center text-sm text-slate-500">{image[1]}</figcaption>}
         </figure>,
       );

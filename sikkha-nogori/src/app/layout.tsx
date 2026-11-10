@@ -1,3 +1,5 @@
+import { Suspense } from "react";
+import { ClickFeedback } from "@/components/click-feedback";
 import type { Metadata } from "next";
 import { Hind_Siliguri } from "next/font/google";
 import { SiteShell } from "@/components/site-shell";
@@ -53,6 +55,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="bn" className={`${hindSiliguri.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
         <SiteShell>{children}</SiteShell>
+        <Suspense fallback={null}>
+          <ClickFeedback />
+        </Suspense>
       </body>
     </html>
   );

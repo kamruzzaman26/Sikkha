@@ -43,6 +43,7 @@ export const adminNav: AdminNavGroup[] = [
       { label: "Pages", icon: "pages", href: "/admin/pages" },
       { label: "Blog", icon: "blog", href: "/admin/blog" },
       { label: "Marketing", icon: "marketing", href: "/admin/marketing" },
+      { label: "Coupons", icon: "payments", href: "/admin/coupons" },
       { label: "SEO", icon: "seo", href: "/admin/seo" },
       { label: "Media Library", icon: "media", href: "/admin/media" },
     ],

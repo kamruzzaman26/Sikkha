@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRef, useState } from "react";
 import { AdminSubmitButton } from "@/components/admin-submit-button";
 import { plainText, readingMinutes, renderPostContent } from "@/lib/blog-content";
+import { BlogImageTool } from "@/components/blog-image-tool";
 import { saveBlogPost } from "@/app/admin/blog/actions";
 
 export type EditablePost = {
@@ -107,6 +108,16 @@ export function AdminPostEditor({
             ))}
           </div>
         </div>
+        {tab === "write" && (
+          <BlogImageTool
+            onCover={setCoverUrl}
+            onInsert={(md) => {
+              const el = area.current;
+              const at = el ? el.selectionStart : content.length;
+              setContent(content.slice(0, at) + md + content.slice(at));
+            }}
+          />
+        )}
         {tab === "write" && (
           <div className="mb-2 flex flex-wrap gap-1.5">
             {tools.map((tool) => (
