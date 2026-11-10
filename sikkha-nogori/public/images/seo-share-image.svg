@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#062f2a"/><stop offset="1" stop-color="#0b6653"/></linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f8df9a"/><stop offset="1" stop-color="#d6a943"/></linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="12" stdDeviation="14" flood-color="#001d19" flood-opacity=".28"/></filter>
+  </defs>
+  <rect width="1200" height="630" rx="0" fill="url(#bg)"/>
+  <circle cx="1040" cy="95" r="210" fill="#ffffff" opacity=".045"/>
+  <circle cx="1090" cy="560" r="250" fill="#f5d98f" opacity=".06"/>
+  <path d="M0 500 Q260 420 520 520 T1200 470 V630 H0Z" fill="#03251f" opacity=".24"/>
+  <g opacity=".18" stroke="#f8df9a" fill="none">
+    <path d="M760 0V630M820 0V630M880 0V630M940 0V630" />
+    <path d="M700 90H1200M700 150H1200M700 210H1200M700 270H1200" />
+  </g>
+  <g transform="translate(790 115)" filter="url(#shadow)">
+    <path d="M120 18 C65 -4 20 4 0 25 V300 C38 278 80 278 120 300Z" fill="#fff8e8"/>
+    <path d="M120 18 C175 -4 220 4 240 25 V300 C202 278 160 278 120 300Z" fill="#f0dfb8"/>
+    <path d="M120 18V300" stroke="#c79d4d" stroke-width="5"/>
+    <path d="M28 65 Q67 52 98 68M28 105 Q67 92 98 108M28 145 Q67 132 98 148M142 68 Q174 52 212 65M142 108 Q174 92 212 105M142 148 Q174 132 212 145" stroke="#b59b70" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <path d="M45 330H195" stroke="url(#gold)" stroke-width="9" stroke-linecap="round"/>
+    <path d="M120 310V365" stroke="#e8c879" stroke-width="6" stroke-linecap="round"/>
+    <path d="M90 365H150" stroke="#e8c879" stroke-width="6" stroke-linecap="round"/>
+  </g>
+  <g transform="translate(80 0)">
+    <rect x="0" y="112" width="8" height="310" rx="4" fill="url(#gold)"/>
+    <text x="52" y="190" fill="#f7e4b2" font-size="28" font-family="Noto Sans Bengali, sans-serif" letter-spacing="2">জ্ঞান • শিক্ষা • উন্নতি</text>
+    <text x="48" y="300" fill="#ffffff" font-size="76" font-weight="700" font-family="Noto Sans Bengali, sans-serif">শিক্ষা নগরী</text>
+    <text x="52" y="365" fill="#f5d98f" font-size="30" font-family="Noto Sans Bengali, sans-serif">বই ও শেখার বিশ্বস্ত ঠিকানা</text>
+    <path d="M52 410H570" stroke="#e2bd6b" stroke-width="3" opacity=".8"/>
+    <text x="52" y="465" fill="#e9f4ef" font-size="23" font-family="Noto Sans Bengali, sans-serif">ইসলামি বই  |  বাংলা বই  |  আরবি শিক্ষা</text>
+    <text x="52" y="505" fill="#e9f4ef" font-size="23" font-family="Noto Sans Bengali, sans-serif">শিক্ষামূলক উপকরণ  |  অনলাইন কোর্স</text>
+  </g>
+  <text x="80" y="585" fill="#d9e9e2" opacity=".82" font-size="17" font-family="Arial, sans-serif" letter-spacing="2">SIKKHA NOGORI</text>
+</svg>
