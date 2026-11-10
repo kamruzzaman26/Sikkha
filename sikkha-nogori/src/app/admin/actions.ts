@@ -523,6 +523,81 @@ export async function setCatalogEntityStatus(formData: FormData) {
   finishCatalogEntityAction("saved");
 }
 
+function getUuidList(formData: FormData, name: string): string[] {
+  return [
+    ...new Set(
+      formData
+        .getAll(name)
+        .filter((value): value is string => typeof value === "string")
+        .map((value) => value.trim()),
+    ),
+  ];
+}
+
+type ProductEntityKind = "authors" | "publishers" | "brands" | "creators";
+type ProductEntitySelections = Record<ProductEntityKind, string[]>;
+
+async function syncProductEntityRelations(
+  supabase: Awaited<ReturnType<typeof requirePermission>>["supabase"],
+  productId: string,
+  selections: ProductEntitySelections,
+  primaryIds: Record<ProductEntityKind, string>,
+) {
+  const db = supabase as unknown as { from: (table: string) => any };
+  const configs: Array<{
+    kind: ProductEntityKind;
+    table: string;
+    foreignKey: string;
+  }> = [
+    { kind: "authors", table: "product_authors", foreignKey: "author_id" },
+    { kind: "publishers", table: "product_publishers", foreignKey: "publisher_id" },
+    { kind: "brands", table: "product_brands", foreignKey: "brand_id" },
+    { kind: "creators", table: "product_creators", foreignKey: "creator_id" },
+  ];
+
+  for (const config of configs) {
+    const ids = selections[config.kind];
+    const primary = ids.includes(primaryIds[config.kind])
+      ? primaryIds[config.kind]
+      : ids[0];
+
+    const { data: existing, error: readError } = await db
+      .from(config.table)
+      .select(config.foreignKey)
+      .eq("product_id", productId);
+    if (readError) throw new Error(`Unable to read product ${config.kind}.`, { cause: readError });
+
+    const removed = (existing ?? [])
+      .map((row: Record<string, string>) => row[config.foreignKey])
+      .filter((id: string) => !ids.includes(id));
+    if (removed.length > 0) {
+      const { error } = await db
+        .from(config.table)
+        .delete()
+        .eq("product_id", productId)
+        .in(config.foreignKey, removed);
+      if (error) throw new Error(`Unable to remove product ${config.kind}.`, { cause: error });
+    }
+
+    await db
+      .from(config.table)
+      .update({ is_primary: false })
+      .eq("product_id", productId);
+
+    if (ids.length > 0) {
+      const { error } = await db.from(config.table).upsert(
+        ids.map((entityId) => ({
+          product_id: productId,
+          [config.foreignKey]: entityId,
+          is_primary: entityId === primary,
+        })),
+        { onConflict: `product_id,${config.foreignKey}` },
+      );
+      if (error) throw new Error(`Unable to save product ${config.kind}.`, { cause: error });
+    }
+  }
+}
+
 async function syncProductCategories(
   supabase: Awaited<ReturnType<typeof requirePermission>>["supabase"],
   productId: string,
@@ -638,9 +713,24 @@ export async function saveProduct(formData: FormData) {
     ),
   ];
   const primaryCategoryId = getFormValue(formData, "primaryCategoryId");
+  const entityRelationsSubmitted = getFormValue(formData, "entityRelationsSubmitted") === "1";
+  const entitySelections: ProductEntitySelections = {
+    authors: getUuidList(formData, "authorsIds"),
+    publishers: getUuidList(formData, "publishersIds"),
+    brands: getUuidList(formData, "brandsIds"),
+    creators: getUuidList(formData, "creatorsIds"),
+  };
+  const entityPrimaryIds: Record<ProductEntityKind, string> = {
+    authors: getFormValue(formData, "authorsPrimaryId"),
+    publishers: getFormValue(formData, "publishersPrimaryId"),
+    brands: getFormValue(formData, "brandsPrimaryId"),
+    creators: getFormValue(formData, "creatorsPrimaryId"),
+  };
 
   if (
     categoryIds.length > 30 ||
+    Object.values(entitySelections).some((ids) => ids.length > 30 || ids.some((entityId) => !isUuid(entityId))) ||
+    Object.values(entityPrimaryIds).some((entityId) => entityId !== "" && !isUuid(entityId)) ||
     categoryIds.some((categoryId) => !isUuid(categoryId)) ||
     (primaryCategoryId !== "" && !isUuid(primaryCategoryId)) ||
     edition.length > 80 ||
@@ -760,6 +850,9 @@ export async function saveProduct(formData: FormData) {
     if (categoriesSubmitted) {
       await syncProductCategories(supabase, id, categoryIds, primaryCategoryId);
     }
+    if (entityRelationsSubmitted) {
+      await syncProductEntityRelations(supabase, id, entitySelections, entityPrimaryIds);
+    }
     if (!oldProduct || Number(oldProduct.price ?? -1) !== Number(price ?? -1) || Number(oldProduct.cost_price ?? -1) !== Number(costPrice ?? -1)) {
       const { data: { user } } = await supabase.auth.getUser();
       const { error: historyError } = await supabase.from("product_price_history").insert({
@@ -791,6 +884,9 @@ export async function saveProduct(formData: FormData) {
 
   if (categoriesSubmitted && created) {
     await syncProductCategories(supabase, created.id, categoryIds, primaryCategoryId);
+  }
+  if (entityRelationsSubmitted && created) {
+    await syncProductEntityRelations(supabase, created.id, entitySelections, entityPrimaryIds);
   }
   if (price !== null) {
     const { data: { user } } = await supabase.auth.getUser();
