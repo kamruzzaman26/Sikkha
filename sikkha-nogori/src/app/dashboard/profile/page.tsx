@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { connection } from "next/server";
 import { updateCustomerProfile, updateCustomerPassword } from "./actions";
+import { ProfileDetailsForm } from "./profile-details-form";
 import { requireCustomer } from "@/lib/supabase/auth";
 
 export const metadata: Metadata = {
@@ -48,12 +49,14 @@ async function ProfileContent({ searchParams }: { searchParams: Promise<{ status
           <div className="space-y-5">
             <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
               <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50 px-5 py-4"><div><h2 className="font-bold">Personal Information</h2><p className="mt-1 text-xs text-slate-500">Update the name shown on your account.</p></div><span className="text-xl">♙</span></div>
-              <form action={updateCustomerProfile} className="space-y-4 p-5">
-                <div><label htmlFor="profile-name" className="mb-2 block text-sm font-semibold">Full Name</label><input id="profile-name" name="displayName" maxLength={100} required defaultValue={profile?.display_name ?? ""} placeholder="Enter your full name" className="w-full rounded-lg border border-slate-300 px-3 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100" /></div>
-                <div><label htmlFor="date-of-birth" className="mb-2 block text-sm font-semibold">Date of Birth</label><input id="date-of-birth" name="dateOfBirth" type="date" max={new Date().toISOString().slice(0, 10)} defaultValue={profile?.date_of_birth ?? ""} className="w-full rounded-lg border border-slate-300 px-3 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100" /><p className="mt-1 text-xs text-slate-500">Optional · Your date of birth is visible only in your account profile.</p></div>
-                <div><label className="mb-2 block text-sm font-semibold">Email Address</label><div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-3 text-sm text-slate-600">{email}</div><p className="mt-1 text-xs text-slate-500">Your sign-in email is managed by your authentication account.</p></div>
-                <div className="flex justify-end"><button type="submit" className="rounded-lg bg-blue-600 px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-100">Save Changes</button></div>
-              </form>
+              <ProfileDetailsForm
+                action={updateCustomerProfile}
+                defaultName={profile?.display_name ?? ""}
+                defaultDateOfBirth={profile?.date_of_birth ?? ""}
+                email={email}
+                isSaved={status === "saved"}
+                maxDate={new Date().toISOString().slice(0, 10)}
+              />
             </section>
             <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
               <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50 px-5 py-4"><div><h2 className="font-bold">Contact Information</h2><p className="mt-1 text-xs text-slate-500">Your registered account contact.</p></div><span className="text-xl">✉</span></div>
