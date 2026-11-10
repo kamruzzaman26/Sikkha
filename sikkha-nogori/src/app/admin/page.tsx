@@ -15,6 +15,8 @@ import {
   saveProduct,
   setAffiliateLinkStatus,
   setProductArchiveStatus,
+  softDeleteAffiliateLink,
+  restoreAffiliateLink,
 } from "./actions";
 import { requireAdmin } from "@/lib/supabase/admin";
 
@@ -46,6 +48,8 @@ const statusMessages: Record<string, string> = {
   invalid:
     "Please verify the HTTPS URL, approved partner domain, and selected product.",
   "link-not-found": "The link was not found or is no longer editable.",
+  "link-deleted": "Affiliate link moved to Deleted Links. It can be restored.",
+  "link-restored": "Affiliate link restored. Its previous active/inactive status is preserved.",
   "partner-domain-unconfigured":
     "No approved hostname is configured for this partner. Add a verified hostname in the database.",
   "product-created": "Product added to the catalog.",
@@ -482,6 +486,7 @@ async function AdminContent({
   const [
     productsResult,
     linksResult,
+    deletedLinksResult,
     productTypesResult,
     categoriesResult,
     productCategoriesResult,
@@ -497,7 +502,13 @@ async function AdminContent({
       .select(
         "id, product_id, url, partner, is_active, created_at, products(title, slug)",
       )
+      .is("deleted_at", null)
       .order("created_at", { ascending: false }),
+    supabase
+      .from("affiliate_links")
+      .select("id, product_id, url, partner, is_active, created_at, deleted_at, delete_reason, products(title, slug)")
+      .not("deleted_at", "is", null)
+      .order("deleted_at", { ascending: false }),
     supabase
       .from("product_types")
       .select("slug, label, is_active")
@@ -519,9 +530,9 @@ async function AdminContent({
       cause: productsResult.error,
     });
   }
-  if (linksResult.error) {
+  if (linksResult.error || deletedLinksResult.error) {
     throw new Error("Unable to load affiliate links.", {
-      cause: linksResult.error,
+      cause: linksResult.error ?? deletedLinksResult.error,
     });
   }
   if (productTypesResult.error) {
@@ -580,6 +591,7 @@ async function AdminContent({
       : undefined;
   const products = productsResult.data;
   const links = linksResult.data;
+  const deletedLinks = deletedLinksResult.data;
   const productQueryValue = Array.isArray(params.productQuery)
     ? params.productQuery[0]
     : params.productQuery;
@@ -1177,6 +1189,16 @@ async function AdminContent({
                           {link.is_active ? "Deactivate" : "Activate"}
                         </button>
                       </form>
+                                            <details className="shrink-0 rounded-xl border border-rose-200 bg-white">
+                        <summary className="flex min-h-11 cursor-pointer items-center px-4 text-sm font-semibold text-rose-700">Delete</summary>
+                        <form action={softDeleteAffiliateLink} className="grid gap-2 border-t border-rose-100 p-3">
+                          <input type="hidden" name="id" value={link.id} />
+                          <label htmlFor={`delete-reason-${link.id}`} className="text-xs font-semibold text-slate-700">Reason (optional)</label>
+                          <input id={`delete-reason-${link.id}`} name="reason" maxLength={300} className="min-h-10 rounded-lg border border-slate-300 px-3 text-sm" />
+                          <p className="text-xs text-slate-500">This moves the link to Deleted Links; it does not permanently erase it.</p>
+                          <button type="submit" className="min-h-10 rounded-lg bg-rose-700 px-3 text-sm font-semibold text-white">Confirm delete</button>
+                        </form>
+                      </details>
                     </div>
 
                     <details className="group mt-3 rounded-xl border border-slate-200 bg-white open:bg-slate-50/70">
@@ -1252,6 +1274,37 @@ async function AdminContent({
                         </div>
                       </form>
                     </details>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </section>
+
+        <section className="mt-7 rounded-2xl border border-rose-200 bg-white shadow-sm">
+          <div className="px-5 pt-5 sm:px-6 sm:pt-6">
+            <h2 className="text-xl font-bold">Deleted Affiliate Links</h2>
+            <p className="mt-1 text-sm text-slate-600">{deletedLinks.length} deleted links · Restoring keeps the previous active/inactive state.</p>
+          </div>
+          {deletedLinks.length === 0 ? (
+            <p className="m-5 rounded-xl border border-dashed border-slate-300 bg-slate-50 px-5 py-8 text-center text-sm text-slate-600 sm:m-6">No deleted affiliate links.</p>
+          ) : (
+            <ul className="mt-4 divide-y divide-slate-100 border-t border-slate-100">
+              {deletedLinks.map((link) => {
+                const embedded = link.products as { title?: string } | { title?: string }[] | null | undefined;
+                const title = Array.isArray(embedded) ? embedded[0]?.title : embedded?.title;
+                return (
+                  <li key={link.id} className="flex flex-wrap items-center justify-between gap-3 px-5 py-4 sm:px-6">
+                    <div className="min-w-0 flex-1">
+                      <p className="font-semibold text-slate-900">{title ?? "Product not found"}</p>
+                      <p className="mt-1 break-all text-xs text-slate-500">{getPartnerName(link.partner) ?? "No partner"} · {link.url}</p>
+                      {link.delete_reason && <p className="mt-1 text-xs text-slate-500">Reason: {link.delete_reason}</p>}
+                      <p className="mt-1 text-xs text-slate-500">Deleted {new Date(link.deleted_at).toLocaleString("en-GB")}</p>
+                    </div>
+                    <form action={restoreAffiliateLink}>
+                      <input type="hidden" name="id" value={link.id} />
+                      <button type="submit" className="min-h-11 rounded-xl border border-emerald-300 bg-white px-4 text-sm font-semibold text-emerald-800 hover:bg-emerald-50">Restore</button>
+                    </form>
                   </li>
                 );
               })}
