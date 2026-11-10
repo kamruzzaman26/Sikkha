@@ -1,0 +1,14 @@
+{
+  "name": "sikkha-nogori-repository",
+  "private": true,
+  "workspaces": [
+    "sikkha-nogori"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=sikkha-nogori",
+    "build": "npm run build --workspace=sikkha-nogori",
+    "start": "npm run start --workspace=sikkha-nogori",
+    "lint": "npm run lint --workspace=sikkha-nogori",
+    "test": "npm run test --workspace=sikkha-nogori"
+  }
+}
