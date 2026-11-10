@@ -562,6 +562,7 @@ async function AdminContent({
 }: Pick<PageProps<"/admin">, "searchParams">) {
   await connection();
   const { supabase, role } = await requireAdmin("admin");
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- table names are fixed by the catalog entity schema.
   const db = supabase as unknown as { from: (table: string) => any };
   const [
     productsResult,
@@ -700,10 +701,10 @@ async function AdminContent({
       if (row.is_primary) primaryEntitiesByProduct[kind].set(row.product_id, row.entity_id);
     }
   };
-  addEntityRelations("authors", (productAuthorsResult.data ?? []).map((row: any) => ({ product_id: row.product_id, entity_id: row.author_id, is_primary: row.is_primary })));
-  addEntityRelations("publishers", (productPublishersResult.data ?? []).map((row: any) => ({ product_id: row.product_id, entity_id: row.publisher_id, is_primary: row.is_primary })));
-  addEntityRelations("brands", (productBrandsResult.data ?? []).map((row: any) => ({ product_id: row.product_id, entity_id: row.brand_id, is_primary: row.is_primary })));
-  addEntityRelations("creators", (productCreatorsResult.data ?? []).map((row: any) => ({ product_id: row.product_id, entity_id: row.creator_id, is_primary: row.is_primary })));
+  addEntityRelations("authors", (productAuthorsResult.data ?? []).map((row: { product_id: string; author_id: string; is_primary: boolean }) => ({ product_id: row.product_id, entity_id: row.author_id, is_primary: row.is_primary })));
+  addEntityRelations("publishers", (productPublishersResult.data ?? []).map((row: { product_id: string; publisher_id: string; is_primary: boolean }) => ({ product_id: row.product_id, entity_id: row.publisher_id, is_primary: row.is_primary })));
+  addEntityRelations("brands", (productBrandsResult.data ?? []).map((row: { product_id: string; brand_id: string; is_primary: boolean }) => ({ product_id: row.product_id, entity_id: row.brand_id, is_primary: row.is_primary })));
+  addEntityRelations("creators", (productCreatorsResult.data ?? []).map((row: { product_id: string; creator_id: string; is_primary: boolean }) => ({ product_id: row.product_id, entity_id: row.creator_id, is_primary: row.is_primary })));
 
   const selectedByProduct = new Map<string, string[]>();
   const primaryByProduct = new Map<string, string>();
