@@ -15,7 +15,7 @@ export async function updateCustomerProfile(formData: FormData) {
   const dateOfBirth = getValue(formData, "dateOfBirth");
   const gender = getValue(formData, "gender");
   const validGender = !gender || ["Male", "Female", "Prefer not to say"].includes(gender);
-  const validDate = !dateOfBirth || (/^\\d{4}-\\d{2}-\\d{2}$/.test(dateOfBirth) && !Number.isNaN(Date.parse(`${dateOfBirth}T00:00:00.000Z`)) && new Date(`${dateOfBirth}T00:00:00.000Z`).toISOString().slice(0, 10) === dateOfBirth && dateOfBirth <= new Date().toISOString().slice(0, 10));
+  const validDate = !dateOfBirth || (/^\d{4}-\d{2}-\d{2}$/.test(dateOfBirth) && !Number.isNaN(Date.parse(`${dateOfBirth}T00:00:00.000Z`)) && new Date(`${dateOfBirth}T00:00:00.000Z`).toISOString().slice(0, 10) === dateOfBirth && dateOfBirth <= new Date().toISOString().slice(0, 10));
   if (!displayName || displayName.length > 100 || !validDate || !validGender) redirect("/dashboard/profile?status=invalid");
 
   const { error } = await supabase.from("profiles").update({
