@@ -295,6 +295,102 @@ export async function setAffiliateLinkStatus(formData: FormData) {
   finishAction(isActiveValue === "true" ? "activated" : "deactivated");
 }
 
+export async function softDeleteAffiliateLink(formData: FormData) {
+  const { supabase } = await requireAdmin("admin");
+  const id = getFormValue(formData, "id");
+  const reason = getFormValue(formData, "reason");
+
+  if (!isUuid(id) || reason.length > 300) {
+    redirect("/admin?status=invalid");
+  }
+
+  const { data: link, error: linkError } = await supabase
+    .from("affiliate_links")
+    .select("id, product_id, partner, deleted_at")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (linkError) {
+    throw new Error("Unable to verify the affiliate link before deletion.", {
+      cause: linkError,
+    });
+  }
+  if (!link || link.deleted_at) {
+    redirect("/admin?status=link-not-found");
+  }
+
+  const { data: { user } } = await supabase.auth.getUser();
+  const { error } = await supabase
+    .from("affiliate_links")
+    .update({
+      deleted_at: new Date().toISOString(),
+      deleted_by: user?.id ?? null,
+      delete_reason: reason || null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", id)
+    .is("deleted_at", null);
+
+  if (error) {
+    throw new Error("Unable to move the affiliate link to deleted items.", {
+      cause: error,
+    });
+  }
+
+  await logActivity(supabase, "affiliate_link_deleted", "affiliate_link", id, {
+    product_id: link.product_id,
+    partner: link.partner,
+    reason: reason || null,
+  });
+  finishAction("link-deleted");
+}
+
+export async function restoreAffiliateLink(formData: FormData) {
+  const { supabase } = await requireAdmin("admin");
+  const id = getFormValue(formData, "id");
+
+  if (!isUuid(id)) {
+    redirect("/admin?status=invalid");
+  }
+
+  const { data: link, error: linkError } = await supabase
+    .from("affiliate_links")
+    .select("id, product_id, partner, deleted_at")
+    .eq("id", id)
+    .not("deleted_at", "is", null)
+    .maybeSingle();
+
+  if (linkError) {
+    throw new Error("Unable to verify the deleted affiliate link.", {
+      cause: linkError,
+    });
+  }
+  if (!link) {
+    redirect("/admin?status=link-not-found");
+  }
+
+  const { error } = await supabase
+    .from("affiliate_links")
+    .update({
+      deleted_at: null,
+      deleted_by: null,
+      delete_reason: null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", id)
+    .not("deleted_at", "is", null);
+
+  if (error) {
+    throw new Error("Unable to restore the affiliate link.", { cause: error });
+  }
+
+  await logActivity(supabase, "affiliate_link_restored", "affiliate_link", id, {
+    product_id: link.product_id,
+    partner: link.partner,
+  });
+  finishAction("link-restored");
+}
+
 async function syncProductCategories(
   supabase: Awaited<ReturnType<typeof requirePermission>>["supabase"],
   productId: string,
