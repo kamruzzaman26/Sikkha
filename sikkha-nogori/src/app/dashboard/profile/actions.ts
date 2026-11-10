@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireCustomer } from "@/lib/supabase/auth";
+import { getSupabasePublicConfig } from "@/lib/supabase/env";
 
 function getValue(formData: FormData, name: string): string {
   const value = formData.get(name);
@@ -43,4 +44,30 @@ export async function updateCustomerPassword(formData: FormData) {
   if (error) throw new Error("Unable to update your password.", { cause: error });
   revalidatePath("/dashboard/profile");
   redirect("/dashboard/profile?status=password");
+}
+
+
+export async function saveCustomerAvatar(path: string): Promise<{ avatarUrl?: string; error?: string }> {
+  const { supabase, user } = await requireCustomer();
+  const validPath = new RegExp(`^${user.id}/[0-9a-f-]{36}\\.(jpg|png|webp)$`, "i");
+  if (!validPath.test(path)) {
+    return { error: "Invalid profile image. Please upload it again." };
+  }
+
+  const { url } = getSupabasePublicConfig();
+  const avatarUrl = `${url}/storage/v1/object/public/avatars/${path}`;
+  const { data, error } = await supabase
+    .from("profiles")
+    .update({ avatar_url: avatarUrl, updated_at: new Date().toISOString() })
+    .eq("id", user.id)
+    .select("id")
+    .maybeSingle();
+
+  if (error || !data) {
+    return { error: "Your profile photo could not be saved. Please try again." };
+  }
+
+  revalidatePath("/dashboard");
+  revalidatePath("/dashboard/profile");
+  return { avatarUrl };
 }
