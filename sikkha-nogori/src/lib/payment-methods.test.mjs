@@ -54,6 +54,18 @@ test("validates manual and COD payment method data", () => {
   assert.equal(parsePaymentMethodForm(checkedForm)?.is_enabled, true);
 });
 
+test("accepts only a disabled SSLCOMMERZ gateway configuration", () => {
+  const gateway = form({
+    ...validMethod,
+    name: "SSLCOMMERZ",
+    code: "sslcommerz",
+    methodType: "gateway",
+    isEnabled: "false",
+  });
+  assert.equal(parsePaymentMethodForm(gateway)?.method_type, "gateway");
+  assert.equal(parsePaymentMethodForm(gateway)?.is_enabled, false);
+});
+
 test("rejects invalid values and enabled gateway methods", () => {
   for (const values of [
     { ...validMethod, code: "BKASH" },
@@ -87,7 +99,8 @@ test("public visibility excludes disabled and unsupported gateway methods", () =
     isCustomerVisiblePaymentMethod({
       is_enabled: true,
       method_type: "gateway",
+      code: "sslcommerz",
     }),
-    false,
+    true,
   );
 });
