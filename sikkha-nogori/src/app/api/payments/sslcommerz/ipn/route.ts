@@ -107,7 +107,7 @@ export async function POST(request: Request) {
       return json(202, { received: true, processed: false });
     }
 
-    validationId = validation.val_id;
+    validationId = validation.val_id ?? null;
     finalStatus = ipnStatus;
     finalTransactionId = validation.bank_tran_id?.trim() || validation.tran_id || merchantReference;
   } else if (ipnStatus === "FAILED" || ipnStatus === "CANCELLED") {
