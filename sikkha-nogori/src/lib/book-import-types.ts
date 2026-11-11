@@ -8,6 +8,8 @@ export type BookImportRowResult = {
   salesType?: string;
   authors?: string[];
   publishers?: string[];
+  brands?: string[];
+  instructors?: string[];
   categories?: string[];
   bestseller?: boolean;
   status: BookImportRowStatus;
