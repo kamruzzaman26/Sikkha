@@ -18,7 +18,7 @@ type SiteIdentity = {
 } | null;
 
 export type MenuCategory = { name: string; children: MenuCategory[] };
-export type CategoryMenu = { books: MenuCategory[]; products: MenuCategory[] };
+export type CategoryMenu = { books: MenuCategory[]; products: MenuCategory[]; courses: MenuCategory[] };
 
 type IconName = "menu" | "search" | "heart" | "user" | "close";
 type NavigationIconName =
@@ -542,6 +542,20 @@ export function SiteHeader({
                     "Grooming", "Oral & Health", "Body Wash", "Mum Pot & Cups", "Bathing"
                   ]} basePath="/products" />
                 </>
+              )}
+              {categoryMenu?.courses.length ? (
+                <details className="group border-b border-slate-100">
+                  <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 rounded-lg px-3 text-sm font-bold text-slate-800 outline-none hover:bg-emerald-50 focus-visible:ring-2 focus-visible:ring-emerald-700 [&::-webkit-details-marker]:hidden">
+                    <span className="flex items-center gap-3"><CategoryGlyph name="Courses" />কোর্স</span>
+                    <span aria-hidden="true" className="transition group-open:rotate-180">⌄</span>
+                  </summary>
+                  <div className="pb-2 pl-5">
+                    <DrawerLink icon="article" href="/courses" onClick={closeDrawer}>সব কোর্স</DrawerLink>
+                    <CategoryTree items={categoryMenu.courses} basePath="/courses" onNavigate={closeDrawer} />
+                  </div>
+                </details>
+              ) : (
+                <DrawerLink icon="article" href="/courses" onClick={closeDrawer}>কোর্স</DrawerLink>
               )}
               <DrawerLink icon="article" href="/books?category=শিক্ষা%20কুইজ" onClick={closeDrawer}>শিক্ষা কুইজ</DrawerLink>
 

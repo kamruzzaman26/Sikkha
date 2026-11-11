@@ -9,7 +9,7 @@ import {
 } from "@/lib/category-markdown.mjs";
 import { logActivity, requirePermission } from "@/lib/supabase/admin";
 
-const groups = ["books", "products", "electronics"] as const;
+const groups = ["books", "products", "electronics", "courses"] as const;
 type Group = (typeof groups)[number];
 const BASE = "/admin/categories";
 const FORBIDDEN = `${BASE}?status=forbidden`;

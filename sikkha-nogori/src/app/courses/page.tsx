@@ -10,8 +10,8 @@ export const metadata: Metadata = {
   description: "শিক্ষা নগরীর যাচাইকৃত অনলাইন কোর্সের তালিকা দেখুন।",
 };
 
-async function CourseCatalog() {
-  const courses = await getPublishedCourses();
+async function CourseCatalog({ category }: { category?: string }) {
+  const courses = await getPublishedCourses(category);
 
   if (!courses) {
     return (
@@ -79,7 +79,8 @@ async function CourseCatalog() {
   );
 }
 
-export default function CoursesPage() {
+async function CoursesPageContent({ searchParams }: { searchParams: Promise<{ category?: string }> }) {
+  const { category } = await searchParams;
   return (
     <main className="min-h-screen bg-[#f7faf8] px-5 py-10 text-slate-900 sm:px-8 sm:py-14">
       <div className="mx-auto max-w-6xl">
@@ -98,6 +99,7 @@ export default function CoursesPage() {
           <h1 className="mt-2 text-3xl font-extrabold sm:text-4xl">
             অনলাইন কোর্স
           </h1>
+          {category && <p className="mt-2 text-sm font-semibold text-emerald-800">ক্যাটাগরি: {category} · <Link href="/courses" className="underline">সব কোর্স</Link></p>}
           <p className="mt-3 max-w-2xl leading-7 text-slate-600">
             শেখার লক্ষ্য অনুযায়ী কোর্সের বিবরণ দেখুন। পার্টনারের মাধ্যমে কোর্স
             কিনলে শিক্ষা নগরী কমিশন পেতে পারে।
@@ -112,7 +114,7 @@ export default function CoursesPage() {
             />
           }
         >
-          <CourseCatalog />
+          <CourseCatalog category={category} />
         </Suspense>
 
         <footer className="mt-10 border-t border-slate-200 pt-5 text-sm text-slate-600">
@@ -134,5 +136,22 @@ export default function CoursesPage() {
         </footer>
       </div>
     </main>
+  );
+}
+
+export default function CoursesPage({ searchParams }: { searchParams: Promise<{ category?: string }> }) {
+  return (
+    <Suspense
+      fallback={
+        <main className="min-h-screen bg-[#f7faf8] px-5 py-10 text-slate-900 sm:px-8 sm:py-14">
+          <div className="mx-auto max-w-6xl">
+            <div className="h-9 w-56 animate-pulse rounded-lg bg-white" />
+            <div className="mt-8 h-64 animate-pulse rounded-2xl bg-white" />
+          </div>
+        </main>
+      }
+    >
+      <CoursesPageContent searchParams={searchParams} />
+    </Suspense>
   );
 }

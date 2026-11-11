@@ -15,7 +15,7 @@ type CategoryRow = {
   name_en: string | null;
   slug: string;
   parent_id: string | null;
-  category_group: "books" | "products" | "electronics";
+  category_group: "books" | "products" | "electronics" | "courses";
   sort_order: number;
   is_active: boolean;
 };
@@ -24,6 +24,7 @@ const groupLabels = {
   books: "Books",
   products: "General Products",
   electronics: "Electronics",
+  courses: "Courses",
 } as const;
 
 const messages: Record<string, string> = {
@@ -323,7 +324,7 @@ export default async function AdminCategoriesPage({
       )}
 
       <div className="mt-8 space-y-7">
-        {(["books", "products", "electronics"] as const).map((group) => {
+        {(["books", "products", "electronics", "courses"] as const).map((group) => {
           const groupRoots = roots.filter((row) => row.category_group === group);
           return (
             <section key={group} className="overflow-hidden rounded-xl border border-slate-200 bg-white">
