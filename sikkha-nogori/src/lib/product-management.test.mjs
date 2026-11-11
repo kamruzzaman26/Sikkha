@@ -119,18 +119,18 @@ test("product publication state stays in sync with the admin publish control", a
 
   assert.match(
     action,
-    /is_published: isPublishedValue === "true",[\\s\\S]+status: isPublishedValue === "true" \\? "published" : "draft"/,
+    /is_published: isPublishedValue === "true",[\s\S]+status: isPublishedValue === "true" \? "published" : "draft"/,
   );
-  const statusFilters = catalog.match(/\\.eq\\("status", "published"\\)/g) ?? [];
-  const publishFilters = catalog.match(/\\.eq\\("is_published", true\\)/g) ?? [];
+  const statusFilters = catalog.match(/\.eq\("status", "published"\)/g) ?? [];
+  const publishFilters = catalog.match(/\.eq\("is_published", true\)/g) ?? [];
   assert.ok(statusFilters.length >= 10);
   assert.equal(statusFilters.length, publishFilters.length);
   assert.match(
     migration,
-    /alter policy "Public can resolve products with active affiliate links"[\\s\\S]+status = 'published'::public\\.content_status/i,
+    /alter policy "Public can resolve products with active affiliate links"[\s\S]+status = 'published'::public\.content_status/i,
   );
   assert.match(
     migration,
-    /alter policy "Restrict products to published rows or admins"[\\s\\S]+status = 'published'::public\\.content_status/i,
+    /alter policy "Restrict products to published rows or admins"[\s\S]+status = 'published'::public\.content_status/i,
   );
 });
