@@ -96,13 +96,7 @@ function AdminTopbar({ identity, onMenuClick }: { identity: AdminIdentity; onMen
   const iconBtn = "flex size-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 transition hover:bg-blue-50 hover:text-blue-800";
   return (
     <header className="sticky top-0 z-40 flex min-h-[64px] items-center gap-2 border-b border-slate-200/80 bg-white/95 px-3 shadow-sm backdrop-blur sm:min-h-[72px] sm:px-7">
-      <Link href="/admin/dashboard" className="flex min-w-0 items-center gap-2.5 lg:hidden">
-        <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-[#1d376b] text-sm font-black text-white">SN</span>
-        <span className="min-w-0 leading-tight">
-          <span className="block truncate text-[13px] font-extrabold tracking-wide text-slate-900">SIKKHA NOGORI</span>
-          <span className="block truncate text-[9px] font-bold uppercase tracking-[0.16em] text-slate-500">Admin workspace</span>
-        </span>
-      </Link>
+      <button type="button" onClick={onMenuClick} aria-label="Open navigation menu" className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[#1d376b] text-white lg:hidden"><AdminIcon name="menu" /></button>
       <div className="ml-auto flex items-center gap-2">
         <Dropdown id="bell" open={open} setOpen={setOpen} label="Notifications" triggerClass={iconBtn} trigger={<AdminIcon name="bell" className="size-[19px]" />}>
           <p className="text-sm font-bold text-slate-900">Notifications</p>
@@ -126,7 +120,6 @@ function AdminTopbar({ identity, onMenuClick }: { identity: AdminIdentity; onMen
           <p className="mt-1 break-all text-xs text-slate-500">{identity.email || "Administrator account"}</p>
           <Link href="/" className="mt-3 block rounded-lg bg-slate-50 px-3 py-2 text-xs font-bold text-blue-800 hover:bg-blue-50">View storefront</Link>
         </Dropdown>
-        <button type="button" onClick={onMenuClick} aria-label="Open navigation menu" className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[#1d376b] text-white lg:hidden"><AdminIcon name="menu" /></button>
       </div>
     </header>
   );
