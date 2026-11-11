@@ -101,3 +101,36 @@ test("bulk import keeps row inserts atomic while returning partial failures", as
   assert.match(importFunction, /is_published[\s\S]+false/i);
   assert.match(importFunction, /commerce_mode[\s\S]+'affiliate'/i);
 });
+
+
+test("product publication state stays in sync with the admin publish control", async () => {
+  const action = await readFile(
+    new URL("../app/admin/actions.ts", import.meta.url),
+    "utf8",
+  );
+  const catalog = await readFile(
+    new URL("./catalog.ts", import.meta.url),
+    "utf8",
+  );
+  const migration = await readFile(
+    new URL("../../../supabase/migrations/20261111050000_enforce_published_product_status.sql", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(
+    action,
+    /is_published: isPublishedValue === "true",[\\s\\S]+status: isPublishedValue === "true" \\? "published" : "draft"/,
+  );
+  const statusFilters = catalog.match(/\\.eq\\("status", "published"\\)/g) ?? [];
+  const publishFilters = catalog.match(/\\.eq\\("is_published", true\\)/g) ?? [];
+  assert.ok(statusFilters.length >= 10);
+  assert.equal(statusFilters.length, publishFilters.length);
+  assert.match(
+    migration,
+    /alter policy "Public can resolve products with active affiliate links"[\\s\\S]+status = 'published'::public\\.content_status/i,
+  );
+  assert.match(
+    migration,
+    /alter policy "Restrict products to published rows or admins"[\\s\\S]+status = 'published'::public\\.content_status/i,
+  );
+});
