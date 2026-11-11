@@ -676,6 +676,7 @@ async function AdminContent({
     books: "Books",
     products: "Products",
     electronics: "Electronics",
+    courses: "Courses",
   };
   const categoryOptions: CategoryOption[] = categoryRows
     .filter((row) => row.is_active)
