@@ -1,5 +1,10 @@
 import { createHash } from "node:crypto";
 import { createSupabaseServiceRoleClient } from "@/lib/supabase/server";
+import {
+  isValidSslcommerzFailure,
+  isValidSslcommerzSuccess,
+  parseSslcommerzIpn,
+} from "@/lib/sslcommerz-ipn.mjs";
 
 type ValidationResponse = {
   status?: string;
@@ -20,27 +25,25 @@ function json(status: number, body: Record<string, unknown>) {
 
 export async function POST(request: Request) {
   const rawBody = await request.text();
-  const payload = new URLSearchParams(rawBody);
-  const merchantReference = payload.get("tran_id")?.trim() ?? "";
-  const ipnStatus = payload.get("status")?.trim().toUpperCase() ?? "";
-  const ipnAmount = Number(payload.get("amount"));
-  const ipnCurrency = payload.get("currency")?.trim().toUpperCase() ?? "";
-  const providerTransactionId =
-    payload.get("bank_tran_id")?.trim() || merchantReference;
   const storeId = process.env.SSLCOMMERZ_STORE_ID?.trim();
   const storePassword = process.env.SSLCOMMERZ_STORE_PASSWORD?.trim();
 
   if (!storeId || !storePassword) {
     return json(503, { received: false, error: "gateway_not_configured" });
   }
-  if (
-    !/^[A-Za-z0-9_-]{8,30}$/.test(merchantReference) ||
-    !Number.isFinite(ipnAmount) ||
-    ipnAmount <= 0 ||
-    ipnCurrency !== "BDT"
-  ) {
+
+  const parsed = parseSslcommerzIpn(rawBody);
+  if (!parsed) {
     return json(400, { received: false, error: "invalid_notification" });
   }
+  const {
+    payload,
+    merchantReference,
+    status: ipnStatus,
+    amount: ipnAmount,
+    currency: ipnCurrency,
+    providerTransactionId,
+  } = parsed;
 
   const sandbox = process.env.SSLCOMMERZ_IS_SANDBOX?.trim().toLowerCase() !== "false";
   const validationEndpoint = sandbox
@@ -100,18 +103,11 @@ export async function POST(request: Request) {
       return json(503, { received: false, error: "validation_unavailable" });
     }
 
-    if (
-      !["VALID", "VALIDATED"].includes(validation.status ?? "") ||
-      validation.tran_id !== merchantReference ||
-      !validation.val_id ||
-      Number(validation.amount).toFixed(2) !== Number(transaction.amount).toFixed(2) ||
-      validation.currency?.toUpperCase() !== transaction.currency ||
-      String(validation.risk_level ?? "0") === "1"
-    ) {
+    if (!isValidSslcommerzSuccess(validation, transaction, merchantReference)) {
       return json(202, { received: true, processed: false });
     }
 
-    validationId = validation.val_id;
+    validationId = validation.val_id ?? null;
     finalStatus = ipnStatus;
     finalTransactionId = validation.bank_tran_id?.trim() || validation.tran_id || merchantReference;
   } else if (ipnStatus === "FAILED" || ipnStatus === "CANCELLED") {
@@ -138,13 +134,7 @@ export async function POST(request: Request) {
       return json(503, { received: false, error: "status_query_unavailable" });
     }
 
-    if (
-      queried.tran_id !== merchantReference ||
-      queried.status !== ipnStatus ||
-      !["FAILED", "CANCELLED"].includes(queried.status ?? "") ||
-      Number(queried.amount).toFixed(2) !== Number(transaction.amount).toFixed(2) ||
-      queried.currency?.toUpperCase() !== transaction.currency
-    ) {
+    if (!isValidSslcommerzFailure(queried, transaction, merchantReference, ipnStatus)) {
       return json(202, { received: true, processed: false });
     }
     finalStatus = ipnStatus;
