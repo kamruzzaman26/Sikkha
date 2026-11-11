@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 import { parseCheckoutForm } from "@/lib/order-workflow.mjs";
 import { requireCustomer } from "@/lib/supabase/auth";
 import { getPublicSiteOrigin } from "@/lib/supabase/env";
-import { getShippingCharge, isShippingZone } from "@/lib/shipping-fee.mjs";
+import { getShippingCharge, getShippingCharges, isShippingZone } from "@/lib/shipping-fee.mjs";
 
 function isUuid(value: string): boolean {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
@@ -44,7 +44,17 @@ export async function placeOrder(formData: FormData) {
   if (!isShippingZone(shippingZone)) {
     redirect(deliveryUrl(formData, "invalid"));
   }
-  const shippingCharge = getShippingCharge(shippingZone);
+  const { data: settingsRow, error: settingsError } = await supabase
+    .from("site_settings")
+    .select("value")
+    .eq("key", "general")
+    .maybeSingle();
+  if (settingsError) throw new Error("Unable to verify current delivery charges.", { cause: settingsError });
+  const generalSettings = settingsRow?.value && typeof settingsRow.value === "object"
+    ? settingsRow.value as Record<string, unknown>
+    : {};
+  const shippingCharges = getShippingCharges(generalSettings.delivery_charges);
+  const shippingCharge = getShippingCharge(shippingZone, shippingCharges);
   if (shippingCharge === undefined) {
     redirect(deliveryUrl(formData, "invalid"));
   }
