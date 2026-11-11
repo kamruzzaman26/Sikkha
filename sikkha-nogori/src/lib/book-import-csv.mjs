@@ -73,7 +73,8 @@ export function prepareBookImportCsv(csvText, partnerByHostname) {
   const header = parsed.records[0].values.map((value) => value.trim());
   if (new Set(header).size !== header.length) return { rows: [], error: "CSV header-এ একই কলাম একাধিকবার আছে।" };
   const nameHeader = header.includes("product_name") ? "product_name" : "book_name";
-  const required = [nameHeader, "image_url", "sales_type"];
+  const legacyBookCsv = nameHeader === "book_name" && !header.includes("sales_type");
+  const required = [nameHeader, "image_url", ...(legacyBookCsv ? [] : ["sales_type"])];
   const missing = required.filter((name) => !header.includes(name));
   if (missing.length) return { rows: [], error: `CSV header-এ এই কলামগুলো আবশ্যক: ${missing.join(", ")}।` };
   const column = new Map(header.map((name, index) => [name, index]));
@@ -83,7 +84,7 @@ export function prepareBookImportCsv(csvText, partnerByHostname) {
   const rows = parsed.records.slice(1).map(({ rowNumber, values }) => {
     const productName = get(values, nameHeader);
     const productType = get(values, "product_type").trim() || "book";
-    const salesType = get(values, "sales_type").trim().toLowerCase();
+    const salesType = get(values, "sales_type").trim().toLowerCase() || (legacyBookCsv ? "affiliate" : "");
     const affiliateUrl = get(values, "affiliate_url");
     const imageUrl = get(values, "image_url");
     const reasons = [];
