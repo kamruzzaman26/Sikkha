@@ -113,8 +113,9 @@ export function CartPageClient() {
           <aside className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm lg:sticky lg:top-24">
             <h2 className="text-lg font-extrabold">অর্ডার সারাংশ</h2>
             <div className="mt-4 flex justify-between text-sm text-slate-600"><span>পণ্যের সংখ্যা</span><span className="font-semibold text-slate-900">{itemCount}টি</span></div>
-            <div className="mt-3 flex justify-between border-t border-slate-100 pt-3"><span className="font-semibold">সর্বমোট</span><span className="text-xl font-extrabold text-emerald-800">{formatBDT(total)}</span></div>
-            <p className="mt-2 text-xs leading-5 text-slate-500">চূড়ান্ত মূল্য ও প্রাপ্যতা Checkout-এ সার্ভার যাচাই করবে।</p>
+            <div className="mt-3 flex justify-between border-t border-slate-100 pt-3"><span className="font-semibold">পণ্যের মূল্য</span><span className="text-xl font-extrabold text-emerald-800">{formatBDT(total)}</span></div>
+            <div className="mt-3 flex justify-between text-sm text-slate-600"><span>ডেলিভারি চার্জ</span><span>ঠিকানা অনুযায়ী</span></div>
+            <p className="mt-2 text-xs leading-5 text-slate-500">Checkout-এ ডেলিভারি এলাকার ধরন নির্বাচন করলে প্রাথমিক চার্জসহ সর্বমোট দেখাবে।</p>
             <Link href={checkoutHref} className="mt-5 inline-flex min-h-12 w-full items-center justify-center rounded-full bg-emerald-800 px-5 py-3 text-center font-bold text-white transition hover:bg-emerald-900">Checkout-এ যান</Link>
           </aside>
         </div>
