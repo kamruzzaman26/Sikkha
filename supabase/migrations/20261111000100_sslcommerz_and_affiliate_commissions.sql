@@ -416,7 +416,8 @@ begin
   if coalesce(auth.jwt()->>'role','') <> 'service_role' then
     raise exception 'Service role required.' using errcode = '42501';
   end if;
-  if p_merchant_reference is null or p_validation_id is null
+  if p_merchant_reference is null
+    or (p_provider_status in ('VALID','VALIDATED') and p_validation_id is null)
     or p_provider_transaction_id is null or p_amount is null
     or p_currency is null or p_provider_status not in ('VALID','VALIDATED','FAILED','CANCELLED')
     or p_payload_hash is null
