@@ -823,34 +823,37 @@ async function AdminContent({
   );
 
   return (
-    <main lang="en" className="min-h-screen bg-[#f4f6fa] px-4 py-6 text-slate-900 sm:px-7 sm:py-8 xl:px-10">
+    <main lang="en" className="min-h-screen bg-[#f4f7ff] px-4 py-6 text-slate-900 sm:px-7 sm:py-8 xl:px-10">
       <div className="mx-auto max-w-[1500px]">
-        <header className="flex flex-wrap items-end justify-between gap-4">
-          <div className="min-w-0">
-            <p className="text-xs font-bold uppercase tracking-[0.14em] text-brand-800">Catalog</p>
-            <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900">
-              Products &amp; Affiliate Links
-            </h1>
-            <p className="mt-1.5 max-w-3xl text-[15px] leading-6 text-slate-600">
-              Manage product types, sales channels, categories, and cover images. Third-party
-              seller products are not available for direct checkout.
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-2.5">
-            <Link
-              href="/"
-              className="inline-flex min-h-11 items-center rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-800 transition hover:bg-slate-50"
-            >
-              View storefront
-            </Link>
-            <form action={logoutAdmin}>
-              <button
-                type="submit"
-                className="inline-flex min-h-11 items-center rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-800 transition hover:bg-slate-50"
+        <header className="relative overflow-hidden rounded-[28px] border border-slate-800 bg-[#101b35] px-6 py-7 text-white shadow-xl sm:px-8 sm:py-9">
+          <div className="pointer-events-none absolute -right-12 -top-20 size-64 rounded-full bg-blue-500/15 blur-3xl" />
+          <div className="relative flex flex-wrap items-end justify-between gap-4">
+            <div className="min-w-0">
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-blue-200">PRODUCT MANAGEMENT</p>
+              <h1 className="mt-1 text-3xl font-extrabold tracking-tight text-white">
+                Products &amp; Affiliate Links
+              </h1>
+              <p className="mt-2 max-w-3xl text-sm leading-6 text-blue-100/80">
+                Organize your product catalog, partner links, categories, and product details. Third-party
+                seller products are not available for direct checkout.
+              </p>
+            </div>
+            <div className="relative flex flex-wrap gap-2.5">
+              <Link
+                href="/"
+                className="inline-flex min-h-11 items-center rounded-xl border border-white/20 bg-white/10 px-4 text-sm font-semibold text-white transition hover:bg-white/20"
               >
-                Sign out
-              </button>
-            </form>
+                View storefront
+              </Link>
+              <form action={logoutAdmin}>
+                <button
+                  type="submit"
+                  className="inline-flex min-h-11 items-center rounded-xl border border-white/20 bg-white/10 px-4 text-sm font-semibold text-white transition hover:bg-white/20"
+                >
+                  Sign out
+                </button>
+              </form>
+            </div>
           </div>
         </header>
 
@@ -862,13 +865,13 @@ async function AdminContent({
               { href: "/admin/affiliates", label: "Affiliate Accounts", icon: "affiliates" as const, note: "Manage partner accounts" },
               { href: "/admin/users", label: "Manage Users", icon: "customers" as const, note: "View customer accounts" },
             ].map((action) => (
-              <Link key={action.href} href={action.href} className="group flex min-h-[92px] items-center gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-lg">
-                <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-800 transition group-hover:bg-[#1f44ae] group-hover:text-white"><AdminIcon name={action.icon} /></span>
+              <Link key={action.href} href={action.href} className="group flex min-h-[92px] items-center gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-lg">
+                <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-800 transition group-hover:bg-[#1f44ae] group-hover:text-white"><AdminIcon name={action.icon} /></span>
                 <span className="min-w-0">
                   <span className="block text-sm font-extrabold text-slate-900">{action.label}</span>
                   <span className="mt-1 block text-xs text-slate-500">{action.note}</span>
                 </span>
-                <span className="ml-auto text-lg text-slate-300 transition group-hover:translate-x-1 group-hover:text-brand-700">→</span>
+                <span className="ml-auto text-lg text-slate-300 transition group-hover:translate-x-1 group-hover:text-blue-700">→</span>
               </Link>
             ))}
           </section>
@@ -882,10 +885,10 @@ async function AdminContent({
               { label: "Draft products", value: products.filter((product) => !product.is_published && !product.archived_at).length, icon: "edit" as const },
               { label: "Active affiliate links", value: links.filter((link) => link.is_active).length, icon: "affiliates" as const },
             ].map((card) => (
-              <div key={card.label} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+              <div key={card.label} className="rounded-2xl border border-blue-100 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
                 <div className="flex items-center justify-between gap-3">
                   <p className="text-sm font-semibold text-slate-600">{card.label}</p>
-                  <span className="flex size-10 items-center justify-center rounded-xl bg-brand-50 text-brand-700"><AdminIcon name={card.icon} /></span>
+                  <span className="flex size-10 items-center justify-center rounded-xl bg-blue-50 text-blue-800"><AdminIcon name={card.icon} /></span>
                 </div>
                 <p className="mt-4 text-3xl font-bold tracking-tight tabular-nums text-slate-900">{card.value}</p>
               </div>
@@ -907,7 +910,7 @@ async function AdminContent({
         {role === "admin" && (
         <section
           id="product-catalog"
-          className="mt-7 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6"
+          className="mt-7 rounded-2xl border border-blue-100 bg-white p-5 shadow-sm sm:p-6"
         >
           <h2 className="text-xl font-bold">Product Catalog</h2>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
@@ -1152,7 +1155,7 @@ async function AdminContent({
         )}
 
         {role === "admin" && (
-          <section className="mt-7 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+          <section className="mt-7 rounded-2xl border border-blue-100 bg-white p-5 shadow-sm sm:p-6">
             <h2 className="text-xl font-bold">Add Product Type</h2>
             <p className="mt-2 text-sm leading-6 text-slate-600">
               New types become available in product forms. Types already in use
@@ -1203,7 +1206,7 @@ async function AdminContent({
           </section>
         )}
 
-        <section className="mt-7 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+        <section className="mt-7 rounded-2xl border border-blue-100 bg-white p-5 shadow-sm sm:p-6">
           <h2 className="text-xl font-bold">Create Affiliate Link</h2>
           {affiliateProducts.length === 0 ? (
             <p className="mt-4 rounded-xl bg-amber-50 px-4 py-3 leading-6 text-amber-900">
