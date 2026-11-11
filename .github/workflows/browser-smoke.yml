@@ -15,7 +15,7 @@ on:
 jobs:
   browser-smoke:
     if: github.event_name != 'pull_request' || github.event.pull_request.number == 38
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     env:
       BASE_URL: ${{ github.event_name == 'pull_request' && 'https://sikkha-nogori-git-fix-security-advisor-hardening-kamruzzaman1.vercel.app' || (inputs.base_url || 'https://sikkha-nogori.vercel.app') }}
     steps:
