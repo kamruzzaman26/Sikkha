@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { loginAdmin } from "@/app/admin/actions";
+import { SubmitButton } from "@/components/submit-button";
 
 export const metadata: Metadata = {
   title: "Admin Login | Sikkha Nogori",
@@ -85,12 +86,12 @@ async function AdminLoginContent({
             />
           </div>
 
-          <button
-            type="submit"
-            className="mt-2 min-h-12 rounded-xl bg-[#1f44ae] px-4 py-3 font-bold text-white shadow-lg shadow-brand-900/10 transition hover:bg-[#0f172a] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700"
+          <SubmitButton
+            pendingLabel="Signing in…"
+            className="mt-2 min-h-12 rounded-xl bg-[#1f44ae] px-4 py-3 font-bold text-white shadow-lg shadow-blue-900/20 transition hover:bg-[#0f172a] active:scale-[0.98]"
           >
             Sign in
-          </button>
+          </SubmitButton>
         </form>
       </section>
     </main>
