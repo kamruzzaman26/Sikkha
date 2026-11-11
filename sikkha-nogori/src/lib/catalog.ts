@@ -811,3 +811,102 @@ export async function getPublishedBookSlugs(): Promise<
 
   return data ?? [];
 }
+
+// ---------------------------------------------------------------------------
+// Author / publisher / brand profile pages
+// ---------------------------------------------------------------------------
+
+export type CatalogEntityKind = "authors" | "publishers" | "brands";
+
+export type CatalogEntityProfile = {
+  id: string;
+  kind: CatalogEntityKind;
+  name: string;
+  slug: string;
+  imageUrl: string | null;
+  description: string | null;
+  websiteUrl: string | null;
+  seoTitle: string | null;
+  seoDescription: string | null;
+};
+
+const entityJunctions: Record<CatalogEntityKind, { table: string; column: string }> = {
+  authors: { table: "product_authors", column: "author_id" },
+  publishers: { table: "product_publishers", column: "publisher_id" },
+  brands: { table: "product_brands", column: "brand_id" },
+};
+
+export async function getCatalogEntityBySlug(
+  kind: CatalogEntityKind,
+  slug: string,
+): Promise<CatalogEntityProfile | null> {
+  if (!/^[^\s/]{1,160}$/.test(slug)) return null;
+  const supabase = createSupabasePublicServerClient();
+  const { data, error } = await supabase
+    .from(kind)
+    .select("*")
+    .eq("slug", slug)
+    .eq("is_active", true)
+    .maybeSingle();
+  if (error || !data) return null;
+  const row = data as Record<string, string | null>;
+  return {
+    id: row.id as string,
+    kind,
+    name: row.name as string,
+    slug: row.slug as string,
+    imageUrl: row.image_url ?? row.logo_url ?? null,
+    description: row.biography ?? row.description ?? null,
+    websiteUrl: row.website_url ?? null,
+    seoTitle: row.seo_title ?? null,
+    seoDescription: row.seo_description ?? null,
+  };
+}
+
+/** Published products linked to an entity. Each product appears once. */
+export async function getEntityProducts(
+  kind: CatalogEntityKind,
+  entityId: string,
+  page: number,
+): Promise<PublishedBookPage> {
+  const supabase = createSupabasePublicServerClient();
+  const junction = entityJunctions[kind];
+  const { data: links } = await supabase
+    .from(junction.table)
+    .select("product_id")
+    .eq(junction.column, entityId)
+    .limit(2000);
+  const ids = [...new Set((links ?? []).map((row) => row.product_id as string))];
+  if (ids.length === 0) return { products: [], total: 0 };
+  return getPublishedProductsByIds(ids, page);
+}
+
+/** Published, non-archived products for a set of ids (deduplicated), newest first. */
+export async function getPublishedProductsByIds(
+  ids: string[],
+  page: number,
+  order: string[] = [],
+): Promise<PublishedBookPage> {
+  const unique = [...new Set(ids)];
+  if (unique.length === 0) return { products: [], total: 0 };
+  const supabase = createSupabasePublicServerClient();
+  const { data, count, error } = await supabase
+    .from("products")
+    .select(catalogProductSelection, { count: "exact" })
+    .in("id", unique)
+    .eq("status", "published")
+    .eq("is_published", true)
+    .is("archived_at", null)
+    .not("commerce_mode", "is", null)
+    .order("created_at", { ascending: false })
+    .range((page - 1) * bookPageSize, page * bookPageSize - 1);
+  if (error) throw new Error("Unable to load products.", { cause: error });
+  let products = await withReviewStats(await withStockFlags(data as CatalogProduct[]));
+  if (order.length > 0) {
+    const position = new Map(order.map((id, index) => [id, index]));
+    products = [...products].sort((a, b) => (position.get(a.id) ?? 0) - (position.get(b.id) ?? 0));
+  }
+  return { products, total: count ?? 0 };
+}
+
+export const catalogPageSize = bookPageSize;
