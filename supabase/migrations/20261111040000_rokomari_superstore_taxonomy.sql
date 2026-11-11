@@ -10,7 +10,6 @@ from (values
   ('Bags and Travel', 'bags-and-travel', 17),
   ('Fashion', 'fashion', 18),
   ('Software and Multimedia', 'software-multimedia', 19),
-  ('Tools, DIY & Outdoor', 'tools-diy-outdoor', 20),
   ('Furniture & Decor', 'furniture-decor', 21),
   ('Bedding & Bath', 'bedding-bath', 22),
   ('Hobby, Art and Culture', 'hobby-art-culture', 23),
