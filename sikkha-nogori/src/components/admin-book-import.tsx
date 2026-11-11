@@ -59,6 +59,7 @@ function ImportRows({ rows }: { rows: BookImportRowResult[] }) {
               <td className="max-w-56 px-3 py-3 text-xs">
                 <p>{row.authors?.join(" · ") || "—"}</p>
                 <p className="mt-1 text-slate-500">{row.publishers?.join(" · ") || "—"}</p>
+                <p className="mt-1 text-slate-500">{row.brands?.join(" · ") || row.instructors?.join(" · ") || "—"}</p>
               </td>
               <td className="max-w-64 px-3 py-3 text-xs">
                 {row.categories?.join(" | ") || "—"}
