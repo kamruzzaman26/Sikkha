@@ -512,7 +512,7 @@ export function SiteHeader({
                   "একাদশ ও দ্বাদশ শ্রেণির বই", "ভর্তি প্রস্তুতি", "বইমেলা ২০২৬"
                 ]} basePath="/books" />
               )}
-              <DrawerLink icon="book" href="/products?category=ই-বুক" onClick={closeDrawer}>ই-বুক</DrawerLink>
+              <DrawerLink icon="book" href="/books?category=ই-বুক" onClick={closeDrawer}>ই-বুক</DrawerLink>
 
               {categoryMenu?.products.length ? (
                 <details className="group border-b border-slate-100">
@@ -557,7 +557,7 @@ export function SiteHeader({
               ) : (
                 <DrawerLink icon="article" href="/courses" onClick={closeDrawer}>কোর্স</DrawerLink>
               )}
-              <DrawerLink icon="article" href="/books?category=শিক্ষা%20কুইজ" onClick={closeDrawer}>শিক্ষা কুইজ</DrawerLink>
+              <DrawerLink icon="article" href="/quiz" onClick={closeDrawer}>শিক্ষা কুইজ</DrawerLink>
 
 
 
