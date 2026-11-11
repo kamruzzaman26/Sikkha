@@ -113,8 +113,42 @@ export async function POST(request: Request) {
 
     validationId = validation.val_id;
     finalStatus = validation.status;
-    finalTransactionId = validation.bank_tran_id?.trim() || validation.tran_id;
-  } else if (ipnStatus !== "FAILED" && ipnStatus !== "CANCELLED") {
+    finalTransactionId = validation.bank_tran_id?.trim() || validation.tran_id || merchantReference;
+  } else if (ipnStatus === "FAILED" || ipnStatus === "CANCELLED") {
+    const queryUrl = new URL(
+      sandbox
+        ? "https://sandbox.sslcommerz.com/validator/api/merchantTransIDvalidationAPI.php"
+        : "https://securepay.sslcommerz.com/validator/api/merchantTransIDvalidationAPI.php",
+    );
+    queryUrl.search = new URLSearchParams({
+      tran_id: merchantReference,
+      store_id: storeId,
+      store_passwd: storePassword,
+      format: "json",
+    }).toString();
+
+    let queried: ValidationResponse;
+    try {
+      const queryResponse = await fetch(queryUrl, { method: "GET", cache: "no-store" });
+      if (!queryResponse.ok) {
+        return json(202, { received: true, processed: false });
+      }
+      queried = await queryResponse.json() as ValidationResponse;
+    } catch {
+      return json(503, { received: false, error: "status_query_unavailable" });
+    }
+
+    if (
+      queried.tran_id !== merchantReference ||
+      !["FAILED", "CANCELLED"].includes(queried.status ?? "") ||
+      Number(queried.amount).toFixed(2) !== Number(transaction.amount).toFixed(2) ||
+      queried.currency?.toUpperCase() !== transaction.currency
+    ) {
+      return json(202, { received: true, processed: false });
+    }
+    finalStatus = queried.status;
+    finalTransactionId = queried.bank_tran_id?.trim() || queried.tran_id || merchantReference;
+  } else {
     return json(202, { received: true, processed: false });
   }
 
