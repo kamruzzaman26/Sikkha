@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "node --test src/lib/delivery-estimate.test.mjs src/lib/email.test.mjs src/lib/affiliate-url.test.mjs src/lib/book-import-csv.test.mjs src/lib/product-image-url.test.mjs src/lib/product-management.test.mjs src/lib/payment-methods.test.mjs src/lib/sslcommerz-ipn.test.mjs src/lib/order-workflow.test.mjs src/lib/customer-security.test.mjs src/lib/admin-stats.test.mjs src/lib/category-markdown.test.mjs src/lib/category-tree.test.mjs src/lib/category-routing.test.mjs"
+    "test": "node --test src/lib/shipping-fee.test.mjs src/lib/delivery-estimate.test.mjs src/lib/email.test.mjs src/lib/affiliate-url.test.mjs src/lib/book-import-csv.test.mjs src/lib/product-image-url.test.mjs src/lib/product-management.test.mjs src/lib/payment-methods.test.mjs src/lib/sslcommerz-ipn.test.mjs src/lib/order-workflow.test.mjs src/lib/customer-security.test.mjs src/lib/admin-stats.test.mjs src/lib/category-markdown.test.mjs src/lib/category-tree.test.mjs src/lib/category-routing.test.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
