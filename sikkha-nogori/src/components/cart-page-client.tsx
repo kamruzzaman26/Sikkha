@@ -82,10 +82,12 @@ export function CartPageClient() {
     .filter((row): row is { line: CartLine; product: Product } => Boolean(row.product));
   const total = rows.reduce((sum, row) => sum + (row.product.price ?? 0) * row.line.quantity, 0);
   const itemCount = rows.reduce((sum, row) => sum + row.line.quantity, 0);
-  const shippingCharge = getShippingCharge(shippingZone, shippingCharges) ?? 48;
+  const requiresShipping = rows.some(({ product }) => !["course", "ebook", "digital"].includes(product.product_type));
+  const effectiveShippingZone = requiresShipping ? shippingZone : "no_shipping";
+  const shippingCharge = getShippingCharge(effectiveShippingZone, shippingCharges) ?? 0;
   const payableTotal = total + shippingCharge;
   const productHref = (product: Product) => product.product_type === "book" ? `/books/${product.slug}` : product.product_type === "course" ? `/courses/${product.slug}` : `/products/${product.slug}`;
-  const checkoutHref = `/checkout?products=${encodeURIComponent(rows.map((row) => row.line.productId).join(","))}&quantities=${encodeURIComponent(rows.map((row) => `${row.line.productId}:${row.line.quantity}`).join(","))}&shippingZone=${encodeURIComponent(shippingZone)}`;
+  const checkoutHref = `/checkout?products=${encodeURIComponent(rows.map((row) => row.line.productId).join(","))}&quantities=${encodeURIComponent(rows.map((row) => `${row.line.productId}:${row.line.quantity}`).join(","))}&shippingZone=${encodeURIComponent(effectiveShippingZone)}`;
 
   if (loading) return <p role="status" className="mt-8 rounded-2xl bg-white p-6 text-slate-600">কার্ট লোড হচ্ছে…</p>;
 
@@ -127,14 +129,14 @@ export function CartPageClient() {
           <aside className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm lg:sticky lg:top-24">
             <h2 className="text-lg font-extrabold">অর্ডার সারাংশ</h2>
             <div className="mt-4 flex justify-between text-sm text-slate-600"><span>পণ্যের সংখ্যা</span><span className="font-semibold text-slate-900">{itemCount}টি</span></div>
-            <div className="mt-4 border-t border-slate-100 pt-4">
+            {requiresShipping ? <div className="mt-4 border-t border-slate-100 pt-4">
               <label htmlFor="cart-shipping-zone" className="mb-2 block text-sm font-semibold text-slate-700">ডেলিভারি এলাকা নির্বাচন করুন</label>
               <select id="cart-shipping-zone" value={shippingZone} onChange={(event) => setShippingZone(event.target.value)} className="min-h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm">
                 <option value="dhaka_city">ঢাকা সিটি — ৳{shippingCharges.dhaka_city} থেকে</option>
                 <option value="district_town">জেলা সদর / পৌরসভা — ৳{shippingCharges.district_town} থেকে</option>
                 <option value="remote_union">দূরবর্তী এলাকা / ইউনিয়ন — ৳{shippingCharges.remote_union} থেকে</option>
               </select>
-            </div>
+            </div> : <p className="mt-4 border-t border-slate-100 pt-4 text-sm text-emerald-800">ডিজিটাল পণ্য — ডেলিভারি চার্জ প্রযোজ্য নয়।</p>}
             <div className="mt-4 flex justify-between text-sm text-slate-600"><span>পণ্যের মূল্য</span><span className="font-semibold">{formatBDT(total)}</span></div>
             <div className="mt-2 flex justify-between text-sm text-slate-600"><span>ডেলিভারি চার্জ (প্রাথমিক)</span><span className="font-semibold">{formatBDT(shippingCharge)}</span></div>
             <div className="mt-3 flex justify-between border-t border-slate-100 pt-3"><span className="font-semibold">সর্বমোট</span><span className="text-xl font-extrabold text-emerald-800">{formatBDT(payableTotal)}</span></div>
