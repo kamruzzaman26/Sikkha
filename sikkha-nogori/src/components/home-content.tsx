@@ -13,6 +13,7 @@ import {
 import { getActiveAffiliateLinkMap } from "@/lib/supabase/affiliate-links";
 import type { PublicAffiliateLink } from "@/lib/supabase/affiliate-links";
 import { createSupabasePublicServerClient } from "@/lib/supabase/server";
+import { connection } from "next/server";
 import { getHomeCategoryHref } from "@/lib/category-routing.mjs";
 
 const slides = [
@@ -195,6 +196,8 @@ function CollectionBlock({ title, books }: { title: string; books: Book[] }) {
 }
 
 export default async function HomeContent({ searchParams }: { searchParams: Promise<{ source?: string }> }) {
+  // Supabase catalog reads must run in the live request, not after a prerender pass ends.
+  await connection();
   const { source } = await searchParams;
   const activeSource = source === "inhouse" || source === "partner" ? source : "all";
   const [books, products, categories, homeSettings] = await Promise.all([
