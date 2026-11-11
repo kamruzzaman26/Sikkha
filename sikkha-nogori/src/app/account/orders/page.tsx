@@ -51,7 +51,7 @@ type CustomerOrder = {
   discount_amount: number | string | null;
   coupon_code: string | null;
   payment_method_name: string;
-  payment_method_type: "manual" | "cod";
+  payment_method_type: "manual" | "cod" | "gateway";
   payment_instructions: string;
   status: keyof typeof orderStatusLabels;
   payment_status: keyof typeof paymentStatusLabels;
