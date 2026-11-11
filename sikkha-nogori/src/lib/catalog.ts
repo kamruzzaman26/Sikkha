@@ -413,12 +413,14 @@ export async function getPublishedProducts({
   category,
   productType,
   sort,
+  inStock = false,
 }: {
   page: number;
   query: string;
   category?: string;
   productType?: string;
-  sort: "name-asc" | "name-desc";
+  sort: "name-asc" | "name-desc" | "newest" | "price-low" | "price-high";
+  inStock?: boolean;
 }): Promise<PublishedBookPage | null> {
   const supabase = createSupabasePublicServerClient();
   const searchTerm = normalizeCatalogQuery(query);
@@ -452,9 +454,24 @@ export async function getPublishedProducts({
       ? request.eq("category", category)
       : request.in("id", categoryProductIds.length > 0 ? categoryProductIds : [emptyUuid]);
   }
+  if (inStock) {
+    const { data: stockRows } = await supabase
+      .from("public_product_stock")
+      .select("product_id")
+      .eq("in_stock", true)
+      .limit(5000);
+    const stockIds = (stockRows ?? []).map((row) => row.product_id as string);
+    request = request
+      .eq("commerce_mode", "direct")
+      .in("id", stockIds.length > 0 ? stockIds : [emptyUuid]);
+  }
 
-  const { data, count, error } = await request
-    .order("title", { ascending: sort === "name-asc" })
+  const orderedRequest = sort === "newest"
+    ? request.order("created_at", { ascending: false })
+    : sort === "price-low" || sort === "price-high"
+      ? request.order("price", { ascending: sort === "price-low", nullsFirst: false })
+      : request.order("title", { ascending: sort === "name-asc" });
+  const { data, count, error } = await orderedRequest
     .range((page - 1) * bookPageSize, page * bookPageSize - 1);
 
   if (error) {
@@ -531,30 +548,42 @@ export async function getPublishedProductCategories(): Promise<
   string[] | null
 > {
   const supabase = createSupabasePublicServerClient();
-  const { data, error } = await supabase
-    .from("products")
-    .select("category")
-    .neq("product_type", "book")
-    .neq("product_type", "course")
-    .eq("is_published", true)
-    .is("archived_at", null)
-    .not("commerce_mode", "is", null)
-    .not("category", "is", null)
-    .order("category")
-    .limit(1000);
+  const [categoriesResult, linksResult, productsResult] = await Promise.all([
+    supabase
+      .from("categories")
+      .select("id, parent_id, name, sort_order")
+      .in("category_group", ["products", "electronics"])
+      .eq("is_active", true)
+      .limit(1000),
+    supabase.from("product_categories").select("category_id, product_id").limit(5000),
+    supabase
+      .from("products")
+      .select("id, category")
+      .neq("product_type", "book")
+      .neq("product_type", "course")
+      .eq("is_published", true)
+      .is("archived_at", null)
+      .not("commerce_mode", "is", null)
+      .limit(5000),
+  ]);
 
-  if (error) {
-    if (isMissingCatalogSchema(error)) {
-      console.error(
-        "Product-management migration is missing from the configured database.",
-        error,
-      );
+  if (!productsResult.data || productsResult.error) {
+    if (isMissingCatalogSchema(productsResult.error ?? {})) {
+      console.error("Product catalog migration is missing from the configured database.", productsResult.error);
       return null;
     }
-    throw new Error("Unable to load product categories.", { cause: error });
+    throw new Error("Unable to load product categories.", { cause: productsResult.error });
   }
 
-  return [...new Set(data.map(({ category }) => category).filter(Boolean))];
+  const legacyNames = [...new Set(productsResult.data.map(({ category }) => category).filter(Boolean))];
+  if (categoriesResult.error || linksResult.error || !categoriesResult.data || !linksResult.data) {
+    return legacyNames.sort((a, b) => a.localeCompare(b, "bn"));
+  }
+
+  const publishedIds = new Set(productsResult.data.map((row) => row.id as string));
+  const publishedLinks = linksResult.data.filter((link) => publishedIds.has(link.product_id));
+  const taxonomyNames = rootCategoryCounts(categoriesResult.data, publishedLinks).map(({ name }) => name);
+  return taxonomyNames.length > 0 ? taxonomyNames : legacyNames.sort((a, b) => a.localeCompare(b, "bn"));
 }
 
 export async function getPublishedBookBySlug(
