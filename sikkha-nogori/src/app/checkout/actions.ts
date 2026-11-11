@@ -171,7 +171,7 @@ export async function placeOrder(formData: FormData) {
     }
     const needsShipping = (orderItems ?? []).some((item) => {
       const product = Array.isArray(item.products) ? item.products[0] : item.products;
-      return product?.product_type !== "course";
+      return !["course", "ebook", "digital"].includes(product?.product_type ?? "");
     });
 
     const apiUrl = sandbox
