@@ -7,7 +7,7 @@ export type PublicPaymentMethod = {
   id: string;
   name: string;
   code: string;
-  method_type: "manual" | "cod";
+  method_type: "manual" | "cod" | "gateway";
   description: string;
   instructions: string;
   sort_order: number;
@@ -23,7 +23,6 @@ export async function getEnabledPaymentMethods(): Promise<
       "id, name, code, method_type, description, instructions, sort_order, is_enabled",
     )
     .eq("is_enabled", true)
-    .neq("method_type", "gateway")
     .order("sort_order", { ascending: true })
     .order("name", { ascending: true });
 
@@ -38,8 +37,14 @@ export async function getEnabledPaymentMethods(): Promise<
     throw new Error("Unable to load enabled payment methods.", { cause: error });
   }
 
+  const sslcommerzConfigured = Boolean(
+    process.env.SSLCOMMERZ_STORE_ID?.trim() &&
+    process.env.SSLCOMMERZ_STORE_PASSWORD?.trim(),
+  );
+
   return data
     .filter(isCustomerVisiblePaymentMethod)
+    .filter((method) => method.method_type !== "gateway" || (method.code === "sslcommerz" && sslcommerzConfigured))
     .map(
       ({
         id,

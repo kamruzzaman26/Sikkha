@@ -77,6 +77,8 @@ type ProductFormValue = {
   description?: string;
   price?: number;
   cost_price?: number | null;
+  affiliate_commission_type?: "none" | "percentage" | "fixed";
+  affiliate_commission_value?: number;
   pricing_mode?: "manual" | "automatic";
   markup_percent?: number;
   list_price?: number | null;
@@ -301,6 +303,22 @@ function ProductForm({
         <div><label htmlFor={`${idPrefix}-pricing-mode`} className="mb-1.5 block text-sm font-semibold text-slate-800">Pricing Mode</label><select id={`${idPrefix}-pricing-mode`} name="pricingMode" defaultValue={product?.pricing_mode ?? "manual"} className={inputClass}><option value="manual">Manual price</option><option value="automatic">Automatic from cost</option></select></div>
         <div><label htmlFor={`${idPrefix}-markup`} className="mb-1.5 block text-sm font-semibold text-slate-800">Profit Markup (%)</label><input id={`${idPrefix}-markup`} name="markupPercent" type="number" min="0" max="10000" step="0.01" defaultValue={product?.markup_percent ?? 0} className={inputClass} /><p className="mt-1 text-xs text-slate-500">Automatic price = cost × (1 + markup ÷ 100).</p></div>
       </div>
+      <section className="grid gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4 md:grid-cols-2">
+        <div>
+          <label htmlFor={`${idPrefix}-affiliate-commission-type`} className="mb-1.5 block text-sm font-semibold text-slate-800">Affiliate Referral Commission</label>
+          <select id={`${idPrefix}-affiliate-commission-type`} name="affiliateCommissionType" defaultValue={product?.affiliate_commission_type ?? "none"} className={inputClass}>
+            <option value="none">No commission</option>
+            <option value="percentage">Percentage (%)</option>
+            <option value="fixed">Fixed amount per unit (৳)</option>
+          </select>
+          <p className="mt-1 text-xs leading-5 text-slate-500">For direct-sale products referred by an approved Sikkha Nogori affiliate. External partner commissions are reported separately.</p>
+        </div>
+        <div>
+          <label htmlFor={`${idPrefix}-affiliate-commission-value`} className="mb-1.5 block text-sm font-semibold text-slate-800">Commission Value</label>
+          <input id={`${idPrefix}-affiliate-commission-value`} name="affiliateCommissionValue" type="number" min="0" max="9999999999.99" step="0.01" defaultValue={product?.affiliate_commission_value ?? 0} className={inputClass} />
+          <p className="mt-1 text-xs text-slate-500">Percentage is capped at 100. Fixed commission is calculated per unit and cannot exceed the eligible item amount.</p>
+        </div>
+      </section>
         <div>
           <label
             htmlFor={`${idPrefix}-list-price`}
@@ -583,7 +601,7 @@ async function AdminContent({
     supabase
       .from("products")
       .select(
-        "id, title, slug, description, price, cost_price, pricing_mode, markup_percent, list_price, edition, isbn, page_count, language, country, weight_kg, product_type, category, author, publisher, image_url, commerce_mode, is_published, archived_at",
+        "id, title, slug, description, price, cost_price, affiliate_commission_type, affiliate_commission_value, pricing_mode, markup_percent, list_price, edition, isbn, page_count, language, country, weight_kg, product_type, category, author, publisher, image_url, commerce_mode, is_published, archived_at",
       )
       .order("title"),
     supabase

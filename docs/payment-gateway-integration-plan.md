@@ -1,6 +1,6 @@
 # Payment Gateway Integration Plan
 
-Status: design only. No provider selected, no merchant credentials, no live gateway enabled.
+Status: SSLCOMMERZ selected. Integration is being prepared for Sandbox first; no production merchant credentials or live gateway are configured.
 
 ## Audited baseline (branch `merge-auth-otp`)
 
@@ -74,11 +74,29 @@ A failed/cancelled event must never overwrite a paid transaction. Refunds requir
 - Feature flag the gateway and keep it disabled until merchant approval, sandbox verification, production credentials, callback URL verification, and end-to-end tests are complete.
 - Add tests for duplicate checkout, duplicate webhook, mismatched amount/currency, invalid signature, late success after cancellation, success then failure, refund, and affiliate conversion.
 
-## Decisions still required
+## SSLCOMMERZ implementation notes
 
-1. Merchant/provider selection and approved merchant account.
-2. Provider's sandbox and production credentials (entered only in Vercel environment settings).
-3. Refund and settlement policy, fees, and supported payment methods.
-4. Whether the business category is eligible for the selected provider.
+- Hosted Checkout V4 uses the Session API, IPN listener, and Order Validation API.
+- A browser success callback is informational only. The order becomes verified only after the server validates the transaction with SSLCOMMERZ and matches transaction reference, amount, and BDT currency.
+- IPN events are idempotent. Duplicate events cannot create duplicate paid states or affiliate commission rows.
+- Sandbox is the default. Live mode requires an explicit server environment setting.
+- Merchant credentials belong only in Vercel server-side environment variables: `SSLCOMMERZ_STORE_ID`, `SSLCOMMERZ_STORE_PASSWORD`, and `SSLCOMMERZ_IS_SANDBOX`. Never store them in Git, public variables, or database configuration.
+- Merchant onboarding, contracts, identity verification, and settlement accounts must be handled by an eligible adult guardian or authorized adult business representative.
+- Refund initiation/confirmation is not yet automated. Gateway orders must not be marked refunded until SSLCOMMERZ confirms the refund.
 
-No schema migration or live payment setting is changed by this design document.
+## Product-level affiliate referral commission
+
+- Each direct-sale product can use no commission, percentage commission, or fixed commission per unit.
+- The order item snapshots the commission rule at order creation. Later product edits do not change earlier orders.
+- On verified payment, a separate ledger row is created for each order item and the affiliate who referred the order.
+- Percentage commission is calculated on the item's proportional net amount after coupon discount. Fixed commission is per unit and capped at the item's net amount.
+- Refunds reverse pending/approved/paid ledger entries. External Rokomari and 10 Minute School affiliate commissions remain partner-reported and are not inferred from this site's orders.
+
+## Remaining prerequisites
+
+1. Apply and verify the reviewed database migration before deploying application code.
+2. Configure Sandbox credentials in Vercel server-side environment variables.
+3. Complete Sandbox end-to-end tests before any production credentials or live-mode setting are considered.
+4. Confirm provider eligibility and refund workflow with the adult merchant representative.
+
+No production deployment or live merchant configuration is authorized by this implementation branch.

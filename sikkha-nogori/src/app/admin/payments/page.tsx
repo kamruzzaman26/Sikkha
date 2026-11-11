@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 const methodTypes = [
   { value: "manual", label: "Manual Payment" },
   { value: "cod", label: "Cash on Delivery (COD)" },
-  { value: "gateway", label: "Online Gateway (Not Connected)" },
+  { value: "gateway", label: "SSLCOMMERZ Online Payment" },
 ] as const;
 
 const statusMessages: Record<string, string> = {
@@ -29,7 +29,7 @@ const statusMessages: Record<string, string> = {
   invalid: "Please verify the information and complete all required fields.",
   "duplicate-code": "This code is already in use.",
   "gateway-unavailable":
-    "The online gateway is not connected and cannot be enabled for customers.",
+    "SSLCOMMERZ cannot be enabled until the approved merchant credentials are configured securely on the server.",
   "not-found": "Payment method not found or no longer editable.",
 };
 
@@ -230,7 +230,7 @@ async function PaymentMethodsContent({
           <div className="min-w-0">
             <p className="text-xs font-bold uppercase tracking-[0.14em] text-brand-800">Daily operations</p>
             <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900">Payment Methods</h1>
-            <p className="mt-1.5 max-w-3xl text-[15px] leading-6 text-slate-600">Manage names, types, instructions, enabled status, and display order. Manual payments are not marked Paid until verified. Checkout or online payment gateways are not currently enabled.</p>
+            <p className="mt-1.5 max-w-3xl text-[15px] leading-6 text-slate-600">Manage names, types, instructions, enabled status, and display order. Manual payments are not marked Paid until verified. SSLCOMMERZ is available after secure server configuration and merchant approval.</p>
           </div>
           <div className="flex flex-wrap gap-2.5">
             <Link href="/admin/dashboard" className="inline-flex min-h-11 items-center rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-800 transition hover:bg-slate-50">Dashboard</Link>
@@ -316,8 +316,7 @@ async function PaymentMethodsContent({
 
                   {method.method_type === "gateway" && (
                     <p className="mb-4 rounded-lg bg-amber-50 px-3 py-2 text-sm leading-6 text-amber-950">
-                      No gateway adapter is connected. This method is not shown to customers
-                      and cannot accept payments.
+                      SSLCOMMERZ will appear at checkout only when its server-side merchant credentials are configured. Never store credentials in this form.
                     </p>
                   )}
 

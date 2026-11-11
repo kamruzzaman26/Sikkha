@@ -710,11 +710,20 @@ export async function saveProduct(formData: FormData) {
   const imageUrl = imageUrlValue ? parseProductImageUrl(imageUrlValue) : null;
   const costPriceValue = getFormValue(formData, "costPrice");
   const costPrice = costPriceValue === "" ? null : parsePrice(costPriceValue);
+  const affiliateCommissionType = getFormValue(formData, "affiliateCommissionType") || "none";
+  const affiliateCommissionValueRaw = getFormValue(formData, "affiliateCommissionValue") || "0";
+  const affiliateCommissionValue = parsePrice(affiliateCommissionValueRaw);
   const pricingMode = getFormValue(formData, "pricingMode") || "manual";
   const markupValue = getFormValue(formData, "markupPercent") || "0";
   const markupPercent = /^(?:0|[1-9]\d*)(?:\.\d{1,2})?$/.test(markupValue) ? Number(markupValue) : NaN;
   if (
     !["manual", "automatic"].includes(pricingMode) ||
+    !["none", "percentage", "fixed"].includes(affiliateCommissionType) ||
+    affiliateCommissionValue === undefined ||
+    (affiliateCommissionType !== "none" && affiliateCommissionValue <= 0) ||
+    (affiliateCommissionType === "percentage" && affiliateCommissionValue > 100) ||
+    (affiliateCommissionType === "none" && affiliateCommissionValue !== 0) ||
+    (commerceMode !== "direct" && (affiliateCommissionType !== "none" || affiliateCommissionValue !== 0)) ||
     (costPriceValue !== "" && costPrice === undefined) ||
     !Number.isFinite(markupPercent) || markupPercent < 0 || markupPercent > 10000 ||
     (pricingMode === "automatic" && (costPrice === null || costPrice === undefined))
@@ -820,6 +829,8 @@ export async function saveProduct(formData: FormData) {
     category: category || null,
     image_url: imageUrl,
     commerce_mode: commerceMode,
+    affiliate_commission_type: affiliateCommissionType,
+    affiliate_commission_value: affiliateCommissionValue,
     author: author || null,
     publisher: publisher || null,
     product_type: productType,
