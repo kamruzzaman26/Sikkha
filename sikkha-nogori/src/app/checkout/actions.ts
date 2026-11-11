@@ -76,7 +76,7 @@ export async function placeOrder(formData: FormData) {
 
   const { data: savedOrder, error: savedOrderError } = await supabase
     .from("orders")
-    .select("payment_method_type, total_amount, currency, customer_name, customer_phone, delivery_address")
+    .select("payment_method_type, payment_status, total_amount, currency, customer_name, customer_phone, delivery_address")
     .eq("id", orderId)
     .maybeSingle();
 
@@ -85,6 +85,9 @@ export async function placeOrder(formData: FormData) {
   }
 
   if (savedOrder.payment_method_type === "gateway") {
+    if (savedOrder.payment_status === "verified") {
+      redirect("/account/orders?status=created");
+    }
     const storeId = process.env.SSLCOMMERZ_STORE_ID?.trim();
     const storePassword = process.env.SSLCOMMERZ_STORE_PASSWORD?.trim();
     if (!storeId || !storePassword) {
@@ -111,6 +114,25 @@ export async function placeOrder(formData: FormData) {
       redirect("/account/orders?status=payment-init-failed");
     }
 
+    const sandbox = process.env.SSLCOMMERZ_IS_SANDBOX?.trim().toLowerCase() !== "false";
+    const allowedGatewayOrigin = sandbox
+      ? "https://sandbox.sslcommerz.com"
+      : "https://securepay.sslcommerz.com";
+    if (
+      transaction.transaction_status === "pending" &&
+      typeof transaction.gateway_page_url === "string" &&
+      typeof transaction.provider_session_id === "string"
+    ) {
+      try {
+        const existingGatewayUrl = new URL(transaction.gateway_page_url);
+        if (existingGatewayUrl.origin === allowedGatewayOrigin) {
+          redirect(existingGatewayUrl.toString());
+        }
+      } catch (error) {
+        if (error instanceof Error && error.message.includes("NEXT_REDIRECT")) throw error;
+      }
+    }
+
     const { data: orderItems, error: orderItemsError } = await supabase
       .from("order_items")
       .select("products(product_type)")
@@ -123,7 +145,6 @@ export async function placeOrder(formData: FormData) {
       return product?.product_type !== "course";
     });
 
-    const sandbox = process.env.SSLCOMMERZ_IS_SANDBOX?.trim().toLowerCase() !== "false";
     const apiUrl = sandbox
       ? "https://sandbox.sslcommerz.com/gwprocess/v4/api.php"
       : "https://securepay.sslcommerz.com/gwprocess/v4/api.php";
@@ -181,9 +202,6 @@ export async function placeOrder(formData: FormData) {
     } catch {
       redirect("/account/orders?status=payment-init-failed");
     }
-    const allowedGatewayOrigin = sandbox
-      ? "https://sandbox.sslcommerz.com"
-      : "https://securepay.sslcommerz.com";
     if (
       gatewayResponse.status !== "SUCCESS" ||
       !sessionKey ||
