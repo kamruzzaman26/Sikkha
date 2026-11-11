@@ -173,7 +173,7 @@ function ProductForm({
   primaryEntityIds: EntityPrimaries;
 }) {
   const inputClass =
-    "w-full min-h-11 rounded-lg border border-slate-300 bg-white px-3 text-sm";
+    "w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5";
 
   return (
     <AdminAutoDraftForm draftKey={product?.id ?? idPrefix} action={saveProduct} className="grid gap-4">
@@ -182,7 +182,7 @@ function ProductForm({
         <div>
           <label
             htmlFor={`${idPrefix}-title`}
-            className="mb-1.5 block text-sm font-semibold text-slate-800"
+            className="mb-2 block text-sm font-semibold text-slate-700"
           >
             Name
           </label>
@@ -198,7 +198,7 @@ function ProductForm({
         <div>
           <label
             htmlFor={`${idPrefix}-slug`}
-            className="mb-1.5 block text-sm font-semibold text-slate-800"
+            className="mb-2 block text-sm font-semibold text-slate-700"
           >
             URL slug (lowercase letters and hyphens)
           </label>
@@ -218,7 +218,7 @@ function ProductForm({
         <div>
           <label
             htmlFor={`${idPrefix}-type`}
-            className="mb-1.5 block text-sm font-semibold text-slate-800"
+            className="mb-2 block text-sm font-semibold text-slate-700"
           >
             Type
           </label>
@@ -239,7 +239,7 @@ function ProductForm({
         <div>
           <label
             htmlFor={`${idPrefix}-category`}
-            className="mb-1.5 block text-sm font-semibold text-slate-800"
+            className="mb-2 block text-sm font-semibold text-slate-700"
           >
             Category
           </label>
@@ -257,7 +257,7 @@ function ProductForm({
         <div>
           <label
             htmlFor={`${idPrefix}-commerce-mode`}
-            className="mb-1.5 block text-sm font-semibold text-slate-800"
+            className="mb-2 block text-sm font-semibold text-slate-700"
           >
             Sales Type
           </label>
@@ -278,7 +278,7 @@ function ProductForm({
         <div>
           <label
             htmlFor={`${idPrefix}-price`}
-            className="mb-1.5 block text-sm font-semibold text-slate-800"
+            className="mb-2 block text-sm font-semibold text-slate-700"
           >
             Price (৳)
           </label>
@@ -299,13 +299,13 @@ function ProductForm({
           </p>
         </div>
       <div className="grid gap-4 md:grid-cols-3">
-        <div><label htmlFor={`${idPrefix}-cost-price`} className="mb-1.5 block text-sm font-semibold text-slate-800">Purchase / Cost Price (৳)</label><input id={`${idPrefix}-cost-price`} name="costPrice" type="number" min="0" max="9999999999.99" step="0.01" defaultValue={product?.cost_price ?? ""} className={inputClass} /></div>
-        <div><label htmlFor={`${idPrefix}-pricing-mode`} className="mb-1.5 block text-sm font-semibold text-slate-800">Pricing Mode</label><select id={`${idPrefix}-pricing-mode`} name="pricingMode" defaultValue={product?.pricing_mode ?? "manual"} className={inputClass}><option value="manual">Manual price</option><option value="automatic">Automatic from cost</option></select></div>
-        <div><label htmlFor={`${idPrefix}-markup`} className="mb-1.5 block text-sm font-semibold text-slate-800">Profit Markup (%)</label><input id={`${idPrefix}-markup`} name="markupPercent" type="number" min="0" max="10000" step="0.01" defaultValue={product?.markup_percent ?? 0} className={inputClass} /><p className="mt-1 text-xs text-slate-500">Automatic price = cost × (1 + markup ÷ 100).</p></div>
+        <div><label htmlFor={`${idPrefix}-cost-price`} className="mb-2 block text-sm font-semibold text-slate-700">Purchase / Cost Price (৳)</label><input id={`${idPrefix}-cost-price`} name="costPrice" type="number" min="0" max="9999999999.99" step="0.01" defaultValue={product?.cost_price ?? ""} className={inputClass} /></div>
+        <div><label htmlFor={`${idPrefix}-pricing-mode`} className="mb-2 block text-sm font-semibold text-slate-700">Pricing Mode</label><select id={`${idPrefix}-pricing-mode`} name="pricingMode" defaultValue={product?.pricing_mode ?? "manual"} className={inputClass}><option value="manual">Manual price</option><option value="automatic">Automatic from cost</option></select></div>
+        <div><label htmlFor={`${idPrefix}-markup`} className="mb-2 block text-sm font-semibold text-slate-700">Profit Markup (%)</label><input id={`${idPrefix}-markup`} name="markupPercent" type="number" min="0" max="10000" step="0.01" defaultValue={product?.markup_percent ?? 0} className={inputClass} /><p className="mt-1 text-xs text-slate-500">Automatic price = cost × (1 + markup ÷ 100).</p></div>
       </div>
       <section className="grid gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4 md:grid-cols-2">
         <div>
-          <label htmlFor={`${idPrefix}-affiliate-commission-type`} className="mb-1.5 block text-sm font-semibold text-slate-800">Affiliate Referral Commission</label>
+          <label htmlFor={`${idPrefix}-affiliate-commission-type`} className="mb-2 block text-sm font-semibold text-slate-700">Affiliate Referral Commission</label>
           <select id={`${idPrefix}-affiliate-commission-type`} name="affiliateCommissionType" defaultValue={product?.affiliate_commission_type ?? "none"} className={inputClass}>
             <option value="none">No commission</option>
             <option value="percentage">Percentage (%)</option>
@@ -314,7 +314,7 @@ function ProductForm({
           <p className="mt-1 text-xs leading-5 text-slate-500">For direct-sale products referred by an approved Sikkha Nogori affiliate. External partner commissions are reported separately.</p>
         </div>
         <div>
-          <label htmlFor={`${idPrefix}-affiliate-commission-value`} className="mb-1.5 block text-sm font-semibold text-slate-800">Commission Value</label>
+          <label htmlFor={`${idPrefix}-affiliate-commission-value`} className="mb-2 block text-sm font-semibold text-slate-700">Commission Value</label>
           <input id={`${idPrefix}-affiliate-commission-value`} name="affiliateCommissionValue" type="number" min="0" max="9999999999.99" step="0.01" defaultValue={product?.affiliate_commission_value ?? 0} className={inputClass} />
           <p className="mt-1 text-xs text-slate-500">Percentage is capped at 100. Fixed commission is calculated per unit and cannot exceed the eligible item amount.</p>
         </div>
@@ -322,7 +322,7 @@ function ProductForm({
         <div>
           <label
             htmlFor={`${idPrefix}-list-price`}
-            className="mb-1.5 block text-sm font-semibold text-slate-800"
+            className="mb-2 block text-sm font-semibold text-slate-700"
           >
             List Price (৳, optional)
           </label>
@@ -346,7 +346,7 @@ function ProductForm({
         <div>
           <label
             htmlFor={`${idPrefix}-edition`}
-            className="mb-1.5 block text-sm font-semibold text-slate-800"
+            className="mb-2 block text-sm font-semibold text-slate-700"
           >
             Edition (optional)
           </label>
@@ -361,7 +361,7 @@ function ProductForm({
         <div>
           <label
             htmlFor={`${idPrefix}-isbn`}
-            className="mb-1.5 block text-sm font-semibold text-slate-800"
+            className="mb-2 block text-sm font-semibold text-slate-700"
           >
             ISBN (optional)
           </label>
@@ -376,7 +376,7 @@ function ProductForm({
         <div>
           <label
             htmlFor={`${idPrefix}-pageCount`}
-            className="mb-1.5 block text-sm font-semibold text-slate-800"
+            className="mb-2 block text-sm font-semibold text-slate-700"
           >
             Page Count (optional)
           </label>
@@ -391,7 +391,7 @@ function ProductForm({
         <div>
           <label
             htmlFor={`${idPrefix}-language`}
-            className="mb-1.5 block text-sm font-semibold text-slate-800"
+            className="mb-2 block text-sm font-semibold text-slate-700"
           >
             Language (optional)
           </label>
@@ -406,7 +406,7 @@ function ProductForm({
         <div>
           <label
             htmlFor={`${idPrefix}-country`}
-            className="mb-1.5 block text-sm font-semibold text-slate-800"
+            className="mb-2 block text-sm font-semibold text-slate-700"
           >
             Country (optional)
           </label>
@@ -421,7 +421,7 @@ function ProductForm({
         <div>
           <label
             htmlFor={`${idPrefix}-weightKg`}
-            className="mb-1.5 block text-sm font-semibold text-slate-800"
+            className="mb-2 block text-sm font-semibold text-slate-700"
           >
             Weight (kg, optional)
           </label>
@@ -439,7 +439,7 @@ function ProductForm({
         <div>
           <label
             htmlFor={`${idPrefix}-author`}
-            className="mb-1.5 block text-sm font-semibold text-slate-800"
+            className="mb-2 block text-sm font-semibold text-slate-700"
           >
             Legacy Author Text
           </label>
@@ -454,7 +454,7 @@ function ProductForm({
         <div>
           <label
             htmlFor={`${idPrefix}-publisher`}
-            className="mb-1.5 block text-sm font-semibold text-slate-800"
+            className="mb-2 block text-sm font-semibold text-slate-700"
           >
             Legacy Publisher Text
           </label>
@@ -545,7 +545,7 @@ function ProductForm({
       <div>
         <label
           htmlFor={`${idPrefix}-description`}
-          className="mb-1.5 block text-sm font-semibold text-slate-800"
+          className="mb-2 block text-sm font-semibold text-slate-700"
         >
           Description
         </label>
@@ -852,34 +852,37 @@ async function AdminContent({
   );
 
   return (
-    <main lang="en" className="min-h-screen bg-[#f4f6fa] px-4 py-6 text-slate-900 sm:px-7 sm:py-8 xl:px-10">
+    <main lang="en" className="min-h-screen bg-[#f4f7ff] px-4 py-6 text-slate-900 sm:px-7 sm:py-8 xl:px-10">
       <div className="mx-auto max-w-[1500px]">
-        <header className="flex flex-wrap items-end justify-between gap-4">
-          <div className="min-w-0">
-            <p className="text-xs font-bold uppercase tracking-[0.14em] text-brand-800">Catalog</p>
-            <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900">
-              Products &amp; Affiliate Links
-            </h1>
-            <p className="mt-1.5 max-w-3xl text-[15px] leading-6 text-slate-600">
-              Manage product types, sales channels, categories, and cover images. Third-party
-              seller products are not available for direct checkout.
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-2.5">
-            <Link
-              href="/"
-              className="inline-flex min-h-11 items-center rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-800 transition hover:bg-slate-50"
-            >
-              View storefront
-            </Link>
-            <form action={logoutAdmin}>
-              <button
-                type="submit"
-                className="inline-flex min-h-11 items-center rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-800 transition hover:bg-slate-50"
+        <header className="relative overflow-hidden rounded-[28px] border border-slate-800 bg-[#101b35] px-6 py-7 text-white shadow-xl sm:px-8 sm:py-9">
+          <div className="pointer-events-none absolute -right-12 -top-20 size-64 rounded-full bg-blue-500/15 blur-3xl" />
+          <div className="relative flex flex-wrap items-end justify-between gap-4">
+            <div className="min-w-0">
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-blue-200">PRODUCT MANAGEMENT</p>
+              <h1 className="mt-1 text-3xl font-extrabold tracking-tight text-white">
+                Products &amp; Affiliate Links
+              </h1>
+              <p className="mt-2 max-w-3xl text-sm leading-6 text-blue-100/80">
+                Organize your product catalog, partner links, categories, and product details. Third-party
+                seller products are not available for direct checkout.
+              </p>
+            </div>
+            <div className="relative flex flex-wrap gap-2.5">
+              <Link
+                href="/"
+                className="inline-flex min-h-11 items-center rounded-xl border border-white/20 bg-white/10 px-4 text-sm font-semibold text-white transition hover:bg-white/20"
               >
-                Sign out
-              </button>
-            </form>
+                View storefront
+              </Link>
+              <form action={logoutAdmin}>
+                <button
+                  type="submit"
+                  className="inline-flex min-h-11 items-center rounded-xl border border-white/20 bg-white/10 px-4 text-sm font-semibold text-white transition hover:bg-white/20"
+                >
+                  Sign out
+                </button>
+              </form>
+            </div>
           </div>
         </header>
 
@@ -891,13 +894,13 @@ async function AdminContent({
               { href: "/admin/affiliates", label: "Affiliate Accounts", icon: "affiliates" as const, note: "Manage partner accounts" },
               { href: "/admin/users", label: "Manage Users", icon: "customers" as const, note: "View customer accounts" },
             ].map((action) => (
-              <Link key={action.href} href={action.href} className="group flex min-h-[92px] items-center gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-lg">
-                <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-800 transition group-hover:bg-[#1f44ae] group-hover:text-white"><AdminIcon name={action.icon} /></span>
+              <Link key={action.href} href={action.href} className="group flex min-h-[92px] items-center gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-lg">
+                <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-800 transition group-hover:bg-[#1f44ae] group-hover:text-white"><AdminIcon name={action.icon} /></span>
                 <span className="min-w-0">
                   <span className="block text-sm font-extrabold text-slate-900">{action.label}</span>
                   <span className="mt-1 block text-xs text-slate-500">{action.note}</span>
                 </span>
-                <span className="ml-auto text-lg text-slate-300 transition group-hover:translate-x-1 group-hover:text-brand-700">→</span>
+                <span className="ml-auto text-lg text-slate-300 transition group-hover:translate-x-1 group-hover:text-blue-700">→</span>
               </Link>
             ))}
           </section>
@@ -911,10 +914,10 @@ async function AdminContent({
               { label: "Draft products", value: products.filter((product) => !product.is_published && !product.archived_at).length, icon: "edit" as const },
               { label: "Active affiliate links", value: links.filter((link) => link.is_active).length, icon: "affiliates" as const },
             ].map((card) => (
-              <div key={card.label} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+              <div key={card.label} className="rounded-2xl border border-blue-100 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
                 <div className="flex items-center justify-between gap-3">
                   <p className="text-sm font-semibold text-slate-600">{card.label}</p>
-                  <span className="flex size-10 items-center justify-center rounded-xl bg-brand-50 text-brand-700"><AdminIcon name={card.icon} /></span>
+                  <span className="flex size-10 items-center justify-center rounded-xl bg-blue-50 text-blue-800"><AdminIcon name={card.icon} /></span>
                 </div>
                 <p className="mt-4 text-3xl font-bold tracking-tight tabular-nums text-slate-900">{card.value}</p>
               </div>
@@ -936,7 +939,7 @@ async function AdminContent({
         {role === "admin" && (
         <section
           id="product-catalog"
-          className="mt-7 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6"
+          className="mt-7 rounded-2xl border border-blue-100 bg-white p-5 shadow-sm sm:p-6"
         >
           <h2 className="text-xl font-bold">Product Catalog</h2>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
@@ -972,7 +975,7 @@ async function AdminContent({
             <div>
               <label
                 htmlFor="admin-product-query"
-                className="mb-1.5 block text-sm font-semibold text-slate-800"
+                className="mb-2 block text-sm font-semibold text-slate-700"
               >
                 Search name, slug, category, author, publisher, or description
               </label>
@@ -981,13 +984,13 @@ async function AdminContent({
                 name="productQuery"
                 type="search"
                 defaultValue={productQueryInput}
-                className="w-full min-h-11 rounded-lg border border-slate-300 bg-white px-3 text-sm"
+                className="w-full min-h-11 rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
               />
             </div>
             <div>
               <label
                 htmlFor="admin-product-type"
-                className="mb-1.5 block text-sm font-semibold text-slate-800"
+                className="mb-2 block text-sm font-semibold text-slate-700"
               >
                 Product Type
               </label>
@@ -995,7 +998,7 @@ async function AdminContent({
                 id="admin-product-type"
                 name="productTypeFilter"
                 defaultValue={productTypeFilter}
-                className="w-full min-h-11 rounded-lg border border-slate-300 bg-white px-3 text-sm"
+                className="w-full min-h-11 rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
               >
                 <option value="all">All Types</option>
                 {productTypes.map((type) => (
@@ -1008,7 +1011,7 @@ async function AdminContent({
             <div>
               <label
                 htmlFor="admin-product-archive"
-                className="mb-1.5 block text-sm font-semibold text-slate-800"
+                className="mb-2 block text-sm font-semibold text-slate-700"
               >
                 Archive Status
               </label>
@@ -1016,7 +1019,7 @@ async function AdminContent({
                 id="admin-product-archive"
                 name="archivedFilter"
                 defaultValue={archivedFilter}
-                className="w-full min-h-11 rounded-lg border border-slate-300 bg-white px-3 text-sm"
+                className="w-full min-h-11 rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
               >
                 <option value="all">All Products</option>
                 <option value="active">Not Archived</option>
@@ -1026,7 +1029,7 @@ async function AdminContent({
             <div>
               <label
                 htmlFor="admin-product-publication"
-                className="mb-1.5 block text-sm font-semibold text-slate-800"
+                className="mb-2 block text-sm font-semibold text-slate-700"
               >
                 Publication Status
               </label>
@@ -1034,7 +1037,7 @@ async function AdminContent({
                 id="admin-product-publication"
                 name="publicationFilter"
                 defaultValue={publicationFilter}
-                className="w-full min-h-11 rounded-lg border border-slate-300 bg-white px-3 text-sm"
+                className="w-full min-h-11 rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
               >
                 <option value="all">All Statuses</option>
                 <option value="published">Published</option>
@@ -1201,7 +1204,7 @@ async function AdminContent({
         )}
 
         {role === "admin" && (
-          <section className="mt-7 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+          <section className="mt-7 rounded-2xl border border-blue-100 bg-white p-5 shadow-sm sm:p-6">
             <h2 className="text-xl font-bold">Add Product Type</h2>
             <p className="mt-2 text-sm leading-6 text-slate-600">
               New types become available in product forms. Types already in use
@@ -1214,7 +1217,7 @@ async function AdminContent({
               <div>
                 <label
                   htmlFor="new-product-type-label"
-                  className="mb-1.5 block text-sm font-semibold text-slate-800"
+                  className="mb-2 block text-sm font-semibold text-slate-700"
                 >
                   Type Name
                 </label>
@@ -1223,13 +1226,13 @@ async function AdminContent({
                   name="label"
                   required
                   maxLength={120}
-                  className="w-full min-h-11 rounded-lg border border-slate-300 bg-white px-3 text-sm"
+                  className="w-full min-h-11 rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                 />
               </div>
               <div>
                 <label
                   htmlFor="new-product-type-slug"
-                  className="mb-1.5 block text-sm font-semibold text-slate-800"
+                  className="mb-2 block text-sm font-semibold text-slate-700"
                 >
                   URL slug
                 </label>
@@ -1239,7 +1242,7 @@ async function AdminContent({
                   required
                   maxLength={80}
                   pattern="[a-z0-9]+(?:-[a-z0-9]+)*"
-                  className="w-full min-h-11 rounded-lg border border-slate-300 bg-white px-3 text-sm"
+                  className="w-full min-h-11 rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                 />
               </div>
               <button
@@ -1252,7 +1255,7 @@ async function AdminContent({
           </section>
         )}
 
-        <section className="mt-7 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+        <section className="mt-7 rounded-2xl border border-blue-100 bg-white p-5 shadow-sm sm:p-6">
           <h2 className="text-xl font-bold">Create Affiliate Link</h2>
           {affiliateProducts.length === 0 ? (
             <p className="mt-4 rounded-xl bg-amber-50 px-4 py-3 leading-6 text-amber-900">
@@ -1264,7 +1267,7 @@ async function AdminContent({
                 <div>
                   <label
                     htmlFor="new-product"
-                    className="mb-1.5 block text-sm font-semibold text-slate-800"
+                    className="mb-2 block text-sm font-semibold text-slate-700"
                   >
                     Product
                   </label>
@@ -1273,7 +1276,7 @@ async function AdminContent({
                     name="productId"
                     required
                     defaultValue=""
-                    className="w-full min-h-11 rounded-lg border border-slate-300 bg-white px-3 text-sm"
+                    className="w-full min-h-11 rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                   >
                     <option value="" disabled>
                       Select a product
@@ -1289,7 +1292,7 @@ async function AdminContent({
                 <div>
                   <label
                     htmlFor="new-partner"
-                    className="mb-1.5 block text-sm font-semibold text-slate-800"
+                    className="mb-2 block text-sm font-semibold text-slate-700"
                   >
                     Affiliate Partner
                   </label>
@@ -1298,7 +1301,7 @@ async function AdminContent({
                     name="partner"
                     required
                     defaultValue=""
-                    className="w-full min-h-11 rounded-lg border border-slate-300 bg-white px-3 text-sm"
+                    className="w-full min-h-11 rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                   >
                     <option value="" disabled>
                       Select a partner
@@ -1315,7 +1318,7 @@ async function AdminContent({
               <div>
                 <label
                   htmlFor="new-url"
-                  className="mb-1.5 block text-sm font-semibold text-slate-800"
+                  className="mb-2 block text-sm font-semibold text-slate-700"
                 >
                   Approved Affiliate URL (HTTPS)
                 </label>
@@ -1327,7 +1330,7 @@ async function AdminContent({
                   required
                   maxLength={2048}
                   placeholder="https://..."
-                  className="w-full min-h-11 rounded-lg border border-slate-300 bg-white px-3 text-sm"
+                  className="w-full min-h-11 rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                 />
               </div>
 
@@ -1341,7 +1344,7 @@ async function AdminContent({
           )}
         </section>
 
-        <section className="mt-7 rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <section className="mt-7 rounded-2xl border border-blue-100 bg-white shadow-sm">
           <div className="px-5 pt-5 sm:px-6 sm:pt-6">
             <h2 className="text-xl font-bold">Saved Affiliate Links</h2>
             <p className="mt-1 text-sm text-slate-600">{links.length} links total</p>
@@ -1428,7 +1431,7 @@ async function AdminContent({
                         <input type="hidden" name="id" value={link.id} />
                         <div className="grid gap-4 md:grid-cols-2">
                           <div>
-                            <label htmlFor={`product-${link.id}`} className="mb-1.5 block text-sm font-semibold text-slate-800">
+                            <label htmlFor={`product-${link.id}`} className="mb-2 block text-sm font-semibold text-slate-700">
                               Products
                             </label>
                             <select
@@ -1436,7 +1439,7 @@ async function AdminContent({
                               name="productId"
                               required
                               defaultValue={link.product_id}
-                              className="w-full min-h-11 rounded-lg border border-slate-300 bg-white px-3 text-sm"
+                              className="w-full min-h-11 rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                             >
                               {products.map((product) => (
                                 <option key={product.id} value={product.id}>
@@ -1446,7 +1449,7 @@ async function AdminContent({
                             </select>
                           </div>
                           <div>
-                            <label htmlFor={`partner-${link.id}`} className="mb-1.5 block text-sm font-semibold text-slate-800">
+                            <label htmlFor={`partner-${link.id}`} className="mb-2 block text-sm font-semibold text-slate-700">
                               Affiliate Partner
                             </label>
                             <select
@@ -1454,7 +1457,7 @@ async function AdminContent({
                               name="partner"
                               required
                               defaultValue={link.partner ?? ""}
-                              className="w-full min-h-11 rounded-lg border border-slate-300 bg-white px-3 text-sm"
+                              className="w-full min-h-11 rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                             >
                               <option value="" disabled>
                                 Select a partner
@@ -1468,7 +1471,7 @@ async function AdminContent({
                           </div>
                         </div>
                         <div>
-                          <label htmlFor={`url-${link.id}`} className="mb-1.5 block text-sm font-semibold text-slate-800">
+                          <label htmlFor={`url-${link.id}`} className="mb-2 block text-sm font-semibold text-slate-700">
                             Affiliate URL (HTTPS)
                           </label>
                           <input
@@ -1479,7 +1482,7 @@ async function AdminContent({
                             required
                             maxLength={2048}
                             defaultValue={link.url}
-                            className="w-full min-h-11 rounded-lg border border-slate-300 bg-white px-3 text-sm"
+                            className="w-full min-h-11 rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                           />
                         </div>
                         <div>

@@ -48,6 +48,8 @@ type CustomerOrder = {
   delivery_address: string;
   currency: string;
   total_amount: number | string;
+  shipping_charge: number | string;
+  shipping_zone: string | null;
   discount_amount: number | string | null;
   coupon_code: string | null;
   payment_method_name: string;
@@ -68,7 +70,7 @@ async function AccountOrdersContent({
   const { data: orders, error: ordersError } = await supabase
     .from("orders")
     .select(
-      "id, customer_name, customer_phone, delivery_address, currency, total_amount, discount_amount, coupon_code, payment_method_name, payment_method_type, payment_instructions, status, payment_status, payment_refund_reason, created_at",
+      "id, customer_name, customer_phone, delivery_address, currency, total_amount, shipping_charge, shipping_zone, discount_amount, coupon_code, payment_method_name, payment_method_type, payment_instructions, status, payment_status, payment_refund_reason, created_at",
     )
     .eq("user_id", user.id)
     .order("created_at", { ascending: false })
@@ -223,6 +225,10 @@ async function AccountOrdersContent({
                   </ul>
 
                   <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
+                    <div>
+                      <dt className="font-semibold text-slate-600">ডেলিভারি চার্জ</dt>
+                      <dd className="mt-1">{formatBDT(order.shipping_charge ?? 0)}{order.shipping_zone ? ` · ${({ dhaka_city: "ঢাকা সিটি", district_town: "জেলা সদর / পৌরসভা", remote_union: "দূরবর্তী এলাকা / ইউনিয়ন", no_shipping: "ডিজিটাল পণ্য" } as Record<string, string>)[order.shipping_zone] ?? ""}` : ""}</dd>
+                    </div>
                     {Number(order.discount_amount ?? 0) > 0 && (
                       <div>
                         <dt className="font-semibold text-slate-600">কুপন ছাড় ({order.coupon_code})</dt>

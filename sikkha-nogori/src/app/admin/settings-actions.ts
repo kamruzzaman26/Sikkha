@@ -61,6 +61,17 @@ export async function saveGeneralSettings(form: FormData) {
   const zoneDays = (key: string, fallback: number) => { const raw = field(form, key); return raw === "" ? fallback : Number(raw); };
   const daysDhaka = zoneDays("deliveryDaysDhaka", 2);
   const daysOutside = zoneDays("deliveryDaysOutside", 3);
+  const charge = (key: string, fallback: number) => {
+    const raw = field(form, key);
+    const value = raw === "" ? fallback : Number(raw);
+    if (!Number.isFinite(value) || value < 0 || value > 10000 || Math.round(value * 100) !== value * 100) invalid();
+    return value;
+  };
+  const deliveryCharges = {
+    dhaka_city: charge("chargeDhaka", 48),
+    district_town: charge("chargeDistrict", 52),
+    remote_union: charge("chargeRemote", 57),
+  };
   if (!Number.isInteger(deliveryDays) || deliveryDays < 0 || deliveryDays > 60) invalid();
   if (![daysDhaka, daysOutside].every((d) => Number.isInteger(d) && d >= 1 && d <= 60)) invalid();
 
@@ -83,6 +94,7 @@ export async function saveGeneralSettings(form: FormData) {
     delivery_days: deliveryDays,
     delivery_days_dhaka: daysDhaka,
     delivery_days_outside: daysOutside,
+    delivery_charges: deliveryCharges,
     delivery_delay_note: text("deliveryDelayNote", 300),
     social,
   });

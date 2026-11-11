@@ -13,6 +13,7 @@ import {
 import { getActiveAffiliateLinkMap } from "@/lib/supabase/affiliate-links";
 import type { PublicAffiliateLink } from "@/lib/supabase/affiliate-links";
 import { createSupabasePublicServerClient } from "@/lib/supabase/server";
+import { getHomeCategoryHref } from "@/lib/category-routing.mjs";
 
 const slides = [
   { title: "বই ও প্রয়োজনীয় পণ্য", text: "পড়াশোনা, জ্ঞানচর্চা ও দৈনন্দিন কেনাকাটা—এক জায়গায়", cta: "এখনই ঘুরে দেখুন", href: "/books", tone: "from-emerald-700 to-emerald-950" },
@@ -242,7 +243,7 @@ export default async function HomeContent({ searchParams }: { searchParams: Prom
             <div className="-mx-3 overflow-x-auto px-3 pb-1 [scrollbar-width:none] sm:mx-0 sm:px-0">
               <div className="grid auto-cols-[5.5rem] grid-flow-col grid-rows-2 gap-x-3 gap-y-4 lg:auto-cols-auto lg:grid-flow-row lg:grid-cols-8 lg:grid-rows-none">
                 {categories.map((category) => (
-                  <Link key={category.id} href={category.category_group === "books" ? `/books?category=${encodeURIComponent(category.name)}` : category.category_group === "courses" ? `/courses?category=${encodeURIComponent(category.name)}` : `/products?category=${encodeURIComponent(category.name)}`} className="group flex flex-col items-center text-center">
+                  <Link key={category.id} href={getHomeCategoryHref(category)} className="group flex flex-col items-center text-center">
                     <span className="flex size-14 items-center justify-center rounded-full bg-emerald-50 text-2xl ring-1 ring-emerald-100 transition group-hover:-translate-y-0.5 group-hover:bg-emerald-100 sm:size-16" aria-hidden="true">{getCategoryIcon(category.name)}</span>
                     <span className="mt-1.5 line-clamp-2 min-h-8 text-[11px] font-semibold leading-4 text-slate-700 sm:text-xs">{category.name}</span>
                   </Link>

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { AdminIcon } from "@/components/admin-icons";
 import { AdminNavLink } from "@/components/admin-nav-link";
 import { adminNav } from "@/lib/admin-nav";
@@ -84,10 +84,6 @@ function AdminTopbar({ identity, onMenuClick }: { identity: AdminIdentity; onMen
   const displayName = identity.name || identity.email?.split("@")[0] || "Administrator";
   const initials = displayName.slice(0, 2).toUpperCase();
   const [open, setOpen] = useState<string | null>(null);
-  const pathname = usePathname();
-
-  // Close any open dropdown on outside tap, Escape, or page change.
-  useEffect(() => { setOpen(null); }, [pathname]);
   useEffect(() => {
     if (!open) return;
     const onDown = (e: Event) => { if (!(e.target as HTMLElement).closest("[data-dropdown]")) setOpen(null); };
@@ -100,13 +96,7 @@ function AdminTopbar({ identity, onMenuClick }: { identity: AdminIdentity; onMen
   const iconBtn = "flex size-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 transition hover:bg-blue-50 hover:text-blue-800";
   return (
     <header className="sticky top-0 z-40 flex min-h-[64px] items-center gap-2 border-b border-slate-200/80 bg-white/95 px-3 shadow-sm backdrop-blur sm:min-h-[72px] sm:px-7">
-      <Link href="/admin/dashboard" className="flex min-w-0 items-center gap-2.5 lg:hidden">
-        <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-[#1d376b] text-sm font-black text-white">SN</span>
-        <span className="min-w-0 leading-tight">
-          <span className="block truncate text-[13px] font-extrabold tracking-wide text-slate-900">SIKKHA NOGORI</span>
-          <span className="block truncate text-[9px] font-bold uppercase tracking-[0.16em] text-slate-500">Admin workspace</span>
-        </span>
-      </Link>
+      <button type="button" onClick={onMenuClick} aria-label="Open navigation menu" className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[#1d376b] text-white lg:hidden"><AdminIcon name="menu" /></button>
       <div className="ml-auto flex items-center gap-2">
         <Dropdown id="bell" open={open} setOpen={setOpen} label="Notifications" triggerClass={iconBtn} trigger={<AdminIcon name="bell" className="size-[19px]" />}>
           <p className="text-sm font-bold text-slate-900">Notifications</p>
@@ -130,13 +120,13 @@ function AdminTopbar({ identity, onMenuClick }: { identity: AdminIdentity; onMen
           <p className="mt-1 break-all text-xs text-slate-500">{identity.email || "Administrator account"}</p>
           <Link href="/" className="mt-3 block rounded-lg bg-slate-50 px-3 py-2 text-xs font-bold text-blue-800 hover:bg-blue-50">View storefront</Link>
         </Dropdown>
-        <button type="button" onClick={onMenuClick} aria-label="Open navigation menu" className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[#1d376b] text-white lg:hidden"><AdminIcon name="menu" /></button>
       </div>
     </header>
   );
 }
 
 export function AdminShell({ children, identity }: { children: React.ReactNode; identity: AdminIdentity }) {
+  const pathname = usePathname() ?? "";
   const [mobileOpen, setMobileOpen] = useState(false);
   useEffect(() => {
     if (!mobileOpen) return;
@@ -159,13 +149,13 @@ export function AdminShell({ children, identity }: { children: React.ReactNode; 
         </div>
       </aside>
       <div className="min-w-0 flex-1">
-        <AdminTopbar identity={identity} onMenuClick={() => setMobileOpen(true)} />
+        <AdminTopbar key={pathname} identity={identity} onMenuClick={() => setMobileOpen(true)} />
         <main className="min-w-0">{children}</main>
       </div>
       {mobileOpen && (
         <div className="fixed inset-0 z-[100] lg:hidden" role="dialog" aria-modal="true" aria-label="Admin navigation">
           <button type="button" aria-label="Close navigation menu" onClick={() => setMobileOpen(false)} className="absolute inset-0 size-full bg-slate-950/60 backdrop-blur-sm" />
-          <aside className="absolute bottom-0 right-0 top-0 w-[min(86vw,340px)] overflow-y-auto overscroll-contain border-l border-white/10 bg-[#0d1933] px-4 py-5 text-white shadow-2xl">
+          <aside className="absolute bottom-0 left-0 top-0 w-[min(86vw,340px)] overflow-y-auto overscroll-contain border-r border-white/10 bg-[#0d1933] px-4 py-5 text-white shadow-2xl">
             <div className="mb-5 flex items-center justify-between">
               <Brand />
               <button type="button" onClick={() => setMobileOpen(false)} aria-label="Close menu" className="flex size-9 shrink-0 items-center justify-center rounded-lg text-slate-200 hover:bg-white/10"><AdminIcon name="x" /></button>

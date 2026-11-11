@@ -4,6 +4,7 @@ import { connection } from "next/server";
 import { Suspense } from "react";
 import type { ReactNode } from "react";
 import { formatBDT } from "@/lib/money";
+import { SalesAnalytics } from "@/components/admin-sales-analytics";
 import { bestSellers, summarizeOrders } from "@/lib/admin-stats.mjs";
 import { requireAdmin } from "@/lib/supabase/admin";
 
@@ -233,19 +234,7 @@ async function DashboardContent() {
       : { data: [], error: null };
   const top = bestSellers(itemsResult.data ?? []);
   const topMax = Math.max(1, ...top.map((item) => Number(item.quantity) || 0));
-  const dhakaNow = new Date(Date.now() + 6 * 60 * 60 * 1000);
-  const dhakaTodayUtc = Date.UTC(dhakaNow.getUTCFullYear(), dhakaNow.getUTCMonth(), dhakaNow.getUTCDate());
-  const salesDays = Array.from({ length: 7 }, (_, index) => {
-    const date = new Date(dhakaTodayUtc - (6 - index) * 86400000);
-    const key = date.toISOString().slice(0, 10);
-    const amount = orders.reduce((sum, order) => (
-      order.payment_status === "verified" && dhakaDateKey(order.created_at) === key
-        ? sum + (Number(order.total_amount) || 0)
-        : sum
-    ), 0);
-    return { key, label: date.toLocaleDateString("en-US", { weekday: "short", timeZone: "UTC" }), amount };
-  });
-  const maxDailySales = Math.max(1, ...salesDays.map((day) => day.amount));
+  const todayKey = dhakaDateKey(new Date().toISOString());
 
   return (
     <main lang="en" className="min-h-screen bg-[#f4f7ff] px-4 py-6 text-slate-900 sm:px-7 sm:py-8 xl:px-10">
@@ -282,22 +271,7 @@ async function DashboardContent() {
         ) : (
           <>
           <div className="grid gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(260px,1fr)]">
-            <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div><h2 className="text-lg font-bold tracking-tight text-slate-900">Sales Overview</h2><p className="mt-1 text-xs text-slate-500">Verified order revenue · Last 7 days</p></div>
-                <span className="rounded-lg bg-blue-50 px-3 py-2 text-xs font-bold text-blue-800">7D</span>
-              </div>
-              <div className="mt-6 grid grid-cols-[auto_1fr] gap-3">
-                <div className="flex h-52 flex-col justify-between pb-7 text-[10px] text-slate-400"><span>{formatBDT(maxDailySales)}</span><span>{formatBDT(maxDailySales * .66)}</span><span>{formatBDT(maxDailySales * .33)}</span><span>৳0</span></div>
-                <div className="relative h-52 border-b border-slate-200">
-                  <div className="pointer-events-none absolute inset-0 flex flex-col justify-between pb-7"><span className="border-t border-dashed border-slate-200" /><span className="border-t border-dashed border-slate-200" /><span className="border-t border-dashed border-slate-200" /><span className="border-t border-slate-200" /></div>
-                  <div className="relative flex h-full items-end justify-around gap-2 px-2 pb-7">
-                    {salesDays.map((day) => <div key={day.key} className="flex h-full min-w-0 flex-1 flex-col items-center justify-end gap-2"><div title={formatBDT(day.amount)} className="w-full max-w-12 rounded-t-lg bg-blue-600 transition hover:bg-blue-700" style={{ height: day.amount > 0 ? `${Math.max(4, day.amount / maxDailySales * 82)}%` : "3px" }} /><span className="absolute bottom-0 text-[10px] font-medium text-slate-500">{day.label}</span></div>)}
-                  </div>
-                </div>
-              </div>
-              {salesDays.every((day) => day.amount === 0) && <p className="mt-2 text-center text-xs text-slate-500">No verified sales recorded in the last 7 days.</p>}
-            </section>
+            <SalesAnalytics orders={orders} todayKey={todayKey} />
             <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
               <h2 className="text-lg font-bold tracking-tight text-slate-900">Quick Actions</h2>
               <div className="mt-4 grid gap-2">

@@ -223,7 +223,7 @@ async function getBookCategoryProductIds(
   const { data: rows, error } = await supabase
     .from("categories")
     .select("id, parent_id, name")
-    .eq("category_group", "books")
+    .in("category_group", category === "ই-বুক" ? ["books", "products"] : ["books"])
     .eq("is_active", true)
     .limit(1000);
   if (error || !rows) {
