@@ -70,7 +70,7 @@ async function DeliveryContent({ searchParams }: Pick<PageProps<"/checkout/deliv
       return { ...w, title: product.title, product_type: product.product_type, price: Number(product.price), total: Math.round(Number(product.price) * w.quantity * 100) / 100 };
     });
   const subtotal = Math.round(lines.reduce((sum, l) => sum + l.total, 0) * 100) / 100;
-  const requiresShipping = lines.some((line) => line.product_type !== "course");
+  const requiresShipping = lines.some((line) => !["course", "ebook", "digital"].includes(line.product_type));
   const requestedShippingZone = first(params.shippingZone);
   const initialShippingZone = ["dhaka_city", "district_town", "remote_union"].includes(requestedShippingZone ?? "")
     ? requestedShippingZone!
@@ -90,14 +90,13 @@ async function DeliveryContent({ searchParams }: Pick<PageProps<"/checkout/deliv
       couponNote = `${couponFailure[row?.status as string] ?? "কুপন যাচাই করা যায়নি"} — এই অর্ডারে কুপন প্রযোজ্য হবে না।`;
     }
   }
-  const total = Math.round((subtotal - discount) * 100) / 100;
-
   const back = new URLSearchParams();
   if (lines.length) {
     back.set("products", lines.map((l) => l.id).join(","));
     back.set("quantities", lines.map((l) => `${l.id}:${l.quantity}`).join(","));
   }
   if (couponInput) back.set("couponCode", couponInput);
+  if (initialShippingZone) back.set("shippingZone", initialShippingZone);
   const backHref = `/checkout${back.toString() ? `?${back}` : ""}`;
 
   return (
