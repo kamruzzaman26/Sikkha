@@ -16,9 +16,6 @@ jobs:
   browser-smoke:
     if: github.event_name != 'pull_request' || github.event.pull_request.number == 38
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: sikkha-nogori
     env:
       BASE_URL: ${{ github.event_name == 'pull_request' && 'https://sikkha-nogori-git-fix-security-advisor-hardening-kamruzzaman1.vercel.app' || (inputs.base_url || 'https://sikkha-nogori.vercel.app') }}
     steps:
@@ -28,9 +25,15 @@ jobs:
           node-version: 22
           cache: npm
           cache-dependency-path: sikkha-nogori/package-lock.json
-      - run: npm ci
-      - run: npm install --no-save playwright@1.55.0
-      - run: npx playwright install --with-deps chromium
+      - name: Install application dependencies
+        run: |
+          test -f "$GITHUB_WORKSPACE/sikkha-nogori/package.json"
+          test -f "$GITHUB_WORKSPACE/sikkha-nogori/package-lock.json"
+          npm ci --prefix "$GITHUB_WORKSPACE/sikkha-nogori" --package-lock=true --include=dev
+      - name: Install Playwright
+        run: npm install --no-save --prefix "$GITHUB_WORKSPACE/sikkha-nogori" playwright@1.55.0
+      - name: Install Chromium
+        run: cd "$GITHUB_WORKSPACE/sikkha-nogori" && npx playwright install --with-deps chromium
       - name: Wait for website to respond
         run: |
           for attempt in $(seq 1 30); do
@@ -42,4 +45,4 @@ jobs:
           echo "Website did not become available: $BASE_URL"
           exit 1
       - name: Run browser route and navigation smoke tests
-        run: node scripts/browser-smoke.mjs
+        run: cd "$GITHUB_WORKSPACE/sikkha-nogori" && node scripts/browser-smoke.mjs
