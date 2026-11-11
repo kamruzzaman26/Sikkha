@@ -106,6 +106,8 @@ alter table public.payment_transactions enable row level security;
 alter table public.payment_webhook_events enable row level security;
 revoke all on public.payment_transactions from public, anon, authenticated;
 revoke all on public.payment_webhook_events from public, anon, authenticated;
+grant all on public.payment_transactions to service_role;
+grant all on public.payment_webhook_events to service_role;
 
 create table if not exists public.affiliate_product_commissions (
   id uuid primary key default gen_random_uuid(),
@@ -478,6 +480,17 @@ begin
     return false;
   end if;
 
+  if exists (
+    select 1 from public.orders
+    where id = payment_row.order_id and status = 'cancelled'
+  ) then
+    update public.payment_webhook_events
+    set processing_status='ignored', safe_error_code='order_cancelled',
+      processed_at=now()
+    where provider_code='sslcommerz' and event_key=event_key_value;
+    return false;
+  end if;
+
   if payment_row.status = 'paid' then
     update public.payment_webhook_events
     set processing_status='processed', processed_at=now()
@@ -569,7 +582,7 @@ begin
     set status='reversed',
       reversal_reason=coalesce(new.payment_refund_reason,'Order refunded'),
       updated_at=now()
-    where order_id=new.id and status in ('pending','approved');
+    where order_id=new.id and status in ('pending','approved','paid');
   end if;
   return new;
 end;
