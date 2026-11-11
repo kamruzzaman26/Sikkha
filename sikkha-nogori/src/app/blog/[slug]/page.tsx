@@ -9,6 +9,7 @@ import { formatPostDate, getPublishedPostBySlug, getPublishedPosts } from "@/lib
 import { getSiteSettings, resolveSiteOrigin } from "@/lib/site-settings";
 
 export async function generateMetadata({ params }: PageProps<"/blog/[slug]">): Promise<Metadata> {
+  await connection();
   const { slug } = await params;
   const [post, { general, seo }] = await Promise.all([getPublishedPostBySlug(slug), getSiteSettings()]);
   if (!post) return { title: "লেখা পাওয়া যায়নি", robots: { index: false, follow: false } };
