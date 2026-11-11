@@ -6,6 +6,7 @@ import { useCallback, useEffect, useState } from "react";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { readCart, writeCart, type CartLine } from "@/lib/cart";
 import { formatBDT } from "@/lib/money";
+import { getShippingCharge } from "@/lib/shipping-fee.mjs";
 
 type Product = { id: string; title: string; slug: string; price: number | null; image_url: string | null; commerce_mode: string | null; product_type: string };
 
@@ -14,6 +15,7 @@ export function CartPageClient() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [shippingZone, setShippingZone] = useState("dhaka_city");
 
   const refresh = useCallback(async () => {
     const current = readCart();
@@ -70,8 +72,10 @@ export function CartPageClient() {
     .filter((row): row is { line: CartLine; product: Product } => Boolean(row.product));
   const total = rows.reduce((sum, row) => sum + (row.product.price ?? 0) * row.line.quantity, 0);
   const itemCount = rows.reduce((sum, row) => sum + row.line.quantity, 0);
+  const shippingCharge = getShippingCharge(shippingZone) ?? 48;
+  const payableTotal = total + shippingCharge;
   const productHref = (product: Product) => product.product_type === "book" ? `/books/${product.slug}` : product.product_type === "course" ? `/courses/${product.slug}` : `/products/${product.slug}`;
-  const checkoutHref = `/checkout?products=${encodeURIComponent(rows.map((row) => row.line.productId).join(","))}&quantities=${encodeURIComponent(rows.map((row) => `${row.line.productId}:${row.line.quantity}`).join(","))}`;
+  const checkoutHref = `/checkout?products=${encodeURIComponent(rows.map((row) => row.line.productId).join(","))}&quantities=${encodeURIComponent(rows.map((row) => `${row.line.productId}:${row.line.quantity}`).join(","))}&shippingZone=${encodeURIComponent(shippingZone)}`;
 
   if (loading) return <p role="status" className="mt-8 rounded-2xl bg-white p-6 text-slate-600">কার্ট লোড হচ্ছে…</p>;
 
@@ -113,9 +117,18 @@ export function CartPageClient() {
           <aside className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm lg:sticky lg:top-24">
             <h2 className="text-lg font-extrabold">অর্ডার সারাংশ</h2>
             <div className="mt-4 flex justify-between text-sm text-slate-600"><span>পণ্যের সংখ্যা</span><span className="font-semibold text-slate-900">{itemCount}টি</span></div>
-            <div className="mt-3 flex justify-between border-t border-slate-100 pt-3"><span className="font-semibold">পণ্যের মূল্য</span><span className="text-xl font-extrabold text-emerald-800">{formatBDT(total)}</span></div>
-            <div className="mt-3 flex justify-between text-sm text-slate-600"><span>ডেলিভারি চার্জ</span><span>ঠিকানা অনুযায়ী</span></div>
-            <p className="mt-2 text-xs leading-5 text-slate-500">Checkout-এ ডেলিভারি এলাকার ধরন নির্বাচন করলে প্রাথমিক চার্জসহ সর্বমোট দেখাবে।</p>
+            <div className="mt-4 border-t border-slate-100 pt-4">
+              <label htmlFor="cart-shipping-zone" className="mb-2 block text-sm font-semibold text-slate-700">ডেলিভারি এলাকা নির্বাচন করুন</label>
+              <select id="cart-shipping-zone" value={shippingZone} onChange={(event) => setShippingZone(event.target.value)} className="min-h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm">
+                <option value="dhaka_city">ঢাকা সিটি — ৳৪৮ থেকে</option>
+                <option value="district_town">জেলা সদর / পৌরসভা — ৳৫২ থেকে</option>
+                <option value="remote_union">দূরবর্তী এলাকা / ইউনিয়ন — ৳৫৭ থেকে</option>
+              </select>
+            </div>
+            <div className="mt-4 flex justify-between text-sm text-slate-600"><span>পণ্যের মূল্য</span><span className="font-semibold">{formatBDT(total)}</span></div>
+            <div className="mt-2 flex justify-between text-sm text-slate-600"><span>ডেলিভারি চার্জ (প্রাথমিক)</span><span className="font-semibold">{formatBDT(shippingCharge)}</span></div>
+            <div className="mt-3 flex justify-between border-t border-slate-100 pt-3"><span className="font-semibold">সর্বমোট</span><span className="text-xl font-extrabold text-emerald-800">{formatBDT(payableTotal)}</span></div>
+            <p className="mt-2 text-xs leading-5 text-slate-500">পণ্যের ধরন, সংখ্যা, ওজন ও নির্দিষ্ট লোকেশন অনুযায়ী চূড়ান্ত চার্জ পরিবর্তিত হতে পারে। Checkout-এ ঠিকানা দিয়ে আবার যাচাই করুন।</p>
             <Link href={checkoutHref} className="mt-5 inline-flex min-h-12 w-full items-center justify-center rounded-full bg-emerald-800 px-5 py-3 text-center font-bold text-white transition hover:bg-emerald-900">Checkout-এ যান</Link>
           </aside>
         </div>
