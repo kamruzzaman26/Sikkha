@@ -720,6 +720,7 @@ export async function saveProduct(formData: FormData) {
     !["manual", "automatic"].includes(pricingMode) ||
     !["none", "percentage", "fixed"].includes(affiliateCommissionType) ||
     affiliateCommissionValue === undefined ||
+    (affiliateCommissionType !== "none" && affiliateCommissionValue <= 0) ||
     (affiliateCommissionType === "percentage" && affiliateCommissionValue > 100) ||
     (affiliateCommissionType === "none" && affiliateCommissionValue !== 0) ||
     (commerceMode !== "direct" && (affiliateCommissionType !== "none" || affiliateCommissionValue !== 0)) ||
