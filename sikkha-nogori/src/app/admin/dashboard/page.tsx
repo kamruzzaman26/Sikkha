@@ -199,8 +199,18 @@ function Empty({ children }: { children: ReactNode }) {
 }
 
 function buildDhakaSalesDays(orders: Array<{ payment_status: string; created_at: string; total_amount: number | string }>) {
-  const salesDays = buildDhakaSalesDays(orders);
-  return salesDays;
+  const dhakaNow = new Date(Date.now() + 6 * 60 * 60 * 1000);
+  const dhakaTodayUtc = Date.UTC(dhakaNow.getUTCFullYear(), dhakaNow.getUTCMonth(), dhakaNow.getUTCDate());
+  return Array.from({ length: 7 }, (_, index) => {
+    const date = new Date(dhakaTodayUtc - (6 - index) * 86400000);
+    const key = date.toISOString().slice(0, 10);
+    const amount = orders.reduce((sum, order) => (
+      order.payment_status === "verified" && dhakaDateKey(order.created_at) === key
+        ? sum + (Number(order.total_amount) || 0)
+        : sum
+    ), 0);
+    return { key, label: date.toLocaleDateString("en-US", { weekday: "short", timeZone: "UTC" }), amount };
+  });
 }
 
 async function DashboardContent() {
@@ -238,18 +248,7 @@ async function DashboardContent() {
       : { data: [], error: null };
   const top = bestSellers(itemsResult.data ?? []);
   const topMax = Math.max(1, ...top.map((item) => Number(item.quantity) || 0));
-  const dhakaNow = new Date(Date.now() + 6 * 60 * 60 * 1000);
-  const dhakaTodayUtc = Date.UTC(dhakaNow.getUTCFullYear(), dhakaNow.getUTCMonth(), dhakaNow.getUTCDate());
-  const salesDays = Array.from({ length: 7 }, (_, index) => {
-    const date = new Date(dhakaTodayUtc - (6 - index) * 86400000);
-    const key = date.toISOString().slice(0, 10);
-    const amount = orders.reduce((sum, order) => (
-      order.payment_status === "verified" && dhakaDateKey(order.created_at) === key
-        ? sum + (Number(order.total_amount) || 0)
-        : sum
-    ), 0);
-    return { key, label: date.toLocaleDateString("en-US", { weekday: "short", timeZone: "UTC" }), amount };
-  });
+  const salesDays = buildDhakaSalesDays(orders);
   const maxDailySales = Math.max(1, ...salesDays.map((day) => day.amount));
 
   return (
