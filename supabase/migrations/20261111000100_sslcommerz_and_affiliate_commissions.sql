@@ -333,13 +333,14 @@ begin
     raise exception 'Invalid payment request.' using errcode = '23514';
   end if;
 
-  select id, user_id, total_amount, currency, payment_method_type, payment_status
+  select id, user_id, total_amount, currency, payment_method_type, payment_status, status
   into selected_order
   from public.orders
   where id = p_order_id and user_id = requesting_user
   for update;
   if not found or selected_order.payment_method_type <> 'gateway'
-    or selected_order.payment_status <> 'awaiting'
+    or selected_order.payment_status not in ('awaiting','failed','cancelled')
+    or selected_order.status = 'cancelled'
     or selected_order.currency <> 'BDT'
     or selected_order.total_amount not between 10 and 500000
   then
@@ -371,6 +372,10 @@ begin
     payment_transactions.status
   into transaction_id, merchant_reference, amount, currency,
     provider_session_id, gateway_page_url, transaction_status;
+
+  update public.orders
+  set payment_status='awaiting', updated_at=now()
+  where id=p_order_id and payment_status in ('failed','cancelled');
 
   return next;
 end;
