@@ -64,7 +64,7 @@ begin
     from public.order_items oi
     join public.products p on p.id = oi.product_id
     where oi.order_id = new_order_id
-      and p.product_type <> 'course'
+      and p.product_type not in ('course', 'ebook', 'digital')
   ) into has_physical_items;
 
   if (has_physical_items and p_shipping_zone = 'no_shipping')
