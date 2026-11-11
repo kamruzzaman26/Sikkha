@@ -20,7 +20,7 @@ export function parseSslcommerzIpn(rawBody) {
 
   if (
     !merchantReferencePattern.test(merchantReference)
-    || !/^(?:0|[1-9]\\d*)(?:\\.\\d{1,2})?$/.test(amountText)
+    || !/^(?:0|[1-9]\d*)(?:\.\d{1,2})?$/.test(amountText)
     || !Number.isFinite(Number(amountText))
     || Number(amountText) <= 0
     || currency !== "BDT"
