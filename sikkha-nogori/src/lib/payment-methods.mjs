@@ -51,7 +51,7 @@ export function parsePaymentMethodForm(formData) {
   }
 
   const isEnabled = isEnabledValue === "true";
-  if (methodType === "gateway" && isEnabled) {
+  if (methodType === "gateway" && (isEnabled || code !== "sslcommerz")) {
     return undefined;
   }
 
@@ -71,5 +71,5 @@ export function parsePaymentMethodForm(formData) {
  * @param {{ is_enabled: boolean; method_type: string }} method
  */
 export function isCustomerVisiblePaymentMethod(method) {
-  return method.is_enabled && method.method_type !== "gateway";
+  return method.is_enabled && (method.method_type !== "gateway" || method.code === "sslcommerz");
 }
