@@ -1,11 +1,13 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 
 type Suggestion = { title: string; slug: string; author: string | null };
 
 export function SiteSearch() {
+  const router = useRouter();
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [open, setOpen] = useState(false);
@@ -15,15 +17,7 @@ export function SiteSearch() {
 
   useEffect(() => {
     const term = query.trim();
-    if (term.length < 2) {
-      setSuggestions([]);
-      setOpen(false);
-      setLoading(false);
-      return;
-    }
-
-    setSuggestions([]);
-    setOpen(false);
+    if (term.length < 2) return;
     const controller = new AbortController();
     const timeout = window.setTimeout(async () => {
       setLoading(true);
@@ -80,7 +74,7 @@ export function SiteSearch() {
       setActiveIndex((current) => current <= 0 ? suggestions.length - 1 : current - 1);
     } else if (event.key === "Enter" && activeIndex >= 0) {
       event.preventDefault();
-      window.location.href = `/books/${encodeURIComponent(suggestions[activeIndex].slug)}`;
+      router.push(`/books/${encodeURIComponent(suggestions[activeIndex].slug)}`);
     }
   }
 
