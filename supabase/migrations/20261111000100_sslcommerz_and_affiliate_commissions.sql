@@ -535,6 +535,55 @@ begin
 end;
 $$;
 
+create or replace function public.admin_record_order_refund(
+  p_order_id uuid,
+  p_reason text
+)
+returns uuid
+language plpgsql
+security definer
+set search_path = ''
+as $
+declare
+  requesting_user uuid := auth.uid();
+  selected_payment_method_type text;
+begin
+  if requesting_user is null or not exists (
+    select 1 from public.admin_users
+    where user_id = requesting_user and role = 'admin'
+  ) then
+    raise exception 'Administrator access required.' using errcode = '42501';
+  end if;
+  if p_order_id is null or p_reason is null
+    or char_length(btrim(p_reason)) not between 3 and 500
+  then
+    raise exception 'A valid refund reason is required.' using errcode = '23514';
+  end if;
+
+  select payment_method_type into selected_payment_method_type
+  from public.orders
+  where id = p_order_id and payment_status = 'verified'
+  for update;
+  if not found then
+    raise exception 'Verified order not found.' using errcode = 'P0002';
+  end if;
+  if selected_payment_method_type = 'gateway' then
+    raise exception 'Gateway refunds must be confirmed by SSLCOMMERZ before recording them.'
+      using errcode = '23514';
+  end if;
+
+  update public.orders
+  set payment_status = 'refunded',
+      payment_refund_reason = btrim(p_reason),
+      payment_reviewed_at = now(),
+      payment_reviewed_by = requesting_user,
+      updated_at = now()
+  where id = p_order_id;
+
+  return p_order_id;
+end;
+$;
+
 create or replace function public.sync_affiliate_product_commissions()
 returns trigger
 language plpgsql
@@ -594,6 +643,8 @@ after update of payment_status on public.orders
 for each row execute function public.sync_affiliate_product_commissions();
 
 revoke all on function public.sync_affiliate_product_commissions() from public, anon, authenticated;
+revoke all on function public.admin_record_order_refund(uuid,text) from public, anon;
+grant execute on function public.admin_record_order_refund(uuid,text) to authenticated;
 revoke all on function public.create_sslcommerz_transaction(uuid,text) from public, anon;
 revoke all on function public.update_sslcommerz_session(uuid,text,text) from public, anon;
 revoke all on function public.complete_sslcommerz_payment(text,text,text,numeric,text,text,text) from public, anon, authenticated;
