@@ -1,6 +1,6 @@
 import "server-only";
 
-import { createSupabasePublicServerClient } from "@/lib/supabase/server";
+import { createSupabasePublicServerClient, createSupabaseServiceRoleClient } from "@/lib/supabase/server";
 import { getCategorySlug, type Book } from "@/lib/books";
 import { collectCategoryIds, rootCategoryCounts } from "@/lib/category-tree.mjs";
 
@@ -328,8 +328,27 @@ export async function getPublishedBooks({
   // Best sellers: rank by units in verified-payment orders. With no sales yet, fall back to newest.
   let salesUnits: Map<string, number> | null = null;
   if (sort === "best-seller") {
-    const { data: ranked } = await supabase.rpc("best_selling_product_ids", { p_limit: 1000 });
-    salesUnits = new Map((ranked ?? []).map((row: { product_id: string; units: number }) => [row.product_id, Number(row.units)]));
+    try {
+      // Sales totals are private business data. Fetch rankings with the server-only
+      // service-role client; never expose the ranking RPC to public API roles.
+      const rankingClient = createSupabaseServiceRoleClient();
+      const { data: ranked, error: rankingError } = await rankingClient.rpc(
+        "best_selling_product_ids",
+        { p_limit: 1000 },
+      );
+      if (rankingError) {
+        console.error("Unable to load best-seller rankings.", rankingError);
+      } else {
+        salesUnits = new Map(
+          (ranked ?? []).map((row: { product_id: string; units: number }) => [
+            row.product_id,
+            Number(row.units),
+          ]),
+        );
+      }
+    } catch (error) {
+      console.error("Best-seller ranking is unavailable; using newest products.", error);
+    }
     request = request.order("created_at", { ascending: false });
   } else if (sort === "newest") {
     request = request.order("created_at", { ascending: false });
