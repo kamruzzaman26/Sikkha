@@ -14,12 +14,15 @@ export function ShippingChargeSelector({
   subtotal,
   discount,
   required,
+  initialZone = "dhaka_city",
 }: {
   subtotal: number;
   discount: number;
   required: boolean;
+  initialZone?: string;
 }) {
-  const [zone, setZone] = useState("dhaka_city");
+  const allowedZones = ["dhaka_city", "district_town", "remote_union"];
+  const [zone, setZone] = useState(allowedZones.includes(initialZone) ? initialZone : "dhaka_city");
   const charge = required ? getShippingCharge(zone) ?? 0 : 0;
   const total = Math.max(0, subtotal - discount) + charge;
 
