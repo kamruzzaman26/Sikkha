@@ -7,7 +7,7 @@ import { AdminSubmitButton } from "@/components/admin-submit-button";
 export const metadata: Metadata = { title: "Website Settings | Sikkha Nogori Admin", robots: { index: false, follow: false } };
 const input = "min-h-11 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 outline-none transition focus:border-brand-600 focus:ring-4 focus:ring-brand-600/10";
 const label = "mb-1.5 block text-xs font-bold uppercase tracking-wide text-slate-600";
-type General = { logo_url?: string; favicon_url?: string; whatsapp?: string; business_hours?: string; announcement_text?: string; announcement_link?: string; footer_about?: string; return_policy?: string; site_name?: string; tagline?: string; contact_email?: string; contact_phone?: string; helpline?: string; delivery_note?: string; delivery_days?: number; delivery_days_dhaka?: number; delivery_days_outside?: number; delivery_delay_note?: string; address?: string; currency?: string; social?: { facebook?: string; instagram?: string; youtube?: string; tiktok?: string; linkedin?: string; x?: string } };
+type General = { logo_url?: string; favicon_url?: string; whatsapp?: string; business_hours?: string; announcement_text?: string; announcement_link?: string; footer_about?: string; return_policy?: string; site_name?: string; tagline?: string; contact_email?: string; contact_phone?: string; helpline?: string; delivery_note?: string; delivery_days?: number; delivery_days_dhaka?: number; delivery_days_outside?: number; delivery_delay_note?: string; delivery_charges?: { dhaka_city?: number; district_town?: number; remote_union?: number }; address?: string; currency?: string; social?: { facebook?: string; instagram?: string; youtube?: string; tiktok?: string; linkedin?: string; x?: string } };
 export default async function WebsiteSettingsPage({ searchParams }: { searchParams: Promise<Record<string,string|string[]|undefined>> }) {
   await connection();
   const { supabase } = await requirePermission("manage_settings", "/admin/dashboard");
@@ -67,6 +67,15 @@ export default async function WebsiteSettingsPage({ searchParams }: { searchPara
             <div className="sm:col-span-2"><label className={label} htmlFor="deliveryDelayNote">Delay note (under the ⓘ button)</label><textarea className={input} id="deliveryDelayNote" name="deliveryDelayNote" maxLength={300} rows={2} defaultValue={s.delivery_delay_note ?? "অনাকাঙ্ক্ষিত কারণে এবং অনলাইন পেমেন্ট এর ক্ষেত্রে পেমেন্টে বিলম্ব হলে সম্ভাব্য ডেলিভারি তারিখ পরিবর্তিত হতে পারে।"} /></div>
           </div>
           {where("the estimated delivery date on every product page.")}
+        </section>
+
+        <section className={card}><p className={eyebrow}>Delivery pricing</p><h2 className="mt-1 text-xl font-bold">Delivery charge by area (BDT)</h2><p className="mt-2 text-sm leading-6 text-slate-600">এই চার্জগুলো কার্ট ও Checkout-এ দেখাবে। এখানে পরিবর্তন করলে নতুন অর্ডারে স্বয়ংক্রিয়ভাবে কার্যকর হবে। ডিজিটাল পণ্যে চার্জ ০ টাকা থাকবে।</p>
+          <div className="mt-5 grid gap-4 sm:grid-cols-3">
+            <div><label className={label} htmlFor="chargeDhaka">ঢাকা সিটি (৳)</label><input className={input} id="chargeDhaka" name="chargeDhaka" type="number" min="0" max="10000" step="0.01" required defaultValue={s.delivery_charges?.dhaka_city ?? 48} /></div>
+            <div><label className={label} htmlFor="chargeDistrict">জেলা সদর / পৌরসভা (৳)</label><input className={input} id="chargeDistrict" name="chargeDistrict" type="number" min="0" max="10000" step="0.01" required defaultValue={s.delivery_charges?.district_town ?? 52} /></div>
+            <div><label className={label} htmlFor="chargeRemote">দূরবর্তী এলাকা / ইউনিয়ন (৳)</label><input className={input} id="chargeRemote" name="chargeRemote" type="number" min="0" max="10000" step="0.01" required defaultValue={s.delivery_charges?.remote_union ?? 57} /></div>
+          </div>
+          {where("cart, checkout and the saved order total. Only administrators with settings permission can change these amounts.")}
         </section>
 
         <section className={card}><p className={eyebrow}>Footer & policies</p><h2 className="mt-1 text-xl font-bold">About text and return policy</h2>
