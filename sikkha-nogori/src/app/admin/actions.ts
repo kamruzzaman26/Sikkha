@@ -846,6 +846,7 @@ export async function saveProduct(formData: FormData) {
     country: country || null,
     weight_kg: weightKg,
     is_published: isPublishedValue === "true",
+    status: isPublishedValue === "true" ? "published" : "draft",
     updated_at: new Date().toISOString(),
   };
 
