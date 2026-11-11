@@ -81,7 +81,7 @@ async function getCategoryMenu() {
       .eq("is_active", true)
       .limit(2000);
     if (error || !data) {
-      return { books: [], products: [] };
+      return { books: [], products: [], courses: [] };
     }
     return {
       books: buildCategoryMenu(data, "books"),
@@ -89,6 +89,7 @@ async function getCategoryMenu() {
         ...buildCategoryMenu(data, "products"),
         ...buildCategoryMenu(data, "electronics"),
       ],
+      courses: buildCategoryMenu(data, "courses"),
     };
   } catch {
     return { books: [], products: [] };
