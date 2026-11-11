@@ -118,19 +118,20 @@ export async function placeOrder(formData: FormData) {
     const allowedGatewayOrigin = sandbox
       ? "https://sandbox.sslcommerz.com"
       : "https://securepay.sslcommerz.com";
+    let existingGatewayUrl: URL | null = null;
     if (
       transaction.transaction_status === "pending" &&
       typeof transaction.gateway_page_url === "string" &&
       typeof transaction.provider_session_id === "string"
     ) {
       try {
-        const existingGatewayUrl = new URL(transaction.gateway_page_url);
-        if (existingGatewayUrl.origin === allowedGatewayOrigin) {
-          redirect(existingGatewayUrl.toString());
-        }
-      } catch (error) {
-        if (error instanceof Error && error.message.includes("NEXT_REDIRECT")) throw error;
+        existingGatewayUrl = new URL(transaction.gateway_page_url);
+      } catch {
+        existingGatewayUrl = null;
       }
+    }
+    if (existingGatewayUrl?.origin === allowedGatewayOrigin) {
+      redirect(existingGatewayUrl.toString());
     }
 
     const { data: orderItems, error: orderItemsError } = await supabase
