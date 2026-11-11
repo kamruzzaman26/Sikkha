@@ -22,9 +22,10 @@ const slides = [
 
 type HomeConfig = { show_categories?: boolean; show_new_arrivals?: boolean; show_deals?: boolean; categories_title?: string; new_arrivals_title?: string; deals_title?: string };
 type Banner = { title: string; text: string; cta: string; href: string; tone: string; active: boolean };
-type HomeCategory = { id: string; name: string; category_group: "books" | "products" | "electronics"; sort_order: number | null };
+type HomeCategory = { id: string; name: string; category_group: "books" | "products" | "electronics" | "courses"; sort_order: number | null };
 
 const categoryIcons: { test: RegExp; icon: string }[] = [
+  { test: /course|কোর্স|class|ক্লাস|skill/i, icon: "🎓" },
   { test: /book|বই|ebook|ই-বুক/i, icon: "📚" },
   { test: /audio|অডিও|sound/i, icon: "🎧" },
   { test: /stationery|স্টেশনারি|কলম/i, icon: "✏️" },
@@ -76,7 +77,7 @@ async function loadCategoryTiles(): Promise<HomeCategory[]> {
       .select("id, name, category_group, sort_order")
       .eq("is_active", true)
       .is("parent_id", null)
-      .in("category_group", ["books", "products", "electronics"])
+      .in("category_group", ["books", "products", "electronics", "courses"])
       .order("sort_order")
       .limit(40);
     if (error || !data || data.length === 0) {
@@ -241,7 +242,7 @@ export default async function HomeContent({ searchParams }: { searchParams: Prom
             <div className="-mx-3 overflow-x-auto px-3 pb-1 [scrollbar-width:none] sm:mx-0 sm:px-0">
               <div className="grid auto-cols-[5.5rem] grid-flow-col grid-rows-2 gap-x-3 gap-y-4 lg:auto-cols-auto lg:grid-flow-row lg:grid-cols-8 lg:grid-rows-none">
                 {categories.map((category) => (
-                  <Link key={category.id} href={category.category_group === "books" ? `/books?category=${encodeURIComponent(category.name)}` : `/products?category=${encodeURIComponent(category.name)}`} className="group flex flex-col items-center text-center">
+                  <Link key={category.id} href={category.category_group === "books" ? `/books?category=${encodeURIComponent(category.name)}` : category.category_group === "courses" ? `/courses?category=${encodeURIComponent(category.name)}` : `/products?category=${encodeURIComponent(category.name)}`} className="group flex flex-col items-center text-center">
                     <span className="flex size-14 items-center justify-center rounded-full bg-emerald-50 text-2xl ring-1 ring-emerald-100 transition group-hover:-translate-y-0.5 group-hover:bg-emerald-100 sm:size-16" aria-hidden="true">{getCategoryIcon(category.name)}</span>
                     <span className="mt-1.5 line-clamp-2 min-h-8 text-[11px] font-semibold leading-4 text-slate-700 sm:text-xs">{category.name}</span>
                   </Link>
