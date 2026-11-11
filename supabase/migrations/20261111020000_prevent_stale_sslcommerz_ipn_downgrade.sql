@@ -17,6 +17,7 @@ set search_path = ''
 as $$
 declare
   payment_row record;
+  payment_order_id uuid;
   event_key_value text;
 begin
   if coalesce(auth.jwt()->>'role','') <> 'service_role' then
@@ -40,6 +41,30 @@ begin
   on conflict (provider_code,event_key) do nothing;
   if not found then
     return true;
+  end if;
+
+  -- Use the same lock order as create_sslcommerz_transaction:
+  -- order first, then payment transaction. This closes the race where a retry
+  -- could be inserted while an older failure event is checking for newer rows.
+  select order_id into payment_order_id
+  from public.payment_transactions
+  where merchant_reference = p_merchant_reference
+    and provider_code = 'sslcommerz';
+  if not found then
+    update public.payment_webhook_events
+    set processing_status='ignored', safe_error_code='transaction_not_found',
+      processed_at=now()
+    where provider_code='sslcommerz' and event_key=event_key_value;
+    return false;
+  end if;
+
+  perform 1 from public.orders where id = payment_order_id for update;
+  if not found then
+    update public.payment_webhook_events
+    set processing_status='ignored', safe_error_code='order_not_found',
+      processed_at=now()
+    where provider_code='sslcommerz' and event_key=event_key_value;
+    return false;
   end if;
 
   select * into payment_row
