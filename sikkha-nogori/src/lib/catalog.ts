@@ -124,19 +124,49 @@ function normalizeCatalogQuery(value: string): string {
     .trim();
 }
 
-export async function getPublishedCourses(): Promise<CatalogProduct[] | null> {
+export async function getPublishedCourses(category?: string): Promise<CatalogProduct[] | null> {
   const supabase = createSupabasePublicServerClient();
-  const { data, error } = await supabase
+  let request = supabase
     .from("products")
-    .select(
-      catalogProductSelection,
-    )
+    .select(catalogProductSelection)
     .eq("product_type", "course")
     .eq("is_published", true)
     .is("archived_at", null)
     .not("commerce_mode", "is", null)
     .order("title")
     .limit(100);
+
+  if (category) {
+    const { data: rows, error: categoryError } = await supabase
+      .from("categories")
+      .select("id, parent_id, name")
+      .eq("category_group", "courses")
+      .eq("is_active", true)
+      .limit(1000);
+    if (categoryError || !rows) {
+      request = request.eq("category", category);
+    } else {
+      const categoryIds = collectCategoryIds(rows, category);
+      const { data: links, error: linkError } = categoryIds.length
+        ? await supabase.from("product_categories").select("product_id").in("category_id", categoryIds).limit(1000)
+        : { data: [], error: null };
+      if (linkError) {
+        request = request.eq("category", category);
+      } else {
+        const linkedIds = (links ?? []).map((row) => row.product_id as string);
+        const { data: legacyRows } = await supabase
+          .from("products")
+          .select("id")
+          .eq("product_type", "course")
+          .eq("category", category)
+          .limit(1000);
+        const ids = [...new Set([...linkedIds, ...(legacyRows ?? []).map((row) => row.id as string)])];
+        request = request.in("id", ids.length ? ids : [emptyUuid]);
+      }
+    }
+  }
+
+  const { data, error } = await request;
 
   if (error) {
     if (isMissingCatalogSchema(error)) {
