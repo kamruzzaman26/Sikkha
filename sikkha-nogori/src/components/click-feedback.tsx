@@ -1,6 +1,6 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 /**
@@ -11,6 +11,7 @@ import { useEffect, useRef, useState } from "react";
  */
 export function ClickFeedback() {
   const pathname = usePathname();
+  const search = useSearchParams().toString();
   const [busy, setBusy] = useState(false);
   const marked = useRef<Set<HTMLElement>>(new Set());
   const timer = useRef<number | undefined>(undefined);
@@ -28,7 +29,7 @@ export function ClickFeedback() {
     window.clearTimeout(timer.current);
     const frame = window.requestAnimationFrame(() => setBusy(false));
     return () => window.cancelAnimationFrame(frame);
-  }, [pathname]);
+  }, [pathname, search]);
 
   useEffect(() => {
     function start(els: HTMLElement[]) {
