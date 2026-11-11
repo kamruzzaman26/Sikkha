@@ -15,15 +15,17 @@ export function ShippingChargeSelector({
   discount,
   required,
   initialZone = "dhaka_city",
+  charges,
 }: {
   subtotal: number;
   discount: number;
   required: boolean;
   initialZone?: string;
+  charges?: Record<string, number>;
 }) {
   const allowedZones = ["dhaka_city", "district_town", "remote_union"];
   const [zone, setZone] = useState(allowedZones.includes(initialZone) ? initialZone : "dhaka_city");
-  const charge = required ? getShippingCharge(zone) ?? 0 : 0;
+  const charge = required ? getShippingCharge(zone, charges) ?? 0 : 0;
   const total = Math.max(0, subtotal - discount) + charge;
 
   return (
@@ -40,7 +42,7 @@ export function ShippingChargeSelector({
                   <input type="radio" name="shippingZoneChoice" value={option.value} checked={zone === option.value} onChange={() => setZone(option.value)} className="mt-1 size-4 shrink-0 accent-emerald-700" />
                   <span><span className="block font-semibold">{option.label}</span><span className="mt-1 block text-xs text-slate-500">{option.detail}</span></span>
                 </span>
-                <span className="shrink-0 font-bold text-slate-900">{formatBDT(getShippingCharge(option.value) ?? 0)}</span>
+                <span className="shrink-0 font-bold text-slate-900">{formatBDT(getShippingCharge(option.value, charges) ?? 0)}</span>
               </label>
             ))}
           </fieldset>
