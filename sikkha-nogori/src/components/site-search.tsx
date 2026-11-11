@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 
 type Suggestion = { title: string; slug: string; author: string | null };
 
@@ -22,6 +22,8 @@ export function SiteSearch() {
       return;
     }
 
+    setSuggestions([]);
+    setOpen(false);
     const controller = new AbortController();
     const timeout = window.setTimeout(async () => {
       setLoading(true);
@@ -68,7 +70,7 @@ export function SiteSearch() {
     };
   }, []);
 
-  function onKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
+  function onKeyDown(event: KeyboardEvent<HTMLInputElement>) {
     if (!open || suggestions.length === 0) return;
     if (event.key === "ArrowDown") {
       event.preventDefault();
@@ -130,7 +132,6 @@ export function SiteSearch() {
               {item.author && <span className="mt-0.5 block line-clamp-1 text-xs text-slate-500">{item.author}</span>}
             </Link>
           ))}
-          {!loading && suggestions.length > 0 && <button type="submit" form="site-search-submit" className="hidden" />}
         </div>
       )}
     </div>
