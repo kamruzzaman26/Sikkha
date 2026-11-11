@@ -42,7 +42,7 @@ export function isValidSslcommerzSuccess(validation, transaction, merchantRefere
   return (
     ["VALID", "VALIDATED"].includes(String(validation?.status ?? "").toUpperCase())
     && validation?.tran_id === merchantReference
-    && Boolean(validation?.val_id?.trim())
+    && typeof validation?.val_id === "string" && validation.val_id.trim().length > 0
     && sameMoney(validation?.amount, transaction?.amount)
     && String(validation?.currency ?? "").toUpperCase() === transaction?.currency
     && String(validation?.risk_level ?? "0") !== "1"
