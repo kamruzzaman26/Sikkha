@@ -1,45 +1,123 @@
 "use client";
-import Link from "next/link";
+
 import Image from "next/image";
+import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { readCart, writeCart, type CartLine } from "@/lib/cart";
 import { formatBDT } from "@/lib/money";
-type Product = { id:string; title:string; slug:string; price:number|null; image_url:string|null; commerce_mode:string|null; product_type:string };
+
+type Product = { id: string; title: string; slug: string; price: number | null; image_url: string | null; commerce_mode: string | null; product_type: string };
+
 export function CartPageClient() {
- const [items,setItems]=useState<CartLine[]>([]);
- const [products,setProducts]=useState<Product[]>([]);
- const [loading,setLoading]=useState(true);
- const [error,setError]=useState("");
- const refresh=useCallback(async()=>{
-  const current=readCart(); setItems(current);
-  if(!current.length){setProducts([]);setLoading(false);return;}
-  setLoading(true);
-  const supabase=createSupabaseBrowserClient();
-  const {data,error}=await supabase.from("products").select("id,title,slug,price,image_url,commerce_mode,product_type").in("id",current.map(x=>x.productId)).eq("is_published",true).is("archived_at",null).eq("commerce_mode","direct");
-  if(error){setError("কার্টের পণ্য লোড করা যায়নি। আবার চেষ্টা করুন।");setLoading(false);return;}
-  const valid=(data??[]) as Product[];
-  setProducts(valid);
-  const validIds=new Set(valid.map(p=>p.id));
-  const cleaned=current.filter(x=>validIds.has(x.productId));
-  if(cleaned.length!==current.length)writeCart(cleaned);
-  setItems(cleaned);setLoading(false);
- },[]);
- useEffect(()=>{void Promise.resolve().then(refresh);const onChange=()=>void refresh();window.addEventListener("storage",onChange);window.addEventListener("sikkha-cart-change",onChange);return()=>{window.removeEventListener("storage",onChange);window.removeEventListener("sikkha-cart-change",onChange)}},[refresh]);
- function update(id:string,quantity:number){const next=items.map(x=>x.productId===id?{...x,quantity}:x).filter(x=>x.quantity>0);writeCart(next);setItems(next)}
- const rows=items.map(line=>({line,product:products.find(p=>p.id===line.productId)})).filter(x=>x.product);
- const total=rows.reduce((sum,x)=>sum+(x.product?.price??0)*x.line.quantity,0);
- if(loading)return <p className="mt-8 rounded-2xl bg-white p-6">কার্ট লোড হচ্ছে…</p>;
- return <section className="mt-7">
- {error&&<p role="alert" className="mb-4 rounded-xl bg-rose-50 p-4 text-rose-800">{error}</p>}
- {!rows.length?<div className="rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center"><p className="text-lg font-bold">আপনার কার্ট এখন খালি</p><p className="mt-2 text-slate-600">বই বা সরাসরি বিক্রির পণ্য বেছে কার্টে যোগ করুন।</p><Link href="/books" className="mt-5 inline-flex rounded-lg bg-emerald-700 px-5 py-3 font-bold text-white">বই দেখুন</Link></div>:<>
- <div className="grid gap-3">{rows.map(({line,product})=><article key={line.productId} className="flex flex-wrap items-center gap-4 rounded-2xl border border-slate-200 bg-white p-4">
- {product!.image_url?<Image src={product!.image_url} alt={product!.title} width={72} height={90} unoptimized className="h-20 w-16 rounded-lg object-contain"/>:<div className="h-20 w-16 rounded-lg bg-emerald-50"/>}
- <div className="min-w-0 flex-1"><Link href={`/products/${product!.slug}`} className="font-bold hover:text-emerald-800">{product!.title}</Link><p className="mt-1 text-sm text-slate-600">{product!.price===null?"মূল্য নির্ধারিত নয়":formatBDT(product!.price)}</p></div>
- <div className="flex items-center gap-2"><button aria-label="পরিমাণ কমান" onClick={()=>update(line.productId,line.quantity-1)} className="size-9 rounded-lg border">−</button><span className="min-w-6 text-center font-bold">{line.quantity}</span><button aria-label="পরিমাণ বাড়ান" onClick={()=>update(line.productId,Math.min(99,line.quantity+1))} className="size-9 rounded-lg border">+</button></div>
- <button onClick={()=>update(line.productId,0)} className="text-sm font-semibold text-rose-700">সরান</button>
- </article>)}</div>
- <div className="mt-5 flex flex-wrap items-center justify-between gap-4 rounded-2xl bg-emerald-50 p-5"><div><p className="text-sm text-emerald-900">মোট (আনুমানিক)</p><p className="text-2xl font-extrabold text-emerald-900">{formatBDT(total)}</p><p className="mt-1 text-xs text-emerald-800">চূড়ান্ত মূল্য Checkout-এ সার্ভার যাচাই করবে।</p></div><Link href={`/checkout?products=${encodeURIComponent(rows.map(x=>x.line.productId).join(","))}&quantities=${encodeURIComponent(rows.map(x=>x.line.productId+":"+x.line.quantity).join(","))}`} className="inline-flex min-h-12 items-center rounded-lg bg-emerald-700 px-6 py-3 font-bold text-white">Checkout-এ যান</Link></div>
- </>}
- </section>
+  const [items, setItems] = useState<CartLine[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  const refresh = useCallback(async () => {
+    const current = readCart();
+    setItems(current);
+    setError("");
+    if (!current.length) {
+      setProducts([]);
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+    try {
+      const supabase = createSupabaseBrowserClient();
+      const { data, error: fetchError } = await supabase.from("products")
+        .select("id,title,slug,price,image_url,commerce_mode,product_type")
+        .in("id", current.map((item) => item.productId))
+        .eq("is_published", true)
+        .is("archived_at", null)
+        .eq("commerce_mode", "direct");
+      if (fetchError) throw fetchError;
+      const valid = (data ?? []) as Product[];
+      setProducts(valid);
+      const ids = new Set(valid.map((product) => product.id));
+      const cleaned = current.filter((item) => ids.has(item.productId));
+      if (cleaned.length !== current.length) writeCart(cleaned);
+      setItems(cleaned);
+    } catch {
+      setError("কার্টের পণ্য লোড করা যায়নি। আবার চেষ্টা করুন।");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void Promise.resolve().then(refresh);
+    const onChange = () => void refresh();
+    window.addEventListener("storage", onChange);
+    window.addEventListener("sikkha-cart-change", onChange);
+    return () => {
+      window.removeEventListener("storage", onChange);
+      window.removeEventListener("sikkha-cart-change", onChange);
+    };
+  }, [refresh]);
+
+  function update(id: string, quantity: number) {
+    const next = items.map((item) => item.productId === id
+      ? { ...item, quantity: Math.max(0, Math.min(99, quantity)) }
+      : item).filter((item) => item.quantity > 0);
+    writeCart(next);
+    setItems(next);
+  }
+
+  const rows = items.map((line) => ({ line, product: products.find((product) => product.id === line.productId) }))
+    .filter((row): row is { line: CartLine; product: Product } => Boolean(row.product));
+  const total = rows.reduce((sum, row) => sum + (row.product.price ?? 0) * row.line.quantity, 0);
+  const itemCount = rows.reduce((sum, row) => sum + row.line.quantity, 0);
+  const checkoutHref = `/checkout?products=${encodeURIComponent(rows.map((row) => row.line.productId).join(","))}&quantities=${encodeURIComponent(rows.map((row) => `${row.line.productId}:${row.line.quantity}`).join(","))}`;
+
+  if (loading) return <p role="status" className="mt-8 rounded-2xl bg-white p-6 text-slate-600">কার্ট লোড হচ্ছে…</p>;
+
+  return (
+    <section className="mt-7">
+      {error && <p role="alert" className="mb-4 rounded-xl border border-rose-200 bg-rose-50 p-4 text-rose-800">{error}</p>}
+      {!rows.length ? (
+        <div className="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-12 text-center shadow-sm">
+          <span aria-hidden="true" className="mx-auto flex size-16 items-center justify-center rounded-full bg-emerald-50 text-3xl">🛒</span>
+          <h2 className="mt-4 text-xl font-bold">আপনার কার্ট এখন খালি</h2>
+          <p className="mt-2 text-sm text-slate-600">বই বা সরাসরি বিক্রির পণ্য বেছে কার্টে যোগ করুন।</p>
+          <Link href="/books" className="mt-5 inline-flex min-h-11 items-center rounded-full bg-emerald-800 px-6 py-2.5 font-bold text-white hover:bg-emerald-900">বই দেখুন</Link>
+        </div>
+      ) : (
+        <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_20rem]">
+          <div className="grid gap-3">
+            {rows.map(({ line, product }) => (
+              <article key={line.productId} className="grid grid-cols-[4.5rem_minmax(0,1fr)] gap-3 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm sm:grid-cols-[5rem_minmax(0,1fr)_auto] sm:items-center sm:gap-4 sm:p-4">
+                <Link href={`/products/${product.slug}`} className="flex h-24 items-center justify-center overflow-hidden rounded-xl bg-slate-50 p-1">
+                  {product.image_url ? <Image src={product.image_url} alt={product.title} width={80} height={100} unoptimized className="h-full w-full object-contain" /> : <span className="text-xs text-slate-400">ছবি নেই</span>}
+                </Link>
+                <div className="min-w-0">
+                  <Link href={`/products/${product.slug}`} className="line-clamp-2 font-bold leading-6 text-slate-900 hover:text-emerald-800">{product.title}</Link>
+                  <p className="mt-1 text-sm font-semibold text-slate-600">{product.price === null ? "মূল্য নির্ধারিত নয়" : formatBDT(product.price)}</p>
+                  <p className="mt-1 text-sm font-bold text-emerald-800">মোট: {formatBDT((product.price ?? 0) * line.quantity)}</p>
+                </div>
+                <div className="col-span-2 flex items-center justify-between gap-3 border-t border-slate-100 pt-3 sm:col-span-1 sm:flex-col sm:items-end sm:border-0 sm:pt-0">
+                  <div className="inline-flex items-center rounded-full border border-slate-300 bg-white p-1">
+                    <button type="button" aria-label={`${product.title} পরিমাণ কমান`} onClick={() => update(line.productId, line.quantity - 1)} disabled={line.quantity <= 1} className="flex size-9 items-center justify-center rounded-full text-xl font-bold text-slate-700 hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-30">−</button>
+                    <output aria-live="polite" className="min-w-9 text-center text-base font-bold tabular-nums">{line.quantity}</output>
+                    <button type="button" aria-label={`${product.title} পরিমাণ বাড়ান`} onClick={() => update(line.productId, line.quantity + 1)} disabled={line.quantity >= 99} className="flex size-9 items-center justify-center rounded-full text-xl font-bold text-slate-700 hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-30">+</button>
+                  </div>
+                  <button type="button" onClick={() => update(line.productId, 0)} className="inline-flex min-h-9 items-center rounded-full px-3 text-sm font-semibold text-rose-700 hover:bg-rose-50">সরিয়ে ফেলুন</button>
+                </div>
+              </article>
+            ))}
+            <Link href="/books" className="inline-flex min-h-10 w-fit items-center px-1 text-sm font-semibold text-emerald-800 hover:underline">← কেনাকাটা চালিয়ে যান</Link>
+          </div>
+          <aside className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm lg:sticky lg:top-24">
+            <h2 className="text-lg font-extrabold">অর্ডার সারাংশ</h2>
+            <div className="mt-4 flex justify-between text-sm text-slate-600"><span>পণ্যের সংখ্যা</span><span className="font-semibold text-slate-900">{itemCount}টি</span></div>
+            <div className="mt-3 flex justify-between border-t border-slate-100 pt-3"><span className="font-semibold">সর্বমোট</span><span className="text-xl font-extrabold text-emerald-800">{formatBDT(total)}</span></div>
+            <p className="mt-2 text-xs leading-5 text-slate-500">চূড়ান্ত মূল্য ও প্রাপ্যতা Checkout-এ সার্ভার যাচাই করবে।</p>
+            <Link href={checkoutHref} className="mt-5 inline-flex min-h-12 w-full items-center justify-center rounded-full bg-emerald-800 px-5 py-3 text-center font-bold text-white transition hover:bg-emerald-900">Checkout-এ যান</Link>
+          </aside>
+        </div>
+      )}
+    </section>
+  );
 }
