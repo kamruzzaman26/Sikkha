@@ -75,9 +75,10 @@ begin
         fn.identity_args
       );
       execute format(
-        'alter function private.%I(%s) set search_path = ''''',
+        'alter function private.%I(%s) set search_path = %L',
         fn.proname,
-        fn.identity_args
+        fn.identity_args,
+        ''
       );
     else
       execute format(
