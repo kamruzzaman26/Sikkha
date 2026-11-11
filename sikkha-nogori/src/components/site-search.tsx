@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState, type KeyboardEvent } from "react";
+import { useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
 
 type Suggestion = { title: string; slug: string; author: string | null };
 
@@ -53,7 +53,7 @@ export function SiteSearch() {
         setOpen(false);
       }
     }
-    function closeEscape(event: KeyboardEvent) {
+    function closeEscape(event: globalThis.KeyboardEvent) {
       if (event.key === "Escape") setOpen(false);
     }
     document.addEventListener("pointerdown", closeOutside);
@@ -64,7 +64,7 @@ export function SiteSearch() {
     };
   }, []);
 
-  function onKeyDown(event: KeyboardEvent<HTMLInputElement>) {
+  function onKeyDown(event: ReactKeyboardEvent<HTMLInputElement>) {
     if (!open || suggestions.length === 0) return;
     if (event.key === "ArrowDown") {
       event.preventDefault();
