@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { parseCheckoutForm } from "@/lib/order-workflow.mjs";
 import { requireCustomer } from "@/lib/supabase/auth";
 import { getPublicSiteOrigin } from "@/lib/supabase/env";
+import { getShippingCharge, isShippingZone } from "@/lib/shipping-fee.mjs";
 
 function isUuid(value: string): boolean {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
@@ -16,6 +17,8 @@ function isUuid(value: string): boolean {
 // Back to step 2 with the same selection, so a failed order never loses the cart.
 function deliveryUrl(formData: FormData, status: string): string {
   const q = new URLSearchParams();
+  const zone = formData.get("shippingZone");
+  if (typeof zone === "string" && /^[a-z_]{3,24}$/.test(zone)) q.set("shippingZone", zone);
   for (const entry of formData.getAll("productId")) {
     if (typeof entry !== "string" || !isUuid(entry)) continue;
     q.append("productId", entry);
@@ -33,6 +36,16 @@ export async function placeOrder(formData: FormData) {
 
   const order = parseCheckoutForm(formData);
   if (!order) {
+    redirect(deliveryUrl(formData, "invalid"));
+  }
+
+  const shippingZoneValue = formData.get("shippingZone");
+  const shippingZone = typeof shippingZoneValue === "string" ? shippingZoneValue : "";
+  if (!isShippingZone(shippingZone)) {
+    redirect(deliveryUrl(formData, "invalid"));
+  }
+  const shippingCharge = getShippingCharge(shippingZone);
+  if (shippingCharge === undefined) {
     redirect(deliveryUrl(formData, "invalid"));
   }
 
@@ -55,6 +68,8 @@ export async function placeOrder(formData: FormData) {
     p_items: order.items,
     p_referral_code: validReferralCode,
     p_coupon_code: couponCode,
+    p_shipping_zone: shippingZone,
+    p_shipping_charge: shippingCharge,
   });
 
   if (error) {
