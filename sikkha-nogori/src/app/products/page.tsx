@@ -19,6 +19,7 @@ type ProductSearchParams = Promise<{
   type?: string | string[];
   page?: string | string[];
   sort?: string | string[];
+  instock?: string | string[];
 }>;
 
 function firstValue(value: string | string[] | undefined): string {
@@ -34,7 +35,10 @@ async function ProductResults({
   const query = firstValue(params.q).trim().slice(0, 100);
   const category = firstValue(params.category).trim().slice(0, 120);
   const sortValue = firstValue(params.sort);
-  const sort = sortValue === "name-desc" ? "name-desc" : "name-asc";
+  const sort = ["name-desc", "newest", "price-low", "price-high"].includes(sortValue)
+    ? (sortValue as "name-desc" | "newest" | "price-low" | "price-high")
+    : "name-asc";
+  const inStock = firstValue(params.instock) === "1";
   const pageValue = Number.parseInt(firstValue(params.page), 10);
   const page =
     Number.isSafeInteger(pageValue) && pageValue > 0 && pageValue <= 100000
@@ -59,6 +63,7 @@ async function ProductResults({
           category: category || undefined,
           productType,
           sort,
+          inStock,
         });
   const pageCount = Math.max(
     1,
@@ -70,6 +75,7 @@ async function ProductResults({
     if (category) search.set("category", category);
     if (productType) search.set("type", productType);
     if (sort !== "name-asc") search.set("sort", sort);
+    if (inStock) search.set("instock", "1");
     if (nextPage > 1) search.set("page", String(nextPage));
     const suffix = search.toString();
     return suffix ? `/products?${suffix}` : "/products";
@@ -89,7 +95,7 @@ async function ProductResults({
       <form
         action="/products"
         method="get"
-        className="mt-7 grid gap-4 rounded-2xl border border-emerald-100 bg-white p-4 shadow-sm sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_minmax(10rem,0.5fr)_minmax(10rem,0.5fr)_minmax(9rem,0.4fr)_auto] sm:items-end sm:p-5"
+        className="mt-7 grid gap-4 rounded-2xl border border-emerald-100 bg-white p-4 shadow-sm sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_minmax(10rem,0.5fr)_minmax(10rem,0.5fr)_minmax(10rem,0.5fr)_minmax(9rem,0.4fr)_auto] sm:items-end sm:p-5"
       >
         <div>
           <label
@@ -163,8 +169,21 @@ async function ProductResults({
           >
             <option value="name-asc">নাম: ক থেকে হ</option>
             <option value="name-desc">নাম: হ থেকে ক</option>
+            <option value="newest">নতুন পণ্য</option>
+            <option value="price-low">দাম: কম থেকে বেশি</option>
+            <option value="price-high">দাম: বেশি থেকে কম</option>
           </select>
         </div>
+        <label className="flex min-h-11 items-center gap-2 text-sm font-semibold text-slate-700">
+          <input
+            type="checkbox"
+            name="instock"
+            value="1"
+            defaultChecked={inStock}
+            className="size-4 rounded border-slate-300 text-emerald-700 focus:ring-emerald-600"
+          />
+          স্টকে আছে
+        </label>
         <button
           type="submit"
           className="min-h-11 rounded-lg bg-emerald-700 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-emerald-800"
@@ -176,7 +195,7 @@ async function ProductResults({
       {productPage.products.length > 0 ? (
         <>
           <p className="mt-6 text-sm text-slate-600">
-            মোট {productPage.total}টি পণ্য
+            মোট {productPage.total}টি পণ্য{inStock ? " · স্টকে আছে" : ""}
           </p>
           <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-5 lg:grid-cols-4">
             {productPage.products.map((product) => (
