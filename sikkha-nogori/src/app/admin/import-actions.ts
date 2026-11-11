@@ -32,6 +32,8 @@ function reasonForDatabaseCode(code: string | null): string {
     duplicate_url: "এই Affiliate URL আগে থেকেই ব্যবহৃত হয়েছে।",
     duplicate_slug: "এই URL slug আগে থেকেই ব্যবহৃত হয়েছে।",
     invalid_name: "পণ্যের নাম সঠিক নয়।",
+    invalid_description: "Description সর্বোচ্চ ৫০০০ অক্ষর হতে পারবে।",
+    invalid_slug: "Slug সঠিক নয়।",
     invalid_slug: "Slug সঠিক নয়।",
     invalid_url: "Affiliate URL সঠিক নয়।",
     invalid_image_url: "Image URL সঠিক নয়।",
@@ -43,6 +45,7 @@ function reasonForDatabaseCode(code: string | null): string {
     invalid_cost_price: "Cost Price সঠিক নয়।",
     invalid_list_price: "List Price Selling Price-এর চেয়ে কম হতে পারবে না।",
     invalid_page_count: "Page Count সঠিক নয়।",
+    invalid_weight: "Weight সঠিক নয়।",
     invalid_weight: "Weight সঠিক নয়।",
     category_not_found: "এক বা একাধিক Category Path পাওয়া যায়নি।",
     primary_category_not_selected: "Primary Category নির্বাচিত Category-র মধ্যে নেই।",
@@ -65,7 +68,7 @@ async function validateRows(csvText: string, mode: "preview" | "commit"): Promis
   const resultRows: BookImportRowResult[] = prepared.rows.map((row) => ({
     rowNumber: row.rowNumber, bookName: row.productName, affiliateUrl: row.affiliateUrl,
     imageUrl: row.imageUrl, productType: row.productType, salesType: row.salesType,
-    authors: row.authors, publishers: row.publishers, categories: row.categories,
+    authors: row.authors, publishers: row.publishers, brands: row.brands, instructors: row.instructors, categories: row.categories,
     bestseller: row.bestseller, status: row.status, reasons: row.reasons,
   }));
   const candidates = prepared.rows.filter((row) => row.status === "ready");
