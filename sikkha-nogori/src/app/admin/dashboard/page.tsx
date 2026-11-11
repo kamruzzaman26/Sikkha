@@ -198,6 +198,26 @@ function Empty({ children }: { children: ReactNode }) {
   );
 }
 
+function buildDhakaSalesDays(
+  orders: Array<{ payment_status: string; created_at: string; total_amount: number | string }>,
+) {
+  const latestOrderDate = orders[0]?.created_at;
+  if (!latestOrderDate) return [];
+  const latestKey = dhakaDateKey(latestOrderDate);
+  const [year, month, day] = latestKey.split("-").map(Number);
+  const anchor = Date.UTC(year, month - 1, day);
+  return Array.from({ length: 7 }, (_, index) => {
+    const date = new Date(anchor - (6 - index) * 86400000);
+    const key = date.toISOString().slice(0, 10);
+    const amount = orders.reduce((sum, order) => (
+      order.payment_status === "verified" && dhakaDateKey(order.created_at) === key
+        ? sum + (Number(order.total_amount) || 0)
+        : sum
+    ), 0);
+    return { key, label: date.toLocaleDateString("en-US", { weekday: "short", timeZone: "UTC" }), amount };
+  });
+}
+
 async function DashboardContent() {
   await connection();
   const { supabase } = await requireAdmin("admin");
@@ -233,18 +253,7 @@ async function DashboardContent() {
       : { data: [], error: null };
   const top = bestSellers(itemsResult.data ?? []);
   const topMax = Math.max(1, ...top.map((item) => Number(item.quantity) || 0));
-  const dhakaNow = new Date(Date.now() + 6 * 60 * 60 * 1000);
-  const dhakaTodayUtc = Date.UTC(dhakaNow.getUTCFullYear(), dhakaNow.getUTCMonth(), dhakaNow.getUTCDate());
-  const salesDays = Array.from({ length: 7 }, (_, index) => {
-    const date = new Date(dhakaTodayUtc - (6 - index) * 86400000);
-    const key = date.toISOString().slice(0, 10);
-    const amount = orders.reduce((sum, order) => (
-      order.payment_status === "verified" && dhakaDateKey(order.created_at) === key
-        ? sum + (Number(order.total_amount) || 0)
-        : sum
-    ), 0);
-    return { key, label: date.toLocaleDateString("en-US", { weekday: "short", timeZone: "UTC" }), amount };
-  });
+  const salesDays = buildDhakaSalesDays(orders);
   const maxDailySales = Math.max(1, ...salesDays.map((day) => day.amount));
 
   return (
@@ -284,7 +293,7 @@ async function DashboardContent() {
           <div className="grid gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(260px,1fr)]">
             <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
               <div className="flex flex-wrap items-center justify-between gap-3">
-                <div><h2 className="text-lg font-bold tracking-tight text-slate-900">Sales Overview</h2><p className="mt-1 text-xs text-slate-500">Verified order revenue · Last 7 days</p></div>
+                <div><h2 className="text-lg font-bold tracking-tight text-slate-900">Sales Overview</h2><p className="mt-1 text-xs text-slate-500">Verified order revenue · 7 days ending with latest order</p></div>
                 <span className="rounded-lg bg-blue-50 px-3 py-2 text-xs font-bold text-blue-800">7D</span>
               </div>
               <div className="mt-6 grid grid-cols-[auto_1fr] gap-3">

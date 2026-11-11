@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { AdminIcon } from "@/components/admin-icons";
 import { AdminNavLink } from "@/components/admin-nav-link";
 import { adminNav } from "@/lib/admin-nav";
@@ -84,10 +84,6 @@ function AdminTopbar({ identity, onMenuClick }: { identity: AdminIdentity; onMen
   const displayName = identity.name || identity.email?.split("@")[0] || "Administrator";
   const initials = displayName.slice(0, 2).toUpperCase();
   const [open, setOpen] = useState<string | null>(null);
-  const pathname = usePathname();
-
-  // Close any open dropdown on outside tap, Escape, or page change.
-  useEffect(() => { setOpen(null); }, [pathname]);
   useEffect(() => {
     if (!open) return;
     const onDown = (e: Event) => { if (!(e.target as HTMLElement).closest("[data-dropdown]")) setOpen(null); };
@@ -137,6 +133,7 @@ function AdminTopbar({ identity, onMenuClick }: { identity: AdminIdentity; onMen
 }
 
 export function AdminShell({ children, identity }: { children: React.ReactNode; identity: AdminIdentity }) {
+  const pathname = usePathname() ?? "";
   const [mobileOpen, setMobileOpen] = useState(false);
   useEffect(() => {
     if (!mobileOpen) return;
@@ -159,7 +156,7 @@ export function AdminShell({ children, identity }: { children: React.ReactNode; 
         </div>
       </aside>
       <div className="min-w-0 flex-1">
-        <AdminTopbar identity={identity} onMenuClick={() => setMobileOpen(true)} />
+        <AdminTopbar key={pathname} identity={identity} onMenuClick={() => setMobileOpen(true)} />
         <main className="min-w-0">{children}</main>
       </div>
       {mobileOpen && (

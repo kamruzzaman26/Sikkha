@@ -5,7 +5,9 @@ import { Suspense } from "react";
 import { placeOrder } from "../actions";
 import { AddressFields } from "@/components/address-fields";
 import { SubmitButton } from "@/components/submit-button";
+import { ShippingChargeSelector } from "@/components/shipping-charge-selector";
 import { formatBDT } from "@/lib/money";
+import { getShippingCharges } from "@/lib/shipping-fee.mjs";
 import { isNoActiveSessionError } from "@/lib/supabase/auth-errors";
 import { getCheckoutOptions } from "@/lib/supabase/checkout";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -47,7 +49,15 @@ async function DeliveryContent({ searchParams }: Pick<PageProps<"/checkout/deliv
     throw new Error("Unable to verify the signed-in customer.", { cause: userError });
   }
 
-  const [options, params] = await Promise.all([getCheckoutOptions(), searchParams]);
+  const [options, params, settingsResult] = await Promise.all([
+    getCheckoutOptions(),
+    searchParams,
+    supabase.from("site_settings").select("value").eq("key", "general").maybeSingle(),
+  ]);
+  const generalSettings = settingsResult.data?.value && typeof settingsResult.data.value === "object"
+    ? settingsResult.data.value as Record<string, unknown>
+    : {};
+  const shippingCharges = getShippingCharges(generalSettings.delivery_charges);
   const status = first(params.status);
   const message = status && Object.hasOwn(statusMessages, status) ? statusMessages[status] : undefined;
 
@@ -66,9 +76,14 @@ async function DeliveryContent({ searchParams }: Pick<PageProps<"/checkout/deliv
     .filter((w) => catalog.has(w.id.toLowerCase()))
     .map((w) => {
       const product = catalog.get(w.id.toLowerCase())!;
-      return { ...w, title: product.title, price: Number(product.price), total: Math.round(Number(product.price) * w.quantity * 100) / 100 };
+      return { ...w, title: product.title, product_type: product.product_type, price: Number(product.price), total: Math.round(Number(product.price) * w.quantity * 100) / 100 };
     });
   const subtotal = Math.round(lines.reduce((sum, l) => sum + l.total, 0) * 100) / 100;
+  const requiresShipping = lines.some((line) => !["course", "ebook", "digital"].includes(line.product_type));
+  const requestedShippingZone = first(params.shippingZone);
+  const initialShippingZone = ["dhaka_city", "district_town", "remote_union"].includes(requestedShippingZone ?? "")
+    ? requestedShippingZone!
+    : "dhaka_city";
 
   const couponInput = (first(params.couponCode) ?? "").toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 20);
   let appliedCode = "";
@@ -84,14 +99,13 @@ async function DeliveryContent({ searchParams }: Pick<PageProps<"/checkout/deliv
       couponNote = `${couponFailure[row?.status as string] ?? "কুপন যাচাই করা যায়নি"} — এই অর্ডারে কুপন প্রযোজ্য হবে না।`;
     }
   }
-  const total = Math.round((subtotal - discount) * 100) / 100;
-
   const back = new URLSearchParams();
   if (lines.length) {
     back.set("products", lines.map((l) => l.id).join(","));
     back.set("quantities", lines.map((l) => `${l.id}:${l.quantity}`).join(","));
   }
   if (couponInput) back.set("couponCode", couponInput);
+  if (initialShippingZone) back.set("shippingZone", initialShippingZone);
   const backHref = `/checkout${back.toString() ? `?${back}` : ""}`;
 
   return (
@@ -141,11 +155,6 @@ async function DeliveryContent({ searchParams }: Pick<PageProps<"/checkout/deliv
                   </li>
                 ))}
               </ul>
-              <dl className="mt-3 space-y-1.5 border-t border-slate-200 pt-3 text-sm">
-                <div className="flex justify-between"><dt className="text-slate-600">পণ্যের মূল্য</dt><dd className="font-semibold">{formatBDT(subtotal)}</dd></div>
-                {discount > 0 && <div className="flex justify-between text-emerald-800"><dt>কুপন ছাড় ({appliedCode})</dt><dd className="font-semibold">−{formatBDT(discount)}</dd></div>}
-                <div className="flex justify-between text-lg"><dt className="font-bold">প্রদেয় মোট</dt><dd className="font-extrabold text-emerald-800">{formatBDT(total)}</dd></div>
-              </dl>
               {couponNote && <p className="mt-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-950">{couponNote}</p>}
             </section>
 
@@ -175,6 +184,14 @@ async function DeliveryContent({ searchParams }: Pick<PageProps<"/checkout/deliv
                 </div>
               </div>
             </section>
+
+            <ShippingChargeSelector
+              subtotal={subtotal}
+              discount={discount}
+              required={requiresShipping}
+              initialZone={initialShippingZone}
+              charges={shippingCharges}
+            />
 
             <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
               <h2 className="text-xl font-bold">পেমেন্ট মেথড</h2>

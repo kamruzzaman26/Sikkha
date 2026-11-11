@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import BookCard from "@/components/book-card";
 import { getActiveAffiliateLinkMap } from "@/lib/supabase/affiliate-links";
@@ -43,6 +44,7 @@ async function BookResults({
   const params = await searchParams;
   const query = firstValue(params.q).trim().slice(0, 100);
   const categoryParam = firstValue(params.category).slice(0, 120);
+  if (categoryParam === "শিক্ষা কুইজ" || categoryParam === "education-quiz") redirect("/quiz");
   const legacyCategory = bookCategories.find(
     (item) => item.slug === categoryParam,
   );
@@ -203,8 +205,8 @@ async function BookResults({
             </>
           ) : (
             <div className="rounded-2xl border border-dashed border-slate-300 bg-white px-5 py-12 text-center">
-              <h2 className="text-xl font-bold">কোনো বই পাওয়া যায়নি</h2>
-              <p className="mt-2 text-sm text-slate-600">বানান যাচাই করুন অথবা অন্য বিভাগ বেছে দেখুন।</p>
+              <h2 className="text-xl font-bold">{category ? `${category} বিভাগে এখনো কোনো প্রকাশিত বই নেই` : "এখনো কোনো বই প্রকাশিত হয়নি"}</h2>
+              <p className="mt-2 text-sm text-slate-600">{category ? "এই বিভাগে বই প্রকাশিত হলে এখানে দেখা যাবে।" : "বই যোগ ও প্রকাশিত হলে এখানে দেখা যাবে।"}</p>
               <Link href="/books" className="mt-5 inline-flex rounded-lg bg-emerald-700 px-4 py-2.5 text-sm font-bold text-white hover:bg-emerald-800">সব বই দেখুন</Link>
             </div>
           )}
