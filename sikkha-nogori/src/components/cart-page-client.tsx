@@ -6,7 +6,7 @@ import { useCallback, useEffect, useState } from "react";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { readCart, writeCart, type CartLine } from "@/lib/cart";
 import { formatBDT } from "@/lib/money";
-import { getShippingCharge } from "@/lib/shipping-fee.mjs";
+import { DEFAULT_SHIPPING_CHARGES, getShippingCharge, getShippingCharges } from "@/lib/shipping-fee.mjs";
 
 type Product = { id: string; title: string; slug: string; price: number | null; image_url: string | null; commerce_mode: string | null; product_type: string };
 
@@ -16,6 +16,7 @@ export function CartPageClient() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [shippingZone, setShippingZone] = useState("dhaka_city");
+  const [shippingCharges, setShippingCharges] = useState(DEFAULT_SHIPPING_CHARGES);
 
   const refresh = useCallback(async () => {
     const current = readCart();
@@ -60,6 +61,15 @@ export function CartPageClient() {
     };
   }, [refresh]);
 
+  useEffect(() => {
+    const controller = new AbortController();
+    fetch("/api/delivery-charges", { cache: "no-store", signal: controller.signal })
+      .then((response) => response.ok ? response.json() : null)
+      .then((data) => { if (data?.charges) setShippingCharges(getShippingCharges(data.charges)); })
+      .catch(() => {});
+    return () => controller.abort();
+  }, []);
+
   function update(id: string, quantity: number) {
     const next = items.map((item) => item.productId === id
       ? { ...item, quantity: Math.max(0, Math.min(99, quantity)) }
@@ -72,7 +82,7 @@ export function CartPageClient() {
     .filter((row): row is { line: CartLine; product: Product } => Boolean(row.product));
   const total = rows.reduce((sum, row) => sum + (row.product.price ?? 0) * row.line.quantity, 0);
   const itemCount = rows.reduce((sum, row) => sum + row.line.quantity, 0);
-  const shippingCharge = getShippingCharge(shippingZone) ?? 48;
+  const shippingCharge = getShippingCharge(shippingZone, shippingCharges) ?? 48;
   const payableTotal = total + shippingCharge;
   const productHref = (product: Product) => product.product_type === "book" ? `/books/${product.slug}` : product.product_type === "course" ? `/courses/${product.slug}` : `/products/${product.slug}`;
   const checkoutHref = `/checkout?products=${encodeURIComponent(rows.map((row) => row.line.productId).join(","))}&quantities=${encodeURIComponent(rows.map((row) => `${row.line.productId}:${row.line.quantity}`).join(","))}&shippingZone=${encodeURIComponent(shippingZone)}`;
@@ -120,9 +130,9 @@ export function CartPageClient() {
             <div className="mt-4 border-t border-slate-100 pt-4">
               <label htmlFor="cart-shipping-zone" className="mb-2 block text-sm font-semibold text-slate-700">ডেলিভারি এলাকা নির্বাচন করুন</label>
               <select id="cart-shipping-zone" value={shippingZone} onChange={(event) => setShippingZone(event.target.value)} className="min-h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm">
-                <option value="dhaka_city">ঢাকা সিটি — ৳৪৮ থেকে</option>
-                <option value="district_town">জেলা সদর / পৌরসভা — ৳৫২ থেকে</option>
-                <option value="remote_union">দূরবর্তী এলাকা / ইউনিয়ন — ৳৫৭ থেকে</option>
+                <option value="dhaka_city">ঢাকা সিটি — ৳{shippingCharges.dhaka_city} থেকে</option>
+                <option value="district_town">জেলা সদর / পৌরসভা — ৳{shippingCharges.district_town} থেকে</option>
+                <option value="remote_union">দূরবর্তী এলাকা / ইউনিয়ন — ৳{shippingCharges.remote_union} থেকে</option>
               </select>
             </div>
             <div className="mt-4 flex justify-between text-sm text-slate-600"><span>পণ্যের মূল্য</span><span className="font-semibold">{formatBDT(total)}</span></div>
