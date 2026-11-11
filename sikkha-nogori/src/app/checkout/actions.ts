@@ -77,6 +77,9 @@ export async function placeOrder(formData: FormData) {
     if (error.code === "22023" && /^coupon_[a-z_]+$/.test(error.message)) {
       redirect(deliveryUrl(formData, error.message.replaceAll("_", "-")));
     }
+    if (error.code === "22023") {
+      redirect(deliveryUrl(formData, "invalid"));
+    }
     if (error.code === "23505") {
       redirect("/account/orders?status=created");
     }
