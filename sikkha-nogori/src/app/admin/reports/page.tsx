@@ -61,7 +61,7 @@ export default async function ReportsPage() {
     supabase
       .from("orders")
       .select("total_amount,currency")
-      .eq("payment_status", "paid")
+      .eq("payment_status", "verified")
       .order("created_at", { ascending: false })
       .limit(1000),
   ]);
@@ -83,7 +83,7 @@ export default async function ReportsPage() {
     { label: "Total orders", value: orders.count ?? 0, icon: "orders" },
     { label: "Catalog products", value: products.count ?? 0, icon: "box" },
     { label: "Blog posts", value: posts.count ?? 0, icon: "post" },
-    { label: "Paid orders", value: paid.data?.length ?? 0, icon: "check" },
+    { label: "Verified payments", value: paid.data?.length ?? 0, icon: "check" },
   ];
 
   return (
@@ -114,9 +114,9 @@ export default async function ReportsPage() {
         </section>
 
         <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-          <h2 className="text-lg font-bold tracking-tight">Paid order value by currency</h2>
+          <h2 className="text-lg font-bold tracking-tight">Verified order value by currency</h2>
           <p className="mt-1 text-sm text-slate-600">
-            Calculated from the latest 1,000 paid orders. Currency totals are kept separate.
+            Calculated from the latest 1,000 payment-verified orders. Currency totals are kept separate.
           </p>
           {money.length ? (
             <ul className="mt-5 flex flex-col gap-5">
@@ -142,9 +142,9 @@ export default async function ReportsPage() {
               <span className="flex h-14 w-14 items-center justify-center rounded-full bg-brand-50 text-brand-800">
                 <Icon name="chart" className="h-6 w-6" />
               </span>
-              <p className="text-base font-bold">No paid orders recorded yet</p>
+              <p className="text-base font-bold">No verified payments recorded yet</p>
               <p className="max-w-md text-sm text-slate-600">
-                Totals will appear here, one per currency, as soon as paid orders are recorded.
+                Totals will appear here, one per currency, as soon as payment-verified orders are recorded.
               </p>
               <Link
                 href="/admin/orders"
