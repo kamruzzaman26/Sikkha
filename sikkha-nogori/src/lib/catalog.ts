@@ -130,6 +130,7 @@ export async function getPublishedCourses(category?: string): Promise<CatalogPro
     .from("products")
     .select(catalogProductSelection)
     .eq("product_type", "course")
+    .eq("status", "published")
     .eq("is_published", true)
     .is("archived_at", null)
     .not("commerce_mode", "is", null)
@@ -192,6 +193,7 @@ export async function getPublishedCourseBySlug(
       catalogProductSelection,
     )
     .eq("product_type", "course")
+    .eq("status", "published")
     .eq("is_published", true)
     .is("archived_at", null)
     .not("commerce_mode", "is", null)
@@ -273,6 +275,7 @@ export async function getPublishedBooks({
     .from("products")
     .select(catalogProductSelection, { count: "exact" })
     .eq("product_type", "book")
+    .eq("status", "published")
     .eq("is_published", true)
     .is("archived_at", null)
     .not("commerce_mode", "is", null);
@@ -374,7 +377,8 @@ export async function getBookFacets(): Promise<BookFacets> {
       .from("products")
       .select("author, publisher, language")
       .eq("product_type", "book")
-      .eq("is_published", true)
+      .eq("status", "published")
+    .eq("is_published", true)
       .is("archived_at", null)
       .limit(5000);
     if (error || !data) return empty;
@@ -459,6 +463,7 @@ export async function getPublishedProducts({
     .select(catalogProductSelection, { count: "exact" })
     .neq("product_type", "book")
     .neq("product_type", "course")
+    .eq("status", "published")
     .eq("is_published", true)
     .is("archived_at", null)
     .not("commerce_mode", "is", null);
@@ -527,6 +532,7 @@ export async function getPublishedProductBySlug(
     .select(catalogProductSelection)
     .neq("product_type", "book")
     .neq("product_type", "course")
+    .eq("status", "published")
     .eq("is_published", true)
     .is("archived_at", null)
     .not("commerce_mode", "is", null)
@@ -591,7 +597,8 @@ export async function getPublishedProductCategories(): Promise<
       .select("id, category")
       .neq("product_type", "book")
       .neq("product_type", "course")
-      .eq("is_published", true)
+      .eq("status", "published")
+    .eq("is_published", true)
       .is("archived_at", null)
       .not("commerce_mode", "is", null)
       .limit(5000),
@@ -626,6 +633,7 @@ export async function getPublishedBookBySlug(
       catalogProductSelection,
     )
     .eq("product_type", "book")
+    .eq("status", "published")
     .eq("is_published", true)
     .is("archived_at", null)
     .not("commerce_mode", "is", null)
@@ -661,7 +669,8 @@ async function getTaxonomyBookCategoryNames(
       .from("products")
       .select("id")
       .eq("product_type", "book")
-      .eq("is_published", true)
+      .eq("status", "published")
+    .eq("is_published", true)
       .is("archived_at", null)
       .not("commerce_mode", "is", null)
       .limit(5000),
@@ -694,6 +703,7 @@ export async function getPublishedBookCategories(): Promise<string[] | null> {
     .from("products")
     .select("category")
     .eq("product_type", "book")
+    .eq("status", "published")
     .eq("is_published", true)
     .is("archived_at", null)
     .not("commerce_mode", "is", null)
@@ -722,6 +732,7 @@ export async function getPublishedWishlistProducts(): Promise<
   const { data, error } = await supabase
     .from("products")
     .select(catalogProductSelection)
+    .eq("status", "published")
     .eq("is_published", true)
     .is("archived_at", null)
     .not("commerce_mode", "is", null)
@@ -787,6 +798,7 @@ export async function getPublishedBookSlugs(): Promise<
     .from("products")
     .select("slug")
     .eq("product_type", "book")
+    .eq("status", "published")
     .eq("is_published", true)
     .is("archived_at", null)
     .not("commerce_mode", "is", null)
