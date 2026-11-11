@@ -79,7 +79,7 @@ async function CourseCatalog({ category }: { category?: string }) {
   );
 }
 
-export default async function CoursesPage({ searchParams }: { searchParams: Promise<{ category?: string }> }) {
+async function CoursesPageContent({ searchParams }: { searchParams: Promise<{ category?: string }> }) {
   const { category } = await searchParams;
   return (
     <main className="min-h-screen bg-[#f7faf8] px-5 py-10 text-slate-900 sm:px-8 sm:py-14">
@@ -136,5 +136,22 @@ export default async function CoursesPage({ searchParams }: { searchParams: Prom
         </footer>
       </div>
     </main>
+  );
+}
+
+export default function CoursesPage({ searchParams }: { searchParams: Promise<{ category?: string }> }) {
+  return (
+    <Suspense
+      fallback={
+        <main className="min-h-screen bg-[#f7faf8] px-5 py-10 text-slate-900 sm:px-8 sm:py-14">
+          <div className="mx-auto max-w-6xl">
+            <div className="h-9 w-56 animate-pulse rounded-lg bg-white" />
+            <div className="mt-8 h-64 animate-pulse rounded-2xl bg-white" />
+          </div>
+        </main>
+      }
+    >
+      <CoursesPageContent searchParams={searchParams} />
+    </Suspense>
   );
 }
