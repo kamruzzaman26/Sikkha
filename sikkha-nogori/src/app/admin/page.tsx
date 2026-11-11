@@ -601,7 +601,7 @@ async function AdminContent({
     supabase
       .from("products")
       .select(
-        "id, title, slug, description, price, cost_price, affiliate_commission_type, affiliate_commission_value, pricing_mode, markup_percent, list_price, edition, isbn, page_count, language, country, weight_kg, product_type, category, author, publisher, image_url, commerce_mode, is_published, archived_at",
+        "id, title, slug, description, price, cost_price, affiliate_commission_type, affiliate_commission_value, pricing_mode, markup_percent, list_price, edition, isbn, page_count, language, country, weight_kg, product_type, category, author, publisher, image_url, commerce_mode, is_published, archived_at, created_at",
       )
       .order("title"),
     supabase
@@ -802,6 +802,35 @@ async function AdminContent({
     productTypeFilter !== "all" ||
     publicationFilter !== "all" ||
     archivedFilter !== "all";
+  const sortValue = Array.isArray(params.productSort) ? params.productSort[0] : params.productSort;
+  const productSort = ["name-desc", "price-asc", "price-desc", "newest"].includes(sortValue ?? "") ? (sortValue as string) : "name-asc";
+  const sortedProducts = [...filteredProducts].sort((a, b) => {
+    const priceA = a.price == null ? Number.POSITIVE_INFINITY : Number(a.price);
+    const priceB = b.price == null ? Number.POSITIVE_INFINITY : Number(b.price);
+    switch (productSort) {
+      case "name-desc": return (b.title ?? "").localeCompare(a.title ?? "", "bn");
+      case "price-asc": return priceA - priceB;
+      case "price-desc": return (b.price == null ? -1 : priceB) - (a.price == null ? -1 : priceA);
+      case "newest": return String((b as { created_at?: string }).created_at ?? "").localeCompare(String((a as { created_at?: string }).created_at ?? ""));
+      default: return (a.title ?? "").localeCompare(b.title ?? "", "bn");
+    }
+  });
+  const PAGE_SIZE = 20;
+  const pageValue = Array.isArray(params.productPage) ? params.productPage[0] : params.productPage;
+  const totalPages = Math.max(1, Math.ceil(sortedProducts.length / PAGE_SIZE));
+  const currentPage = Math.min(totalPages, Math.max(1, Number.parseInt(pageValue ?? "1", 10) || 1));
+  const pagedProducts = sortedProducts.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+  const pageHref = (page: number) => {
+    const q = new URLSearchParams();
+    if (productQueryInput) q.set("productQuery", productQueryInput);
+    if (productTypeFilter !== "all") q.set("productTypeFilter", productTypeFilter);
+    if (publicationFilter !== "all") q.set("publicationFilter", publicationFilter);
+    if (archivedFilter !== "all") q.set("archivedFilter", archivedFilter);
+    if (productSort !== "name-asc") q.set("productSort", productSort);
+    if (page > 1) q.set("productPage", String(page));
+    const qs = q.toString();
+    return `/admin${qs ? `?${qs}` : ""}#product-catalog`;
+  };
   const productTypes = productTypesResult.data
     .filter((type) => type.is_active)
     .map(({ slug, label }) => ({ slug, label }));
@@ -809,7 +838,7 @@ async function AdminContent({
     .map(({ slug, label, is_active }) => ({
       slug,
       title: is_active ? label : `${label} · Inactive`,
-      entries: filteredProducts.filter(
+      entries: pagedProducts.filter(
         (product) => product.product_type === slug,
       ),
     }))
@@ -938,7 +967,7 @@ async function AdminContent({
             action="/admin"
             method="get"
             role="search"
-            className="mt-5 grid gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4 sm:grid-cols-[minmax(0,1fr)_9rem_9rem_9rem_auto] sm:items-end"
+            className="mt-5 grid gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4 sm:grid-cols-[minmax(0,1fr)_9rem_9rem_9rem_9rem_auto] sm:items-end"
           >
             <div>
               <label
@@ -1012,6 +1041,16 @@ async function AdminContent({
                 <option value="draft">Draft</option>
               </select>
             </div>
+            <div>
+              <label htmlFor="admin-product-sort" className="mb-1.5 block text-sm font-semibold text-slate-800">Sort by</label>
+              <select id="admin-product-sort" name="productSort" defaultValue={productSort} className="w-full min-h-11 rounded-lg border border-slate-300 bg-white px-3 text-sm">
+                <option value="name-asc">Name A–Z</option>
+                <option value="name-desc">Name Z–A</option>
+                <option value="price-asc">Price low → high</option>
+                <option value="price-desc">Price high → low</option>
+                <option value="newest">Newest first</option>
+              </select>
+            </div>
             <button
               type="submit"
               className="min-h-11 rounded-xl bg-brand-700 px-5 text-sm font-semibold text-white transition hover:bg-brand-800"
@@ -1029,7 +1068,7 @@ async function AdminContent({
           </form>
 
           <p aria-live="polite" className="mt-4 text-sm text-slate-600">
-            Showing {filteredProducts.length} products · {products.length} total
+            Showing {pagedProducts.length ? (currentPage - 1) * PAGE_SIZE + 1 : 0}–{(currentPage - 1) * PAGE_SIZE + pagedProducts.length} of {filteredProducts.length} matching · {products.length} total
           </p>
 
           <div className="mt-6 grid gap-8">
@@ -1148,6 +1187,16 @@ async function AdminContent({
               </section>
             ))}
           </div>
+
+          {totalPages > 1 && (
+            <nav aria-label="Product pages" className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4">
+              <p className="text-sm text-slate-600">Page {currentPage} of {totalPages}</p>
+              <div className="flex gap-2">
+                {currentPage > 1 ? <Link href={pageHref(currentPage - 1)} className="min-h-10 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">← Previous</Link> : <span className="min-h-10 rounded-lg border border-slate-200 px-4 py-2 text-sm text-slate-400">← Previous</span>}
+                {currentPage < totalPages ? <Link href={pageHref(currentPage + 1)} className="min-h-10 rounded-lg bg-brand-700 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-800">Next →</Link> : <span className="min-h-10 rounded-lg border border-slate-200 px-4 py-2 text-sm text-slate-400">Next →</span>}
+              </div>
+            </nav>
+          )}
         </section>
         )}
 
