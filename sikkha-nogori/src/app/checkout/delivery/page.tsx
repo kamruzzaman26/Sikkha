@@ -7,6 +7,7 @@ import { AddressFields } from "@/components/address-fields";
 import { SubmitButton } from "@/components/submit-button";
 import { ShippingChargeSelector } from "@/components/shipping-charge-selector";
 import { formatBDT } from "@/lib/money";
+import { getShippingCharges } from "@/lib/shipping-fee.mjs";
 import { isNoActiveSessionError } from "@/lib/supabase/auth-errors";
 import { getCheckoutOptions } from "@/lib/supabase/checkout";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -48,7 +49,15 @@ async function DeliveryContent({ searchParams }: Pick<PageProps<"/checkout/deliv
     throw new Error("Unable to verify the signed-in customer.", { cause: userError });
   }
 
-  const [options, params] = await Promise.all([getCheckoutOptions(), searchParams]);
+  const [options, params, settingsResult] = await Promise.all([
+    getCheckoutOptions(),
+    searchParams,
+    supabase.from("site_settings").select("value").eq("key", "general").maybeSingle(),
+  ]);
+  const generalSettings = settingsResult.data?.value && typeof settingsResult.data.value === "object"
+    ? settingsResult.data.value as Record<string, unknown>
+    : {};
+  const shippingCharges = getShippingCharges(generalSettings.delivery_charges);
   const status = first(params.status);
   const message = status && Object.hasOwn(statusMessages, status) ? statusMessages[status] : undefined;
 
@@ -181,6 +190,7 @@ async function DeliveryContent({ searchParams }: Pick<PageProps<"/checkout/deliv
               discount={discount}
               required={requiresShipping}
               initialZone={initialShippingZone}
+              charges={shippingCharges}
             />
 
             <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
