@@ -35,6 +35,23 @@ export async function createSupabaseServerClient() {
   });
 }
 
+
+export function createSupabaseServiceRoleClient() {
+  const { url } = getSupabasePublicConfig();
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim();
+  if (!serviceRoleKey) {
+    throw new Error("Supabase service role key is not configured on the server.");
+  }
+
+  return createClient(url, serviceRoleKey, {
+    auth: {
+      autoRefreshToken: false,
+      detectSessionInUrl: false,
+      persistSession: false,
+    },
+  });
+}
+
 export function createSupabasePublicServerClient() {
   const { url, publishableKey } = getSupabasePublicConfig();
 
