@@ -36,11 +36,21 @@ begin
     raise exception 'Authentication required.' using errcode = '42501';
   end if;
 
-  expected_charge := case p_shipping_zone
-    when 'dhaka_city' then 48
-    when 'district_town' then 52
-    when 'remote_union' then 57
-    when 'no_shipping' then 0
+  expected_charge := case
+    when p_shipping_zone = 'no_shipping' then 0
+    when p_shipping_zone in ('dhaka_city', 'district_town', 'remote_union') then
+      coalesce(
+        (
+          select (value -> 'delivery_charges' ->> p_shipping_zone)::numeric
+          from public.site_settings
+          where key = 'general'
+        ),
+        case p_shipping_zone
+          when 'dhaka_city' then 48
+          when 'district_town' then 52
+          when 'remote_union' then 57
+        end
+      )
     else null
   end;
 
