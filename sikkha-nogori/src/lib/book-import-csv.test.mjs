@@ -9,14 +9,14 @@ const partnerDomains = new Map([
   ["rkmri.co", "rokomari"],
   ["10ms.io", "10_minute_school"],
 ]);
-const header = "book_name,affiliate_url,image_url";
+const header = "product_name,product_type,slug,description,author_names,publisher_name,brand_name,instructor_names,category_paths,primary_category,affiliate_url,image_url,isbn,edition,page_count,language,country,weight_kg,cost_price,selling_price,list_price,sales_type,bestseller";
 
 function row(
   name = "নমুনা বই",
   affiliateUrl = "https://rkmri.co/book/123",
   imageUrl = "https://images.example.com/book.jpg",
 ) {
-  return `${name},${affiliateUrl},${imageUrl}`;
+  return `${name},book,,,"আরিফ আজাদ","সমকালীন প্রকাশন",,,,,"category","\${affiliateUrl}","\${imageUrl}",,,,,,,,,affiliate,false`;
 }
 
 test("parses the required header and preserves supplied names and URLs exactly", () => {
@@ -124,4 +124,30 @@ test("accepts 23 or more data rows while enforcing the configured row limit", ()
     prepareBookImportCsv(tooManyRows, partnerDomains).error,
     /সর্বোচ্চ/,
   );
+});
+
+
+test("supports legacy three-column affiliate book CSV", () => {
+  const result = prepareBookImportCsv(
+    "book_name,affiliate_url,image_url\\nবই,https://rkmri.co/book/9,https://images.example.com/9.jpg",
+    partnerDomains,
+  );
+  assert.equal(result.error, undefined);
+  assert.equal(result.rows[0].status, "ready");
+  assert.equal(result.rows[0].salesType, "affiliate");
+});
+
+test("parses Smart Catalog metadata and direct-sale rows", () => {
+  const csv = [
+    header,
+    'নতুন বই,book,new-book,বিবরণ,"লেখক ১|লেখক ২",প্রকাশনী,,,,,,https://images.example.com/new.jpg,ISBN-1,প্রথম,120,বাংলা,বাংলাদেশ,0.3,100,150,200,affiliate,true',
+    'অনলাইন কোর্স,course,online-course,কোর্স পরিচিতি,,,,শিক্ষক,,"",,https://images.example.com/course.jpg,,,,বাংলা,বাংলাদেশ,,,1200,,direct,false',
+  ].join("\\n");
+  const result = prepareBookImportCsv(csv, partnerDomains);
+  assert.equal(result.rows.length, 2);
+  assert.equal(result.rows[0].status, "ready");
+  assert.deepEqual(result.rows[0].authors, ["লেখক ১", "লেখক ২"]);
+  assert.equal(result.rows[0].bestseller, true);
+  assert.equal(result.rows[1].status, "ready");
+  assert.equal(result.rows[1].salesType, "direct");
 });
