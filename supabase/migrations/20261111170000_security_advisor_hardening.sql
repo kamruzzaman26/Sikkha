@@ -174,7 +174,7 @@ where p.status = 'published'::public.content_status
 -- table and column grants and expose only the two columns used by the stock view.
 revoke all privileges on table public.product_inventory from anon;
 
-do $
+do $$
 declare
   columns_to_revoke text;
 begin
