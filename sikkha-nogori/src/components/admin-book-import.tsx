@@ -31,14 +31,16 @@ function statusLabel(status: BookImportRowResult["status"]): string {
 function ImportRows({ rows }: { rows: BookImportRowResult[] }) {
   return (
     <div className="mt-5 overflow-x-auto rounded-xl border border-slate-200">
-      <table className="w-full min-w-[58rem] border-collapse text-left text-sm">
+      <table className="w-full min-w-[78rem] border-collapse text-left text-sm">
         <thead className="bg-slate-50 text-slate-700">
           <tr>
             <th scope="col" className="px-3 py-3">CSV row</th>
-            <th scope="col" className="px-3 py-3">Book title</th>
-            <th scope="col" className="px-3 py-3">Affiliate URL</th>
-            <th scope="col" className="px-3 py-3">Image URL</th>
-            <th scope="col" className="px-3 py-3">Status & details</th>
+            <th scope="col" className="px-3 py-3">Product</th>
+            <th scope="col" className="px-3 py-3">Type / Sales</th>
+            <th scope="col" className="px-3 py-3">Authors / Publisher</th>
+            <th scope="col" className="px-3 py-3">Categories</th>
+            <th scope="col" className="px-3 py-3">Affiliate / Image</th>
+            <th scope="col" className="px-3 py-3">Bestseller / Status</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-100">
@@ -50,14 +52,25 @@ function ImportRows({ rows }: { rows: BookImportRowResult[] }) {
               <td className="max-w-64 whitespace-pre-wrap break-words px-3 py-3">
                 {row.bookName || "—"}
               </td>
-              <td className="max-w-72 break-all px-3 py-3">
-                {row.affiliateUrl || "—"}
+              <td className="px-3 py-3">
+                <p>{row.productType || "—"}</p>
+                <p className="text-xs text-slate-500">{row.salesType || "—"}</p>
               </td>
-              <td className="max-w-72 break-all px-3 py-3">
-                {row.imageUrl || "—"}
+              <td className="max-w-56 px-3 py-3 text-xs">
+                <p>{row.authors?.join(" · ") || "—"}</p>
+                <p className="mt-1 text-slate-500">{row.publishers?.join(" · ") || "—"}</p>
+                <p className="mt-1 text-slate-500">{row.brands?.join(" · ") || row.instructors?.join(" · ") || "—"}</p>
+              </td>
+              <td className="max-w-64 px-3 py-3 text-xs">
+                {row.categories?.join(" | ") || "—"}
+              </td>
+              <td className="max-w-64 break-all px-3 py-3 text-xs">
+                <p>{row.affiliateUrl || "—"}</p>
+                <p className="mt-1 text-slate-500">{row.imageUrl || "—"}</p>
               </td>
               <td className="max-w-80 px-3 py-3">
-                <p className="font-bold">{statusLabel(row.status)}</p>
+                <p className="font-bold">{row.bestseller ? "Bestseller list" : "—"}</p>
+                <p className="mt-1 font-semibold">{statusLabel(row.status)}</p>
                 {row.reasons.length > 0 && (
                   <ul className="mt-1 list-inside list-disc text-rose-700">
                     {row.reasons.map((reason, index) => (
@@ -180,17 +193,14 @@ export function AdminBookImport() {
         Bulk Import Products (CSV)
       </h2>
       <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-        Required CSV headers:{" "}
-        <code className="rounded bg-slate-100 px-1">book_name</code>,{" "}
-        <code className="rounded bg-slate-100 px-1">affiliate_url</code>, and{" "}
-        <code className="rounded bg-slate-100 px-1">image_url</code>. Maximum 500 rows / 512 KiB.
-        Preview validates every row before import. Only valid new products are saved as unpublished drafts.
-        Product names and URLs are preserved exactly. Fix invalid rows, select the updated CSV, and run Preview again.
+        Smart Catalog CSV supports books, courses and other product types. Required headers: <code className="rounded bg-slate-100 px-1">product_name</code>, <code className="rounded bg-slate-100 px-1">image_url</code>, and <code className="rounded bg-slate-100 px-1">sales_type</code>. Legacy <code className="rounded bg-slate-100 px-1">book_name</code> files are also supported. Maximum 500 rows / 512 KiB. Preview validates product type, sales mode, prices, approved affiliate URLs and existing category paths. New authors, publishers, brands and instructors are deduplicated and linked automatically. Every imported product stays an unpublished draft.
       </p>
       <p className="mt-2 text-sm leading-6 text-amber-900">
-        Imported affiliate products will not be available for direct checkout.
-        No products will be written if the required database migration is missing.
+        Affiliate products open the external partner link and cannot be checked out directly. A CSV Bestseller flag adds the product to a draft admin-curated Bestsellers list; it does not claim verified sales ranking. Categories must already exist in Catalog Entities.
       </p>
+      <a href="/templates/smart-catalog-import-template.csv" download className="mt-3 inline-flex min-h-10 items-center rounded-lg border border-brand-200 px-3 py-2 text-sm font-semibold text-brand-800 hover:bg-brand-50">
+        Download Smart Catalog CSV Template
+      </a>
 
       <div className="mt-5 grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
         <div>
