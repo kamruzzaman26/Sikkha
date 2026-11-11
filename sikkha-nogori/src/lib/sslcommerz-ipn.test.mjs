@@ -75,6 +75,10 @@ test("accepts provider-validated success only when reference, amount, currency a
     false,
   );
   assert.equal(
+    isValidSslcommerzSuccess({ ...valid, val_id: 123 }, transaction, reference),
+    false,
+  );
+  assert.equal(
     isValidSslcommerzSuccess({ ...valid, status: "FAILED" }, transaction, reference),
     false,
   );
