@@ -92,7 +92,7 @@ async function getCategoryMenu() {
       courses: buildCategoryMenu(data, "courses"),
     };
   } catch {
-    return { books: [], products: [] };
+    return { books: [], products: [], courses: [] };
   }
 }
 
