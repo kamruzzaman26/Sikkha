@@ -70,6 +70,7 @@ export function CartPageClient() {
     .filter((row): row is { line: CartLine; product: Product } => Boolean(row.product));
   const total = rows.reduce((sum, row) => sum + (row.product.price ?? 0) * row.line.quantity, 0);
   const itemCount = rows.reduce((sum, row) => sum + row.line.quantity, 0);
+  const productHref = (product: Product) => product.product_type === "book" ? `/books/${product.slug}` : product.product_type === "course" ? `/courses/${product.slug}` : `/products/${product.slug}`;
   const checkoutHref = `/checkout?products=${encodeURIComponent(rows.map((row) => row.line.productId).join(","))}&quantities=${encodeURIComponent(rows.map((row) => `${row.line.productId}:${row.line.quantity}`).join(","))}`;
 
   if (loading) return <p role="status" className="mt-8 rounded-2xl bg-white p-6 text-slate-600">কার্ট লোড হচ্ছে…</p>;
@@ -89,11 +90,11 @@ export function CartPageClient() {
           <div className="grid gap-3">
             {rows.map(({ line, product }) => (
               <article key={line.productId} className="grid grid-cols-[4.5rem_minmax(0,1fr)] gap-3 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm sm:grid-cols-[5rem_minmax(0,1fr)_auto] sm:items-center sm:gap-4 sm:p-4">
-                <Link href={`/products/${product.slug}`} className="flex h-24 items-center justify-center overflow-hidden rounded-xl bg-slate-50 p-1">
+                <Link href={productHref(product)} className="flex h-24 items-center justify-center overflow-hidden rounded-xl bg-slate-50 p-1">
                   {product.image_url ? <Image src={product.image_url} alt={product.title} width={80} height={100} unoptimized className="h-full w-full object-contain" /> : <span className="text-xs text-slate-400">ছবি নেই</span>}
                 </Link>
                 <div className="min-w-0">
-                  <Link href={`/products/${product.slug}`} className="line-clamp-2 font-bold leading-6 text-slate-900 hover:text-emerald-800">{product.title}</Link>
+                  <Link href={productHref(product)} className="line-clamp-2 font-bold leading-6 text-slate-900 hover:text-emerald-800">{product.title}</Link>
                   <p className="mt-1 text-sm font-semibold text-slate-600">{product.price === null ? "মূল্য নির্ধারিত নয়" : formatBDT(product.price)}</p>
                   <p className="mt-1 text-sm font-bold text-emerald-800">মোট: {formatBDT((product.price ?? 0) * line.quantity)}</p>
                 </div>
