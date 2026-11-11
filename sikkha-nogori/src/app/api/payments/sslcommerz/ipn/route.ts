@@ -112,7 +112,7 @@ export async function POST(request: Request) {
     }
 
     validationId = validation.val_id;
-    finalStatus = validation.status;
+    finalStatus = ipnStatus;
     finalTransactionId = validation.bank_tran_id?.trim() || validation.tran_id || merchantReference;
   } else if (ipnStatus === "FAILED" || ipnStatus === "CANCELLED") {
     const queryUrl = new URL(
@@ -140,13 +140,14 @@ export async function POST(request: Request) {
 
     if (
       queried.tran_id !== merchantReference ||
+      queried.status !== ipnStatus ||
       !["FAILED", "CANCELLED"].includes(queried.status ?? "") ||
       Number(queried.amount).toFixed(2) !== Number(transaction.amount).toFixed(2) ||
       queried.currency?.toUpperCase() !== transaction.currency
     ) {
       return json(202, { received: true, processed: false });
     }
-    finalStatus = queried.status;
+    finalStatus = ipnStatus;
     finalTransactionId = queried.bank_tran_id?.trim() || queried.tran_id || merchantReference;
   } else {
     return json(202, { received: true, processed: false });
