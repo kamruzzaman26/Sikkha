@@ -823,7 +823,7 @@ async function AdminContent({
   const pageHref = (page: number) => {
     const q = new URLSearchParams();
     if (productQueryInput) q.set("productQuery", productQueryInput);
-    if (productTypeFilter !== "all") q.set("productTypeFilter", productTypeFilter);
+    if (productTypeFilter !== "all") q.set("productTypeFilter", productTypeFilter ?? "");
     if (publicationFilter !== "all") q.set("publicationFilter", publicationFilter);
     if (archivedFilter !== "all") q.set("archivedFilter", archivedFilter);
     if (productSort !== "name-asc") q.set("productSort", productSort);
