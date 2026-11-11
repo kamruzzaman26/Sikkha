@@ -543,7 +543,7 @@ returns uuid
 language plpgsql
 security definer
 set search_path = ''
-as $
+as $$
 declare
   requesting_user uuid := auth.uid();
   selected_payment_method_type text;
@@ -582,7 +582,7 @@ begin
 
   return p_order_id;
 end;
-$;
+$$;
 
 create or replace function public.sync_affiliate_product_commissions()
 returns trigger
