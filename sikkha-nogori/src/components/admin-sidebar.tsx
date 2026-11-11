@@ -155,7 +155,7 @@ export function AdminShell({ children, identity }: { children: React.ReactNode; 
       {mobileOpen && (
         <div className="fixed inset-0 z-[100] lg:hidden" role="dialog" aria-modal="true" aria-label="Admin navigation">
           <button type="button" aria-label="Close navigation menu" onClick={() => setMobileOpen(false)} className="absolute inset-0 size-full bg-slate-950/60 backdrop-blur-sm" />
-          <aside className="absolute bottom-0 right-0 top-0 w-[min(86vw,340px)] overflow-y-auto overscroll-contain border-l border-white/10 bg-[#0d1933] px-4 py-5 text-white shadow-2xl">
+          <aside className="absolute bottom-0 left-0 top-0 w-[min(86vw,340px)] overflow-y-auto overscroll-contain border-r border-white/10 bg-[#0d1933] px-4 py-5 text-white shadow-2xl">
             <div className="mb-5 flex items-center justify-between">
               <Brand />
               <button type="button" onClick={() => setMobileOpen(false)} aria-label="Close menu" className="flex size-9 shrink-0 items-center justify-center rounded-lg text-slate-200 hover:bg-white/10"><AdminIcon name="x" /></button>
