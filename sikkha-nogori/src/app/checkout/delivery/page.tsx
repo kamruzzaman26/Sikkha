@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import { placeOrder } from "../actions";
 import { AddressFields } from "@/components/address-fields";
 import { SubmitButton } from "@/components/submit-button";
+import { ShippingChargeSelector } from "@/components/shipping-charge-selector";
 import { formatBDT } from "@/lib/money";
 import { isNoActiveSessionError } from "@/lib/supabase/auth-errors";
 import { getCheckoutOptions } from "@/lib/supabase/checkout";
@@ -66,9 +67,14 @@ async function DeliveryContent({ searchParams }: Pick<PageProps<"/checkout/deliv
     .filter((w) => catalog.has(w.id.toLowerCase()))
     .map((w) => {
       const product = catalog.get(w.id.toLowerCase())!;
-      return { ...w, title: product.title, price: Number(product.price), total: Math.round(Number(product.price) * w.quantity * 100) / 100 };
+      return { ...w, title: product.title, product_type: product.product_type, price: Number(product.price), total: Math.round(Number(product.price) * w.quantity * 100) / 100 };
     });
   const subtotal = Math.round(lines.reduce((sum, l) => sum + l.total, 0) * 100) / 100;
+  const requiresShipping = lines.some((line) => line.product_type !== "course");
+  const requestedShippingZone = first(params.shippingZone);
+  const initialShippingZone = ["dhaka_city", "district_town", "remote_union"].includes(requestedShippingZone ?? "")
+    ? requestedShippingZone!
+    : "dhaka_city";
 
   const couponInput = (first(params.couponCode) ?? "").toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 20);
   let appliedCode = "";
@@ -141,13 +147,15 @@ async function DeliveryContent({ searchParams }: Pick<PageProps<"/checkout/deliv
                   </li>
                 ))}
               </ul>
-              <dl className="mt-3 space-y-1.5 border-t border-slate-200 pt-3 text-sm">
-                <div className="flex justify-between"><dt className="text-slate-600">পণ্যের মূল্য</dt><dd className="font-semibold">{formatBDT(subtotal)}</dd></div>
-                {discount > 0 && <div className="flex justify-between text-emerald-800"><dt>কুপন ছাড় ({appliedCode})</dt><dd className="font-semibold">−{formatBDT(discount)}</dd></div>}
-                <div className="flex justify-between text-lg"><dt className="font-bold">প্রদেয় মোট</dt><dd className="font-extrabold text-emerald-800">{formatBDT(total)}</dd></div>
-              </dl>
               {couponNote && <p className="mt-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-950">{couponNote}</p>}
             </section>
+
+            <ShippingChargeSelector
+              subtotal={subtotal}
+              discount={discount}
+              required={requiresShipping}
+              initialZone={initialShippingZone}
+            />
 
             <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
               <h2 className="text-xl font-bold">ডেলিভারি তথ্য</h2>
