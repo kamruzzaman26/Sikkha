@@ -15,7 +15,10 @@ alter table public.products
     check (
       affiliate_commission_value >= 0
       and (affiliate_commission_type <> 'percentage' or affiliate_commission_value <= 100)
-      and (affiliate_commission_type <> 'none' or affiliate_commission_value = 0)
+      and (
+        (affiliate_commission_type = 'none' and affiliate_commission_value = 0)
+        or (affiliate_commission_type in ('percentage','fixed') and affiliate_commission_value > 0)
+      )
     );
 
 alter table public.order_items
