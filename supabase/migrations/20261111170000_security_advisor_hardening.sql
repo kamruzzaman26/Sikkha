@@ -79,7 +79,12 @@ begin
         fn.proname,
         fn.identity_args
       );
-      continue;
+    else
+      execute format(
+        'grant execute on function private.%I(%s) to authenticated',
+        fn.proname,
+        fn.identity_args
+      );
     end if;
 
     volatility := case fn.provolatile
@@ -118,16 +123,19 @@ begin
       fn.identity_args
     );
 
-    execute format(
-      'grant execute on function private.%I(%s) to authenticated',
-      fn.proname,
-      fn.identity_args
-    );
-    execute format(
-      'grant execute on function public.%I(%s) to authenticated',
-      fn.proname,
-      fn.identity_args
-    );
+    if fn.proname = 'best_selling_product_ids' then
+      execute format(
+        'grant execute on function public.%I(%s) to service_role',
+        fn.proname,
+        fn.identity_args
+      );
+    else
+      execute format(
+        'grant execute on function public.%I(%s) to authenticated',
+        fn.proname,
+        fn.identity_args
+      );
+    end if;
 
     if fn.proname = 'get_public_coupons' then
       execute format(
