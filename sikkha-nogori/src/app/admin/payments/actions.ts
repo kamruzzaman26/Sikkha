@@ -83,7 +83,7 @@ export async function setPaymentMethodStatus(formData: FormData) {
   if (isEnabledValue === "true") {
     const { data: method, error: methodError } = await supabase
       .from("payment_methods")
-      .select("method_type")
+      .select("method_type, code")
       .eq("id", id)
       .maybeSingle();
 
@@ -95,7 +95,12 @@ export async function setPaymentMethodStatus(formData: FormData) {
     if (!method) {
       redirect("/admin/payments?status=not-found");
     }
-    if (method.method_type === "gateway") {
+    if (
+      method.method_type === "gateway" &&
+      (method.code !== "sslcommerz" ||
+        !process.env.SSLCOMMERZ_STORE_ID?.trim() ||
+        !process.env.SSLCOMMERZ_STORE_PASSWORD?.trim())
+    ) {
       redirect("/admin/payments?status=gateway-unavailable");
     }
   }
