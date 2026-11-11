@@ -56,6 +56,8 @@ type AdminOrder = {
   delivery_address: string;
   currency: string;
   total_amount: number | string;
+  shipping_charge: number | string;
+  shipping_zone: string | null;
   payment_method_id: string;
   payment_method_name: string;
   payment_method_type: "manual" | "cod";
@@ -77,7 +79,7 @@ async function AdminOrdersContent({
   const { data: orders, error: ordersError } = await supabase
     .from("orders")
     .select(
-      "id, user_id, customer_name, customer_phone, delivery_address, currency, total_amount, payment_method_id, payment_method_name, payment_method_type, payment_instructions, status, payment_status, created_at",
+      "id, user_id, customer_name, customer_phone, delivery_address, currency, total_amount, shipping_charge, shipping_zone, payment_method_id, payment_method_name, payment_method_type, payment_instructions, status, payment_status, created_at",
     )
     .order("created_at", { ascending: false })
     .limit(100);
@@ -268,6 +270,10 @@ async function AdminOrdersContent({
                       <dd className="mt-1 whitespace-pre-wrap">
                         {order.delivery_address}
                       </dd>
+                    </div>
+                    <div>
+                      <dt className="font-semibold text-slate-600">Delivery Charge</dt>
+                      <dd className="mt-1 font-semibold">{formatBDT(order.shipping_charge ?? 0)}{order.shipping_zone ? ` · ${({ dhaka_city: "Dhaka City", district_town: "District Town", remote_union: "Remote / Union", no_shipping: "Digital only" } as Record<string, string>)[order.shipping_zone] ?? ""}` : ""}</dd>
                     </div>
                     <div>
                       <dt className="font-semibold text-slate-600">Grand Total</dt>

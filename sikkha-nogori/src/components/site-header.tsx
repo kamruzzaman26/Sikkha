@@ -5,6 +5,7 @@ import Link from "next/link";
 import { createPortal } from "react-dom";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { signOutCustomer } from "@/app/login/actions";
+import { SiteSearch } from "@/components/site-search";
 
 const subscribeToNothing = () => () => {};
 const getClientSnapshot = () => true;
@@ -337,36 +338,7 @@ export function SiteHeader({
             </Link>
           </div>
 
-          <form
-            action="/search"
-            method="get"
-            role="search"
-            className="order-3 w-full lg:order-none lg:min-w-0 lg:flex-1"
-          >
-            <label className="sr-only" htmlFor="site-search">
-              Search books, courses, products, or authors
-            </label>
-            <div className="flex min-h-11 rounded-xl border border-slate-200 bg-[#f8faf9] p-1 transition focus-within:border-emerald-600 focus-within:ring-2 focus-within:ring-emerald-100">
-              <span className="flex items-center pl-2.5 text-slate-500">
-                <Icon name="search" />
-              </span>
-              <input
-                id="site-search"
-                name="q"
-                type="search"
-                placeholder="Search books, courses, products, or authors"
-                className="min-w-0 flex-1 bg-transparent px-2 text-sm text-slate-800 outline-none placeholder:text-slate-500"
-              />
-              <button
-                type="submit"
-                aria-label="Search"
-                className="inline-flex min-h-9 items-center gap-2 rounded-lg bg-[#006b4f] px-3 text-sm font-bold text-white transition hover:bg-[#005640] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700"
-              >
-                <Icon name="search" />
-                <span className="hidden sm:inline">Search</span>
-              </button>
-            </div>
-          </form>
+          <SiteSearch />
 
           <div className="flex shrink-0 items-center justify-end gap-0.5 sm:gap-1">
             <Link
@@ -512,7 +484,7 @@ export function SiteHeader({
                   "একাদশ ও দ্বাদশ শ্রেণির বই", "ভর্তি প্রস্তুতি", "বইমেলা ২০২৬"
                 ]} basePath="/books" />
               )}
-              <DrawerLink icon="book" href="/products?category=ই-বুক" onClick={closeDrawer}>ই-বুক</DrawerLink>
+              <DrawerLink icon="book" href="/books?category=ই-বুক" onClick={closeDrawer}>ই-বুক</DrawerLink>
 
               {categoryMenu?.products.length ? (
                 <details className="group border-b border-slate-100">
@@ -557,7 +529,7 @@ export function SiteHeader({
               ) : (
                 <DrawerLink icon="article" href="/courses" onClick={closeDrawer}>কোর্স</DrawerLink>
               )}
-              <DrawerLink icon="article" href="/books?category=শিক্ষা%20কুইজ" onClick={closeDrawer}>শিক্ষা কুইজ</DrawerLink>
+              <DrawerLink icon="article" href="/quiz" onClick={closeDrawer}>শিক্ষা কুইজ</DrawerLink>
 
 
 

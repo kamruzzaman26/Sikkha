@@ -7,6 +7,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { isNoActiveSessionError } from "@/lib/supabase/auth-errors";
 import { SubmitButton } from "@/components/submit-button";
 import { CouponField } from "@/components/coupon-field";
+import { QuantityStepper } from "@/components/quantity-stepper";
 
 export const metadata: Metadata = {
   title: "অর্ডার | শিক্ষা নগরী",
@@ -155,23 +156,14 @@ async function CheckoutContent({
                       >
                         পরিমাণ
                       </label>
-                      <input
-                        id={`quantity-${product.id}`}
-                        name={`quantity-${product.id}`}
-                        type="number"
-                        min={1}
-                        max={99}
-                        step={1}
-                        defaultValue={selectedQuantities.get(product.id) ?? 1}
-                        required={false}
-                        className="w-full rounded-lg border border-slate-300 px-3 py-2"
-                      />
+                      <QuantityStepper id={`quantity-${product.id}`} name={`quantity-${product.id}`} defaultValue={selectedQuantities.get(product.id) ?? 1} />
                     </div>
                   </li>
                 ))}
               </ul>
             </section>
 
+            <input type="hidden" name="shippingZone" value={Array.isArray(params.shippingZone) ? params.shippingZone[0] ?? "" : params.shippingZone ?? ""} />
             <CouponField
               initialCode={initialCoupon}
               coupons={publicCoupons.map((c) => ({
