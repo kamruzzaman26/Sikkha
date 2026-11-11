@@ -163,6 +163,7 @@ async function CheckoutContent({
               </ul>
             </section>
 
+            <input type="hidden" name="shippingZone" value={Array.isArray(params.shippingZone) ? params.shippingZone[0] ?? "" : params.shippingZone ?? ""} />
             <CouponField
               initialCode={initialCoupon}
               coupons={publicCoupons.map((c) => ({
