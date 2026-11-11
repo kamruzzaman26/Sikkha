@@ -306,7 +306,15 @@ create or replace function public.create_sslcommerz_transaction(
   p_order_id uuid,
   p_merchant_reference text
 )
-returns table(transaction_id uuid, merchant_reference text, amount numeric, currency text)
+returns table(
+  transaction_id uuid,
+  merchant_reference text,
+  amount numeric,
+  currency text,
+  provider_session_id text,
+  gateway_page_url text,
+  transaction_status text
+)
 language plpgsql
 security definer
 set search_path = ''
@@ -338,14 +346,16 @@ begin
     raise exception 'Order is not eligible for online payment.' using errcode = '23514';
   end if;
 
-  select id, merchant_reference, amount, currency
+  select id, merchant_reference, amount, currency, provider_session_id, gateway_page_url, status
   into existing_transaction
   from public.payment_transactions
   where order_id = p_order_id and status in ('initiated','pending')
   order by created_at desc limit 1;
   if found then
     return query select existing_transaction.id, existing_transaction.merchant_reference,
-      existing_transaction.amount, existing_transaction.currency;
+      existing_transaction.amount, existing_transaction.currency,
+      existing_transaction.provider_session_id, existing_transaction.gateway_page_url,
+      existing_transaction.status;
     return;
   end if;
 
@@ -356,8 +366,11 @@ begin
     selected_order.total_amount, 'BDT'
   )
   returning id, payment_transactions.merchant_reference,
-    payment_transactions.amount, payment_transactions.currency
-  into transaction_id, merchant_reference, amount, currency;
+    payment_transactions.amount, payment_transactions.currency,
+    payment_transactions.provider_session_id, payment_transactions.gateway_page_url,
+    payment_transactions.status
+  into transaction_id, merchant_reference, amount, currency,
+    provider_session_id, gateway_page_url, transaction_status;
 
   return next;
 end;
@@ -422,7 +435,8 @@ begin
   if p_merchant_reference is null
     or (p_provider_status in ('VALID','VALIDATED') and p_validation_id is null)
     or p_provider_transaction_id is null or p_amount is null
-    or p_currency is null or p_provider_status not in ('VALID','VALIDATED','FAILED','CANCELLED')
+    or p_currency is null or p_provider_status is null
+    or p_provider_status not in ('VALID','VALIDATED','FAILED','CANCELLED')
     or p_payload_hash is null
   then
     raise exception 'Invalid provider notification.' using errcode = '23514';
