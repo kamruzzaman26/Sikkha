@@ -25,7 +25,18 @@ type BookSearchParams = Promise<{
   author?: string | string[];
   publisher?: string | string[];
   language?: string | string[];
+  brand?: string | string[];
+  tag?: string | string[];
+  collection?: string | string[];
+  minPrice?: string | string[];
+  maxPrice?: string | string[];
+  discount?: string | string[];
 }>;
+
+function amountValue(value: string | string[] | undefined, max: number): string {
+  const number = Number.parseInt(Array.isArray(value) ? (value[0] ?? "") : (value ?? ""), 10);
+  return Number.isSafeInteger(number) && number > 0 && number <= max ? String(number) : "";
+}
 
 function listValue(value: string | string[] | undefined): string[] {
   const values = Array.isArray(value) ? value : value ? [value] : [];
@@ -61,14 +72,21 @@ async function BookResults({
   const authors = listValue(params.author);
   const publishers = listValue(params.publisher);
   const languages = listValue(params.language);
-  const filterCount = (category ? 1 : 0) + (inStock ? 1 : 0) + authors.length + publishers.length + languages.length;
+  const brands = listValue(params.brand);
+  const tags = listValue(params.tag);
+  const collection = firstValue(params.collection).trim().slice(0, 160);
+  const minPrice = amountValue(params.minPrice, 10_000_000);
+  const maxPrice = amountValue(params.maxPrice, 10_000_000);
+  const minDiscount = amountValue(params.discount, 100);
+  const filterCount = (category ? 1 : 0) + (inStock ? 1 : 0) + authors.length + publishers.length + languages.length +
+    brands.length + tags.length + (collection ? 1 : 0) + (minPrice ? 1 : 0) + (maxPrice ? 1 : 0) + (minDiscount ? 1 : 0);
   const pageValue = Number.parseInt(firstValue(params.page), 10);
   const page =
     Number.isSafeInteger(pageValue) && pageValue > 0 && pageValue <= 100000
       ? pageValue
       : 1;
   const [bookPage, databaseCategories, facets] = await Promise.all([
-    getPublishedBooks({ page, query, category: category || undefined, sort, inStock, authors, publishers, languages }),
+    getPublishedBooks({ page, query, category: category || undefined, sort, inStock, authors, publishers, languages, brands, tags, collection: collection || undefined, minPrice: minPrice ? Number(minPrice) : undefined, maxPrice: maxPrice ? Number(maxPrice) : undefined, minDiscount: minDiscount ? Number(minDiscount) : undefined }),
     getPublishedBookCategories(),
     getBookFacets(),
   ]);
@@ -143,6 +161,12 @@ async function BookResults({
     authors.forEach((value) => search.append("author", value));
     publishers.forEach((value) => search.append("publisher", value));
     languages.forEach((value) => search.append("language", value));
+    brands.forEach((value) => search.append("brand", value));
+    tags.forEach((value) => search.append("tag", value));
+    if (collection) search.set("collection", collection);
+    if (minPrice) search.set("minPrice", minPrice);
+    if (maxPrice) search.set("maxPrice", maxPrice);
+    if (minDiscount) search.set("discount", minDiscount);
     if (nextPage > 1) search.set("page", String(nextPage));
     const suffix = search.toString();
     return suffix ? `/books?${suffix}` : "/books";
@@ -164,7 +188,7 @@ async function BookResults({
             <div>
               <MobileCatalogFilters
                 categories={categoryOptions}
-                state={{ query, category, sort, inStock, authors, publishers, languages }}
+                state={{ query, category, sort, inStock, authors, publishers, languages, brands, tags, collection, minPrice, maxPrice, minDiscount }}
                 facets={facets}
               />
             </div>
