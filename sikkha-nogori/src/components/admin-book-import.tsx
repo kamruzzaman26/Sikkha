@@ -35,7 +35,7 @@ function ImportRows({ rows }: { rows: BookImportRowResult[] }) {
       <table className="w-full min-w-[78rem] border-collapse text-left text-sm">
         <thead className="bg-slate-50 text-slate-700">
           <tr>
-            <th scope="col" className="px-3 py-3">CSV row</th>
+            <th scope="col" className="px-3 py-3">File row</th>
             <th scope="col" className="px-3 py-3">Product</th>
             <th scope="col" className="px-3 py-3">Type / Sales</th>
             <th scope="col" className="px-3 py-3">Authors / Publisher</th>
