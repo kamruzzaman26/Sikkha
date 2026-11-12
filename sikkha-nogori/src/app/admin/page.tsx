@@ -157,6 +157,7 @@ function ProductForm({
   productTypes,
   defaultProductType = "book",
   defaultCommerceMode = "",
+  courseAffiliateFields = false,
   categoryOptions = [],
   selectedCategoryIds = [],
   primaryCategoryId = "",
@@ -169,6 +170,7 @@ function ProductForm({
   productTypes: Array<{ slug: string; label: string }>;
   defaultProductType?: string;
   defaultCommerceMode?: "" | "affiliate" | "direct";
+  courseAffiliateFields?: boolean;
   categoryOptions?: CategoryOption[];
   selectedCategoryIds?: string[];
   primaryCategoryId?: string;
@@ -279,6 +281,27 @@ function ProductForm({
             <option value="direct">Sikkha Nogori direct-sale product</option>
           </select>
         </div>
+      </div>
+
+      {courseAffiliateFields && (
+        <section className="grid gap-4 rounded-xl border border-violet-200 bg-violet-50/60 p-4 md:grid-cols-2">
+          <input type="hidden" name="courseAffiliateFields" value="1" />
+          <div>
+            <label htmlFor={`${idPrefix}-affiliate-partner`} className="mb-2 block text-sm font-semibold text-slate-700">Affiliate Provider</label>
+            <select id={`${idPrefix}-affiliate-partner`} name="courseAffiliatePartner" required defaultValue="10_minute_school" className={inputClass}>
+              <option value="10_minute_school">10 Minute School</option>
+              <option value="rokomari">Rokomari</option>
+            </select>
+          </div>
+          <div>
+            <label htmlFor={`${idPrefix}-affiliate-url`} className="mb-2 block text-sm font-semibold text-slate-700">Approved Affiliate URL</label>
+            <input id={`${idPrefix}-affiliate-url`} name="courseAffiliateUrl" type="url" inputMode="url" required maxLength={2048} placeholder="https://..." className={inputClass} />
+          </div>
+          <p className="text-xs leading-5 text-slate-600 md:col-span-2">The URL is checked against the selected provider’s approved domain before the course and affiliate link are saved.</p>
+        </section>
+      )}
+
+      <div className="grid gap-4 md:grid-cols-2">
         <div>
           <label
             htmlFor={`${idPrefix}-price`}
@@ -935,6 +958,7 @@ async function AdminContent({
                   productTypes={productTypes}
                   defaultProductType={courseEntry ? "course" : "book"}
                   defaultCommerceMode={courseEntry ? "affiliate" : ""}
+                  courseAffiliateFields={courseEntry}
                   categoryOptions={categoryOptions}
                   entityOptions={entityOptions}
                   selectedEntityIds={{ authors: [], publishers: [], brands: [], creators: [] }}
