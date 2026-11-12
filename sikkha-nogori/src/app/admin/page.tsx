@@ -161,6 +161,8 @@ function ProductForm({
   entityOptions,
   selectedEntityIds,
   primaryEntityIds,
+  tagOptions = [],
+  selectedTagIds = [],
 }: {
   product?: ProductFormValue;
   idPrefix: string;
@@ -171,6 +173,8 @@ function ProductForm({
   entityOptions: EntityOptions;
   selectedEntityIds: EntitySelections;
   primaryEntityIds: EntityPrimaries;
+  tagOptions?: Array<{ id: string; name: string }>;
+  selectedTagIds?: string[];
 }) {
   const inputClass =
     "w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5";
@@ -488,6 +492,22 @@ function ProductForm({
             />
           ))}
         </div>
+        <fieldset className="rounded-lg border border-slate-200 p-3">
+          <legend className="px-1 text-sm font-semibold text-slate-800">Tags</legend>
+          <input type="hidden" name="tagsSubmitted" value="1" />
+          {tagOptions.length === 0 ? (
+            <p className="text-xs text-slate-500">No tags yet. Create tags under Website Control → Tags.</p>
+          ) : (
+            <div className="flex flex-wrap gap-2">
+              {tagOptions.map((tag) => (
+                <label key={tag.id} className="inline-flex min-h-9 cursor-pointer items-center gap-2 rounded-full border border-slate-300 bg-white px-3 text-sm has-[:checked]:border-brand-600 has-[:checked]:bg-brand-50 has-[:checked]:font-semibold">
+                  <input type="checkbox" name="tagIds" value={tag.id} defaultChecked={selectedTagIds.includes(tag.id)} className="size-4 accent-blue-700" />
+                  {tag.name}
+                </label>
+              ))}
+            </div>
+          )}
+        </fieldset>
       </div>
 
             <ProductImageUpload idPrefix={idPrefix} initialUrl={product?.image_url ?? ""} />
@@ -693,6 +713,15 @@ async function AdminContent({
         label: `${groupLabelsForForm[row.category_group] ?? row.category_group} › ${names.join(" › ")}`,
       };
     });
+  const [tagsResult, productTagsResult] = await Promise.all([
+    db.from("tags").select("id, name").order("name").limit(500),
+    db.from("product_tags").select("product_id, tag_id").limit(20000),
+  ]);
+  const tagOptions: Array<{ id: string; name: string }> = tagsResult.data ?? [];
+  const tagsByProduct = new Map<string, string[]>();
+  for (const row of (productTagsResult.data ?? []) as Array<{ product_id: string; tag_id: string }>) {
+    tagsByProduct.set(row.product_id, [...(tagsByProduct.get(row.product_id) ?? []), row.tag_id]);
+  }
   const entityOptions: EntityOptions = {
     authors: authorsResult.data ?? [],
     publishers: publishersResult.data ?? [],
@@ -932,6 +961,7 @@ async function AdminContent({
                   entityOptions={entityOptions}
                   selectedEntityIds={{ authors: [], publishers: [], brands: [], creators: [] }}
                   primaryEntityIds={{ authors: "", publishers: "", brands: "", creators: "" }}
+                  tagOptions={tagOptions}
                 />
               </div>
             </details>
@@ -1116,6 +1146,8 @@ async function AdminContent({
                                     selectedCategoryIds={selectedByProduct.get(product.id) ?? []}
                                     primaryCategoryId={primaryByProduct.get(product.id) ?? ""}
                                     entityOptions={entityOptions}
+                                    tagOptions={tagOptions}
+                                    selectedTagIds={tagsByProduct.get(product.id) ?? []}
                                     selectedEntityIds={{
                                       authors: selectedEntitiesByProduct.authors.get(product.id) ?? [],
                                       publishers: selectedEntitiesByProduct.publishers.get(product.id) ?? [],

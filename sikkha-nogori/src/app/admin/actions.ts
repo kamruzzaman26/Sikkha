@@ -633,6 +633,29 @@ async function syncProductEntityRelations(
   }
 }
 
+async function syncProductTags(
+  supabase: Awaited<ReturnType<typeof requirePermission>>["supabase"],
+  productId: string,
+  tagIds: string[],
+) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- table names are fixed below.
+  const db = supabase as unknown as { from: (table: string) => any };
+  const { data: existing, error: readError } = await db.from("product_tags").select("tag_id").eq("product_id", productId);
+  if (readError) throw new Error("Unable to read product tags.", { cause: readError });
+  const stale = ((existing ?? []) as Array<{ tag_id: string }>).map((row) => row.tag_id).filter((id) => !tagIds.includes(id));
+  if (stale.length > 0) {
+    const { error } = await db.from("product_tags").delete().eq("product_id", productId).in("tag_id", stale);
+    if (error) throw new Error("Unable to remove product tags.", { cause: error });
+  }
+  if (tagIds.length > 0) {
+    const { error } = await db.from("product_tags").upsert(
+      tagIds.map((tagId) => ({ product_id: productId, tag_id: tagId })),
+      { onConflict: "product_id,tag_id" },
+    );
+    if (error) throw new Error("Unable to save product tags.", { cause: error });
+  }
+}
+
 async function syncProductCategories(
   supabase: Awaited<ReturnType<typeof requirePermission>>["supabase"],
   productId: string,
@@ -757,6 +780,8 @@ export async function saveProduct(formData: FormData) {
     ),
   ];
   const primaryCategoryId = getFormValue(formData, "primaryCategoryId");
+  const tagsSubmitted = getFormValue(formData, "tagsSubmitted") === "1";
+  const tagIds = getUuidList(formData, "tagIds").slice(0, 50);
   const entityRelationsSubmitted = getFormValue(formData, "entityRelationsSubmitted") === "1";
   const entitySelections: ProductEntitySelections = {
     authors: getUuidList(formData, "authorsIds"),
@@ -900,6 +925,9 @@ export async function saveProduct(formData: FormData) {
     if (entityRelationsSubmitted) {
       await syncProductEntityRelations(supabase, id, entitySelections, entityPrimaryIds);
     }
+    if (tagsSubmitted) {
+      await syncProductTags(supabase, id, tagIds);
+    }
     if (!oldProduct || Number(oldProduct.price ?? -1) !== Number(price ?? -1) || Number(oldProduct.cost_price ?? -1) !== Number(costPrice ?? -1)) {
       const { data: { user } } = await supabase.auth.getUser();
       const { error: historyError } = await supabase.from("product_price_history").insert({
@@ -934,6 +962,9 @@ export async function saveProduct(formData: FormData) {
   }
   if (entityRelationsSubmitted && created) {
     await syncProductEntityRelations(supabase, created.id, entitySelections, entityPrimaryIds);
+  }
+  if (tagsSubmitted && created) {
+    await syncProductTags(supabase, created.id, tagIds);
   }
   if (price !== null) {
     const { data: { user } } = await supabase.auth.getUser();
