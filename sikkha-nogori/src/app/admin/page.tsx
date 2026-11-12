@@ -155,6 +155,8 @@ function ProductForm({
   product,
   idPrefix,
   productTypes,
+  defaultProductType = "book",
+  defaultCommerceMode = "",
   categoryOptions = [],
   selectedCategoryIds = [],
   primaryCategoryId = "",
@@ -165,6 +167,8 @@ function ProductForm({
   product?: ProductFormValue;
   idPrefix: string;
   productTypes: Array<{ slug: string; label: string }>;
+  defaultProductType?: string;
+  defaultCommerceMode?: "" | "affiliate" | "direct";
   categoryOptions?: CategoryOption[];
   selectedCategoryIds?: string[];
   primaryCategoryId?: string;
@@ -226,7 +230,7 @@ function ProductForm({
             id={`${idPrefix}-type`}
             name="productType"
             required
-            defaultValue={product?.product_type ?? "book"}
+            defaultValue={product?.product_type ?? defaultProductType}
             className={inputClass}
           >
             {productTypes.map((type) => (
@@ -265,7 +269,7 @@ function ProductForm({
             id={`${idPrefix}-commerce-mode`}
             name="commerceMode"
             required
-            defaultValue={product?.commerce_mode ?? ""}
+            defaultValue={product?.commerce_mode ?? defaultCommerceMode}
             className={inputClass}
           >
             <option value="" disabled>
@@ -735,6 +739,7 @@ async function AdminContent({
   }
 
   const params = await searchParams;
+  const courseEntry = params.courseEntry === "1";
   const statusValue = Array.isArray(params.status)
     ? params.status[0]
     : params.status;
@@ -919,15 +924,17 @@ async function AdminContent({
           </p>
 
           {role === "admin" && (
-            <details className="group mt-5 rounded-xl border border-slate-200 bg-white open:bg-slate-50/70">
+            <details open={courseEntry} className="group mt-5 rounded-xl border border-slate-200 bg-white open:bg-slate-50/70">
               <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 px-4 text-sm font-semibold text-brand-800 [&::-webkit-details-marker]:hidden">
-                <span className="inline-flex items-center gap-2"><AdminIcon name="add" className="size-4" />Add a product to catalog</span>
+                <span className="inline-flex items-center gap-2"><AdminIcon name="add" className="size-4" />{courseEntry ? "Add a course to catalog" : "Add a product to catalog"}</span>
                 <AdminIcon name="chevron" className="size-4 transition group-open:rotate-180" />
               </summary>
               <div className="border-t border-slate-200 p-4">
                 <ProductForm
                   idPrefix="new-product"
                   productTypes={productTypes}
+                  defaultProductType={courseEntry ? "course" : "book"}
+                  defaultCommerceMode={courseEntry ? "affiliate" : ""}
                   categoryOptions={categoryOptions}
                   entityOptions={entityOptions}
                   selectedEntityIds={{ authors: [], publishers: [], brands: [], creators: [] }}
