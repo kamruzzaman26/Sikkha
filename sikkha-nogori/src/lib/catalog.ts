@@ -1019,7 +1019,9 @@ export async function getRuleProducts(rule: {
   else if (rule.sort === "price-high") items = [...items].sort((a, b) => (b.price ?? -1) - (a.price ?? -1));
   if (rule.sort === "bestselling") {
     const { data: ranked } = await supabase.rpc("best_selling_product_ids", { p_limit: 1000 });
-    const units = new Map((ranked ?? []).map((row: { product_id: string; units: number }) => [row.product_id, Number(row.units)]));
+    const units = new Map<string, number>(
+      ((ranked ?? []) as Array<{ product_id: string; units: number }>).map((row): [string, number] => [row.product_id, Number(row.units)]),
+    );
     items = [...items].sort((a, b) => (units.get(b.id) ?? 0) - (units.get(a.id) ?? 0));
   }
   items = items.slice(0, Math.min(60, Math.max(1, rule.limit ?? 12)));
