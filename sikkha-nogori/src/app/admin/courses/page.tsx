@@ -28,7 +28,7 @@ export default async function AdminCoursesPage() {
               Manage online courses as catalog products. Manual entry and the existing Smart Catalog import both use the same product, category, and affiliate-link rules.
             </p>
           </div>
-          <Link href="/admin#product-catalog" className="inline-flex min-h-11 items-center justify-center rounded-xl bg-brand-700 px-4 py-2.5 text-sm font-bold text-white hover:bg-brand-800">
+          <Link href="/admin?courseEntry=1#product-catalog" className="inline-flex min-h-11 items-center justify-center rounded-xl bg-brand-700 px-4 py-2.5 text-sm font-bold text-white hover:bg-brand-800">
             Add Course Manually
           </Link>
         </header>
@@ -37,7 +37,7 @@ export default async function AdminCoursesPage() {
           <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
             <h2 className="font-bold">Manual Course Entry</h2>
             <p className="mt-2 text-sm leading-6 text-slate-600">
-              Open the existing catalog form, select Product Type: course, choose affiliate sales, and add the provider-approved affiliate URL.
+              The dedicated shortcut opens the catalog form with Course and Affiliate preselected. Save the course first, then create its provider-approved affiliate link in the Affiliate Links section.
             </p>
             <Link href="/admin#product-catalog" className="mt-4 inline-flex font-semibold text-brand-700 hover:underline">
               Open Product Catalog →
