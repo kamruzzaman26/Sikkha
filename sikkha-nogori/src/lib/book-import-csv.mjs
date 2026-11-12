@@ -83,7 +83,7 @@ export function prepareBookImportCsv(csvText, partnerByHostname) {
 
   const rows = parsed.records.slice(1).map(({ rowNumber, values }) => {
     const productName = get(values, nameHeader);
-    const productType = get(values, "product_type").trim() || "book";
+    const productType = get(values, "product_type").trim() || (header.includes("instructor_names") ? "course" : "book");
     const salesType = get(values, "sales_type").trim().toLowerCase() || (legacyBookCsv || productType === "course" ? "affiliate" : "");
     const affiliateUrl = get(values, "affiliate_url");
     const imageUrl = get(values, "image_url");
@@ -140,7 +140,7 @@ export function prepareBookImportCsv(csvText, partnerByHostname) {
       pageCount: pageCount || "", language: get(values,"language"),
       country: get(values,"country"), weightKg: get(values,"weight_kg"),
       costPrice: get(values,"cost_price"), sellingPrice: price,
-      listPrice: get(values,"list_price"), bestseller: bestseller === true,
+      listPrice: get(values,"list_price").trim() || (salePrice ? regularPrice : ""), bestseller: bestseller === true,
       status: reasons.length ? "invalid" : "ready", reasons, partner,
     };
   });
