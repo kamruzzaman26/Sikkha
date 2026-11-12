@@ -733,14 +733,19 @@ export async function saveProduct(formData: FormData) {
   ) redirect("/admin?status=product-invalid");
 
   const priceValue = getFormValue(formData, "price");
+  const listPriceValue = getFormValue(formData, "listPrice");
   const manualPrice =
     commerceMode === "affiliate" && priceValue === ""
-      ? null
+      ? courseAffiliateFields && listPriceValue !== ""
+        ? parsePrice(listPriceValue)
+        : null
       : parsePrice(priceValue);
   const calculatedPrice = costPrice == null ? null : Math.round(costPrice * (1 + markupPercent / 100) * 100) / 100;
   const price = pricingMode === "automatic" ? calculatedPrice : manualPrice;
-  const listPriceValue = getFormValue(formData, "listPrice");
-  const listPrice = listPriceValue === "" ? null : parsePrice(listPriceValue);
+  const listPrice =
+    listPriceValue === "" || (courseAffiliateFields && priceValue === "")
+      ? null
+      : parsePrice(listPriceValue);
   const edition = getFormValue(formData, "edition");
   const isbn = getFormValue(formData, "isbn");
   const language = getFormValue(formData, "language");
