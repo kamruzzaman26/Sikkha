@@ -46,9 +46,9 @@ export default async function AdminCoursesPage() {
           <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
             <h2 className="font-bold">Bulk Course Import</h2>
             <p className="mt-2 text-sm leading-6 text-slate-600">
-              The current Smart Catalog importer accepts CSV files, validates course product types and approved affiliate domains, previews rows, detects duplicates, and saves imports as unpublished drafts.
+              The Smart Catalog importer accepts CSV and XLSX files, validates course product types and approved affiliate domains, previews rows, detects duplicates, and saves imports as unpublished drafts.
             </p>
-            <a href="/templates/smart-catalog-import-template.csv" download className="mt-4 inline-flex font-semibold text-brand-700 hover:underline">
+            <a href="/templates/course-import-template.csv" download className="mt-4 inline-flex font-semibold text-brand-700 hover:underline">
               Download CSV Template ↓
             </a>
           </article>
@@ -59,7 +59,7 @@ export default async function AdminCoursesPage() {
         </div>
 
         <p className="mt-5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-950">
-          XLSX upload is not enabled in the current importer yet. Use the CSV template for imports until XLSX parsing and validation are implemented. Imported courses remain drafts and must be reviewed before publishing.
+          Both CSV and XLSX uploads are supported. Use the course CSV template as the column guide; you can open it in Excel or Google Sheets and save it as .xlsx. The importer reads the first worksheet. Imported courses remain drafts and must be reviewed before publishing.
         </p>
       </div>
     </main>
