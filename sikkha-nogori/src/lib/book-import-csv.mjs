@@ -74,7 +74,7 @@ export function prepareBookImportCsv(csvText, partnerByHostname) {
   if (new Set(header).size !== header.length) return { rows: [], error: "CSV header-এ একই কলাম একাধিকবার আছে।" };
   const nameHeader = header.includes("product_name") ? "product_name" : "book_name";
   const legacyBookCsv = nameHeader === "book_name" && !header.includes("sales_type");
-  const required = [nameHeader, "image_url", ...(legacyBookCsv ? [] : ["sales_type"])];
+  const required = [nameHeader, "image_url"];
   const missing = required.filter((name) => !header.includes(name));
   if (missing.length) return { rows: [], error: `CSV header-এ এই কলামগুলো আবশ্যক: ${missing.join(", ")}।` };
   const column = new Map(header.map((name, index) => [name, index]));
@@ -84,7 +84,7 @@ export function prepareBookImportCsv(csvText, partnerByHostname) {
   const rows = parsed.records.slice(1).map(({ rowNumber, values }) => {
     const productName = get(values, nameHeader);
     const productType = get(values, "product_type").trim() || "book";
-    const salesType = get(values, "sales_type").trim().toLowerCase() || (legacyBookCsv ? "affiliate" : "");
+    const salesType = get(values, "sales_type").trim().toLowerCase() || (legacyBookCsv || productType === "course" ? "affiliate" : "");
     const affiliateUrl = get(values, "affiliate_url");
     const imageUrl = get(values, "image_url");
     const reasons = [];
@@ -108,9 +108,11 @@ export function prepareBookImportCsv(csvText, partnerByHostname) {
     } else if (affiliateUrl.trim()) reasons.push("Direct পণ্যে affiliate_url ফাঁকা রাখতে হবে।");
 
     if (imageUrl && !validHttpsUrl(imageUrl)) reasons.push("Image URL অবশ্যই নিরাপদ HTTPS URL হতে হবে।");
-    const price = get(values, "selling_price").trim();
+    const salePrice = get(values, "sale_price").trim();
+    const regularPrice = get(values, "price").trim();
+    const price = get(values, "selling_price").trim() || salePrice || regularPrice;
     if (salesType === "direct" && !price) reasons.push("Direct পণ্যের selling_price আবশ্যক।");
-    for (const field of ["selling_price","cost_price","list_price","weight_kg"]) {
+    for (const field of ["selling_price","sale_price","price","cost_price","list_price","weight_kg"]) {
       const value = get(values, field).trim();
       if (value && (!/^\d+(?:\.\d{1,2})?$/.test(value) || !Number.isFinite(Number(value)))) reasons.push(`${field} সঠিক সংখ্যা হতে হবে।`);
     }
