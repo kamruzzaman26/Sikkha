@@ -13,6 +13,12 @@ export type CatalogFilterState = {
   authors: string[];
   publishers: string[];
   languages: string[];
+  brands: string[];
+  tags: string[];
+  collection: string;
+  minPrice: string;
+  maxPrice: string;
+  minDiscount: string;
 };
 
 const sortOptions: { value: string; label: string }[] = [
@@ -34,6 +40,12 @@ function href(state: CatalogFilterState, overrides: Partial<CatalogFilterState>)
   next.authors.forEach((value) => search.append("author", value));
   next.publishers.forEach((value) => search.append("publisher", value));
   next.languages.forEach((value) => search.append("language", value));
+  next.brands.forEach((value) => search.append("brand", value));
+  next.tags.forEach((value) => search.append("tag", value));
+  if (next.collection) search.set("collection", next.collection);
+  if (next.minPrice) search.set("minPrice", next.minPrice);
+  if (next.maxPrice) search.set("maxPrice", next.maxPrice);
+  if (next.minDiscount) search.set("discount", next.minDiscount);
   const suffix = search.toString();
   return suffix ? `/books?${suffix}` : "/books";
 }
@@ -85,11 +97,12 @@ export default function MobileCatalogFilters({
 }: {
   categories: Option[];
   state: CatalogFilterState;
-  facets: { authors: string[]; publishers: string[]; languages: string[] };
+  facets: { authors: string[]; publishers: string[]; languages: string[]; brands: Option[]; tags: Option[]; collections: Option[] };
 }) {
   const [sheet, setSheet] = useState<null | "filter" | "sort">(null);
   const [allCategories, setAllCategories] = useState(false);
-  const activeCount = (state.category ? 1 : 0) + (state.inStock ? 1 : 0) + state.authors.length + state.publishers.length + state.languages.length;
+  const activeCount = (state.category ? 1 : 0) + (state.inStock ? 1 : 0) + state.authors.length + state.publishers.length + state.languages.length +
+    state.brands.length + state.tags.length + (state.collection ? 1 : 0) + (state.minPrice ? 1 : 0) + (state.maxPrice ? 1 : 0) + (state.minDiscount ? 1 : 0);
   const sortIsListed = sortOptions.some((option) => option.value === state.sort);
   const shownCategories = allCategories ? categories : categories.slice(0, 10);
   const asOptions = (values: string[]): Option[] => values.map((value) => ({ label: value, value }));
@@ -135,7 +148,7 @@ export default function MobileCatalogFilters({
             onClose={() => setSheet(null)}
             footer={
               <div className="flex gap-3 border-t border-slate-200 p-4">
-                <Link href={href({ ...state, category: "", inStock: false, authors: [], publishers: [], languages: [] }, {})} onClick={() => setSheet(null)} className="flex min-h-12 flex-1 items-center justify-center rounded-lg border border-slate-300 text-base font-semibold text-slate-800">Clear All</Link>
+                <Link href={href({ ...state, category: "", inStock: false, authors: [], publishers: [], languages: [], brands: [], tags: [], collection: "", minPrice: "", maxPrice: "", minDiscount: "" }, {})} onClick={() => setSheet(null)} className="flex min-h-12 flex-1 items-center justify-center rounded-lg border border-slate-300 text-base font-semibold text-slate-800">Clear All</Link>
                 <button type="submit" className="min-h-12 flex-[2] rounded-lg bg-blue-700 text-base font-bold text-white hover:bg-blue-800">Apply Filter</button>
               </div>
             }
@@ -160,6 +173,37 @@ export default function MobileCatalogFilters({
                 <label className="flex items-center gap-3 border-t border-slate-100 py-3 text-base font-medium text-slate-400"><input type="checkbox" disabled className="size-5 rounded" /> eBook <span className="text-xs font-normal">(coming soon)</span></label>
               </section>
 
+              <section className="border-t-4 border-slate-100 pt-4">
+                <h3 className="mb-2 text-base font-bold text-slate-900">Price Range (৳)</h3>
+                <div className="flex items-center gap-2">
+                  <input name="minPrice" type="number" inputMode="numeric" min={0} placeholder="Min" aria-label="Minimum price" defaultValue={state.minPrice} className="min-h-11 w-full rounded-lg border border-slate-300 px-3 text-sm" />
+                  <span aria-hidden="true">–</span>
+                  <input name="maxPrice" type="number" inputMode="numeric" min={0} placeholder="Max" aria-label="Maximum price" defaultValue={state.maxPrice} className="min-h-11 w-full rounded-lg border border-slate-300 px-3 text-sm" />
+                </div>
+              </section>
+
+              <section className="border-t-4 border-slate-100 pt-4">
+                <h3 className="mb-2 text-base font-bold text-slate-900">Discount</h3>
+                {[["", "Any"], ["10", "10% or more"], ["20", "20% or more"], ["30", "30% or more"], ["50", "50% or more"]].map(([value, text]) => (
+                  <label key={value} className="flex items-center gap-3 py-2 text-[15px] text-slate-800">
+                    <input type="radio" name="discount" value={value} defaultChecked={state.minDiscount === value} className="size-5 accent-blue-700" /> {text}
+                  </label>
+                ))}
+              </section>
+
+              {facets.collections.length > 0 && (
+                <section className="border-t-4 border-slate-100 pt-4">
+                  <h3 className="mb-2 text-base font-bold text-slate-900">Collection</h3>
+                  <label className="flex items-center gap-3 py-2 text-[15px] text-slate-800"><input type="radio" name="collection" value="" defaultChecked={!state.collection} className="size-5 accent-blue-700" /> Any</label>
+                  {facets.collections.map((option) => (
+                    <label key={option.value} className="flex items-center gap-3 py-2 text-[15px] text-slate-800">
+                      <input type="radio" name="collection" value={option.value} defaultChecked={state.collection === option.value} className="size-5 accent-blue-700" /> {option.label}
+                    </label>
+                  ))}
+                </section>
+              )}
+              <FacetSection title="Brands" name="brand" options={facets.brands} selected={state.brands} />
+              <FacetSection title="Tags" name="tag" options={facets.tags} selected={state.tags} />
               <FacetSection title="Authors" name="author" options={asOptions(facets.authors)} selected={state.authors} />
               <FacetSection title="Publishers" name="publisher" options={asOptions(facets.publishers)} selected={state.publishers} />
               <FacetSection title="Languages" name="language" options={asOptions(facets.languages)} selected={state.languages} />

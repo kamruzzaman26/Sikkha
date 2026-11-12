@@ -257,6 +257,12 @@ export async function getPublishedBooks({
   authors = [],
   publishers = [],
   languages = [],
+  brands = [],
+  tags = [],
+  collection,
+  minPrice,
+  maxPrice,
+  minDiscount,
 }: {
   page: number;
   query: string;
@@ -267,6 +273,13 @@ export async function getPublishedBooks({
   authors?: string[];
   publishers?: string[];
   languages?: string[];
+  /** Entity / tag / collection slugs from the URL. */
+  brands?: string[];
+  tags?: string[];
+  collection?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  minDiscount?: number;
 }): Promise<PublishedBookPage | null> {
   const supabase = createSupabasePublicServerClient();
   const searchTerm = normalizeCatalogQuery(query);
@@ -324,6 +337,15 @@ export async function getPublishedBooks({
     const stockIds = (stockRows ?? []).map((row) => row.product_id as string);
     request = request.in("id", stockIds.length > 0 ? stockIds : [emptyUuid]);
   }
+  if (minPrice !== undefined && minPrice >= 0) request = request.gte("price", minPrice);
+  if (maxPrice !== undefined && maxPrice > 0) request = request.lte("price", maxPrice);
+  if (minDiscount !== undefined && minDiscount > 0) request = request.gte("discount_percent", minDiscount);
+  // Brand, tag and collection filters: each resolves to a set of product ids (AND between filters, OR within one).
+  const idSets: string[][] = [];
+  if (brands.length > 0) idSets.push(await productIdsForEntities(supabase, "brands", "product_brands", "brand_id", brands));
+  if (tags.length > 0) idSets.push(await productIdsForEntities(supabase, "tags", "product_tags", "tag_id", tags));
+  if (collection) idSets.push(await productIdsForCollection(supabase, collection));
+  for (const ids of idSets) request = request.in("id", ids.length > 0 ? ids : [emptyUuid]);
 
   // Best sellers: rank by units in verified-payment orders. With no sales yet, fall back to newest.
   let salesUnits: Map<string, number> | null = null;
@@ -366,13 +388,63 @@ export async function getPublishedBooks({
   return { products: await withReviewStats(await withStockFlags(data)), total: count ?? 0 };
 }
 
-export type BookFacets = { authors: string[]; publishers: string[]; languages: string[] };
+export type FacetOption = { label: string; value: string };
+export type BookFacets = {
+  authors: string[];
+  publishers: string[];
+  languages: string[];
+  brands: FacetOption[];
+  tags: FacetOption[];
+  collections: FacetOption[];
+};
+
+async function productIdsForEntities(
+  supabase: ReturnType<typeof createSupabasePublicServerClient>,
+  table: "brands" | "tags",
+  joinTable: "product_brands" | "product_tags",
+  fk: "brand_id" | "tag_id",
+  slugs: string[],
+): Promise<string[]> {
+  const { data: entities } = await supabase.from(table).select("id").in("slug", slugs.slice(0, 30)).eq("is_active", true);
+  const entityIds = (entities ?? []).map((row) => row.id as string);
+  if (entityIds.length === 0) return [];
+  const { data: links } = await supabase.from(joinTable).select("product_id").in(fk, entityIds).limit(5000);
+  return [...new Set((links ?? []).map((row) => row.product_id as string))];
+}
+
+async function productIdsForCollection(
+  supabase: ReturnType<typeof createSupabasePublicServerClient>,
+  slug: string,
+): Promise<string[]> {
+  // RLS only exposes published collections inside their schedule window.
+  const { data: row } = await supabase.from("collections").select("id, kind, rule").eq("slug", slug).maybeSingle();
+  if (!row) return [];
+  if (row.kind === "rule") {
+    const rule = (row.rule ?? {}) as Record<string, number | string>;
+    const items = await getRuleProducts({
+      sort: String(rule.sort ?? "newest"),
+      limit: Number(rule.limit ?? 12) || 12,
+      min_discount: Number(rule.min_discount ?? 0),
+      window_days: Number(rule.window_days ?? 0),
+    });
+    return items.map((item) => item.id);
+  }
+  const { data: links } = await supabase.from("product_collections").select("product_id").eq("collection_id", row.id).limit(2000);
+  return (links ?? []).map((link) => link.product_id as string);
+}
 
 /** Distinct authors, publishers and languages of published books, most common first. */
 export async function getBookFacets(): Promise<BookFacets> {
-  const empty: BookFacets = { authors: [], publishers: [], languages: [] };
+  const empty: BookFacets = { authors: [], publishers: [], languages: [], brands: [], tags: [], collections: [] };
   try {
     const supabase = createSupabasePublicServerClient();
+    const [brandRows, tagRows, collectionRows] = await Promise.all([
+      supabase.from("brands").select("name, slug").eq("is_active", true).order("name").limit(100),
+      supabase.from("tags").select("name, slug").eq("is_active", true).order("name").limit(100),
+      supabase.from("collections").select("name, slug").order("sort_order").limit(50),
+    ]);
+    const toOptions = (rows: { data: unknown }): FacetOption[] =>
+      ((rows.data ?? []) as Array<{ name: string; slug: string }>).map((row) => ({ label: row.name, value: row.slug }));
     const { data, error } = await supabase
       .from("products")
       .select("author, publisher, language")
@@ -397,6 +469,9 @@ export async function getBookFacets(): Promise<BookFacets> {
       authors: rank(data.map((row) => row.author)),
       publishers: rank(data.map((row) => row.publisher)),
       languages: rank(data.map((row) => row.language)),
+      brands: toOptions(brandRows),
+      tags: toOptions(tagRows),
+      collections: toOptions(collectionRows),
     };
   } catch {
     return empty;
@@ -942,7 +1017,13 @@ export async function getRuleProducts(rule: {
   if (rule.sort === "discount-high") items = [...items].sort((a, b) => discountOf(b) - discountOf(a));
   else if (rule.sort === "price-low") items = [...items].sort((a, b) => (a.price ?? Infinity) - (b.price ?? Infinity));
   else if (rule.sort === "price-high") items = [...items].sort((a, b) => (b.price ?? -1) - (a.price ?? -1));
-  // "bestselling" has no public sales source yet, so it falls back to newest-first.
+  if (rule.sort === "bestselling") {
+    const { data: ranked } = await supabase.rpc("best_selling_product_ids", { p_limit: 1000 });
+    const units = new Map<string, number>(
+      ((ranked ?? []) as Array<{ product_id: string; units: number }>).map((row): [string, number] => [row.product_id, Number(row.units)]),
+    );
+    items = [...items].sort((a, b) => (units.get(b.id) ?? 0) - (units.get(a.id) ?? 0));
+  }
   items = items.slice(0, Math.min(60, Math.max(1, rule.limit ?? 12)));
   return withReviewStats(await withStockFlags(items));
 }
