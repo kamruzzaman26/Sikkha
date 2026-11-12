@@ -910,3 +910,39 @@ export async function getPublishedProductsByIds(
 }
 
 export const catalogPageSize = bookPageSize;
+
+/** Rule-based collections: newest/discount/price ordering with optional minimum discount and age window. */
+export async function getRuleProducts(rule: {
+  sort?: string;
+  limit?: number;
+  min_discount?: number;
+  window_days?: number;
+}): Promise<CatalogProduct[]> {
+  const supabase = createSupabasePublicServerClient();
+  let request = supabase
+    .from("products")
+    .select(catalogProductSelection)
+    .eq("status", "published")
+    .eq("is_published", true)
+    .is("archived_at", null)
+    .not("commerce_mode", "is", null)
+    .order("created_at", { ascending: false })
+    .limit(300);
+  if (rule.window_days && rule.window_days > 0) {
+    request = request.gte("created_at", new Date(Date.now() - rule.window_days * 86_400_000).toISOString());
+  }
+  const { data, error } = await request;
+  if (error) throw new Error("Unable to load collection products.", { cause: error });
+  const discountOf = (p: CatalogProduct) =>
+    p.price !== null && p.list_price !== null && p.list_price > p.price
+      ? ((p.list_price - p.price) / p.list_price) * 100
+      : 0;
+  let items = (data ?? []) as CatalogProduct[];
+  if (rule.min_discount && rule.min_discount > 0) items = items.filter((p) => discountOf(p) >= (rule.min_discount ?? 0));
+  if (rule.sort === "discount-high") items = [...items].sort((a, b) => discountOf(b) - discountOf(a));
+  else if (rule.sort === "price-low") items = [...items].sort((a, b) => (a.price ?? Infinity) - (b.price ?? Infinity));
+  else if (rule.sort === "price-high") items = [...items].sort((a, b) => (b.price ?? -1) - (a.price ?? -1));
+  // "bestselling" has no public sales source yet, so it falls back to newest-first.
+  items = items.slice(0, Math.min(60, Math.max(1, rule.limit ?? 12)));
+  return withReviewStats(await withStockFlags(items));
+}

@@ -1,3 +1,4 @@
+import { HomeMerchandising } from "@/components/home-merchandising";
 import { CatalogProductCard } from "@/components/catalog-product-card";
 import Image from "next/image";
 import Link from "next/link";
@@ -255,6 +256,9 @@ export default async function HomeContent({ searchParams }: { searchParams: Prom
             </div>
           </section>
         )}
+
+        {/* Admin-managed collections and curated lists (Bestseller, Quick Deal, hand-picked lists…). */}
+        <HomeMerchandising />
 
         {/* Topic rail: one real cover per category that has books. */}
         {topics.length > 0 && (
