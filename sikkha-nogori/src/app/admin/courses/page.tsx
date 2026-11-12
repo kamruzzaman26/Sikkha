@@ -37,7 +37,7 @@ export default async function AdminCoursesPage() {
           <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
             <h2 className="font-bold">Manual Course Entry</h2>
             <p className="mt-2 text-sm leading-6 text-slate-600">
-              The dedicated shortcut opens the catalog form with Course and Affiliate preselected. Save the course first, then create its provider-approved affiliate link in the Affiliate Links section.
+              The dedicated shortcut opens a course-focused form with Course and Affiliate preselected. Choose 10 Minute School or Rokomari, enter the approved affiliate URL, and save the course with its affiliate link.
             </p>
             <Link href="/admin#product-catalog" className="mt-4 inline-flex font-semibold text-brand-700 hover:underline">
               Open Product Catalog →
