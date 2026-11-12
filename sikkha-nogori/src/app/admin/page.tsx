@@ -155,6 +155,9 @@ function ProductForm({
   product,
   idPrefix,
   productTypes,
+  defaultProductType = "book",
+  defaultCommerceMode = "",
+  courseAffiliateFields = false,
   categoryOptions = [],
   selectedCategoryIds = [],
   primaryCategoryId = "",
@@ -165,6 +168,9 @@ function ProductForm({
   product?: ProductFormValue;
   idPrefix: string;
   productTypes: Array<{ slug: string; label: string }>;
+  defaultProductType?: string;
+  defaultCommerceMode?: "" | "affiliate" | "direct";
+  courseAffiliateFields?: boolean;
   categoryOptions?: CategoryOption[];
   selectedCategoryIds?: string[];
   primaryCategoryId?: string;
@@ -226,7 +232,7 @@ function ProductForm({
             id={`${idPrefix}-type`}
             name="productType"
             required
-            defaultValue={product?.product_type ?? "book"}
+            defaultValue={product?.product_type ?? defaultProductType}
             className={inputClass}
           >
             {productTypes.map((type) => (
@@ -265,7 +271,7 @@ function ProductForm({
             id={`${idPrefix}-commerce-mode`}
             name="commerceMode"
             required
-            defaultValue={product?.commerce_mode ?? ""}
+            defaultValue={product?.commerce_mode ?? defaultCommerceMode}
             className={inputClass}
           >
             <option value="" disabled>
@@ -275,6 +281,27 @@ function ProductForm({
             <option value="direct">Sikkha Nogori direct-sale product</option>
           </select>
         </div>
+      </div>
+
+      {courseAffiliateFields && (
+        <section className="grid gap-4 rounded-xl border border-violet-200 bg-violet-50/60 p-4 md:grid-cols-2">
+          <input type="hidden" name="courseAffiliateFields" value="1" />
+          <div>
+            <label htmlFor={`${idPrefix}-affiliate-partner`} className="mb-2 block text-sm font-semibold text-slate-700">Affiliate Provider</label>
+            <select id={`${idPrefix}-affiliate-partner`} name="courseAffiliatePartner" required defaultValue="10_minute_school" className={inputClass}>
+              <option value="10_minute_school">10 Minute School</option>
+              <option value="rokomari">Rokomari</option>
+            </select>
+          </div>
+          <div>
+            <label htmlFor={`${idPrefix}-affiliate-url`} className="mb-2 block text-sm font-semibold text-slate-700">Approved Affiliate URL</label>
+            <input id={`${idPrefix}-affiliate-url`} name="courseAffiliateUrl" type="url" inputMode="url" required maxLength={2048} placeholder="https://..." className={inputClass} />
+          </div>
+          <p className="text-xs leading-5 text-slate-600 md:col-span-2">The URL is checked against the selected provider’s approved domain before the course and affiliate link are saved.</p>
+        </section>
+      )}
+
+      <div className="grid gap-4 md:grid-cols-2">
         <div>
           <label
             htmlFor={`${idPrefix}-price`}
@@ -735,6 +762,7 @@ async function AdminContent({
   }
 
   const params = await searchParams;
+  const courseEntry = params.courseEntry === "1";
   const statusValue = Array.isArray(params.status)
     ? params.status[0]
     : params.status;
@@ -919,15 +947,18 @@ async function AdminContent({
           </p>
 
           {role === "admin" && (
-            <details className="group mt-5 rounded-xl border border-slate-200 bg-white open:bg-slate-50/70">
+            <details open={courseEntry} className="group mt-5 rounded-xl border border-slate-200 bg-white open:bg-slate-50/70">
               <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 px-4 text-sm font-semibold text-brand-800 [&::-webkit-details-marker]:hidden">
-                <span className="inline-flex items-center gap-2"><AdminIcon name="add" className="size-4" />Add a product to catalog</span>
+                <span className="inline-flex items-center gap-2"><AdminIcon name="add" className="size-4" />{courseEntry ? "Add a course to catalog" : "Add a product to catalog"}</span>
                 <AdminIcon name="chevron" className="size-4 transition group-open:rotate-180" />
               </summary>
               <div className="border-t border-slate-200 p-4">
                 <ProductForm
                   idPrefix="new-product"
                   productTypes={productTypes}
+                  defaultProductType={courseEntry ? "course" : "book"}
+                  defaultCommerceMode={courseEntry ? "affiliate" : ""}
+                  courseAffiliateFields={courseEntry}
                   categoryOptions={categoryOptions}
                   entityOptions={entityOptions}
                   selectedEntityIds={{ authors: [], publishers: [], brands: [], creators: [] }}

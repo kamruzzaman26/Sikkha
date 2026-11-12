@@ -706,6 +706,9 @@ export async function saveProduct(formData: FormData) {
   const publisher = getFormValue(formData, "publisher");
   const productType = getFormValue(formData, "productType");
   const commerceMode = getFormValue(formData, "commerceMode");
+  const courseAffiliateFields = getFormValue(formData, "courseAffiliateFields") === "1";
+  const courseAffiliatePartner = getFormValue(formData, "courseAffiliatePartner");
+  const courseAffiliateUrlValue = getFormValue(formData, "courseAffiliateUrl");
   const imageUrlValue = getFormValue(formData, "imageUrl");
   const imageUrl = imageUrlValue ? parseProductImageUrl(imageUrlValue) : null;
   const costPriceValue = getFormValue(formData, "costPrice");
@@ -822,6 +825,28 @@ export async function saveProduct(formData: FormData) {
     redirect("/admin?status=product-type-invalid");
   }
 
+  let validatedCourseAffiliateUrl: string | null = null;
+  if (courseAffiliateFields) {
+    if (
+      productType !== "course" ||
+      commerceMode !== "affiliate" ||
+      !isAffiliatePartner(courseAffiliatePartner) ||
+      !courseAffiliateUrlValue ||
+      courseAffiliateUrlValue.length > 2048
+    ) {
+      redirect("/admin?status=product-invalid");
+    }
+    const { data: partnerDomains, error: domainsError } = await supabase
+      .from("affiliate_partner_domains")
+      .select("hostname")
+      .eq("partner", courseAffiliatePartner);
+    if (domainsError) throw new Error("Unable to verify the course affiliate provider.", { cause: domainsError });
+    const allowedHostnames = new Set(partnerDomains.map(({ hostname }) => hostname));
+    if (allowedHostnames.size === 0) redirect("/admin?status=partner-domain-unconfigured");
+    validatedCourseAffiliateUrl = parseAffiliateUrl(courseAffiliateUrlValue, allowedHostnames) ?? null;
+    if (!validatedCourseAffiliateUrl) redirect("/admin?status=product-invalid");
+  }
+
   const values = {
     title,
     slug,
@@ -927,6 +952,18 @@ export async function saveProduct(formData: FormData) {
       "Unable to add the catalog product. Confirm that its slug is unique.",
       { cause: error },
     );
+  }
+
+  if (courseAffiliateFields && created && validatedCourseAffiliateUrl) {
+    const { error: affiliateLinkError } = await supabase.from("affiliate_links").insert({
+      product_id: created.id,
+      partner: courseAffiliatePartner,
+      url: validatedCourseAffiliateUrl,
+      is_active: true,
+    });
+    if (affiliateLinkError) {
+      throw new Error("Course saved, but its affiliate link could not be saved. Open Affiliate Links to finish setup.", { cause: affiliateLinkError });
+    }
   }
 
   if (categoriesSubmitted && created) {
