@@ -843,7 +843,7 @@ export async function saveProduct(formData: FormData) {
     if (domainsError) throw new Error("Unable to verify the course affiliate provider.", { cause: domainsError });
     const allowedHostnames = new Set(partnerDomains.map(({ hostname }) => hostname));
     if (allowedHostnames.size === 0) redirect("/admin?status=partner-domain-unconfigured");
-    validatedCourseAffiliateUrl = parseAffiliateUrl(courseAffiliateUrlValue, allowedHostnames);
+    validatedCourseAffiliateUrl = parseAffiliateUrl(courseAffiliateUrlValue, allowedHostnames) ?? null;
     if (!validatedCourseAffiliateUrl) redirect("/admin?status=product-invalid");
   }
 
