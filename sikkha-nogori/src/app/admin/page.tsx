@@ -307,7 +307,7 @@ function ProductForm({
             htmlFor={`${idPrefix}-price`}
             className="mb-2 block text-sm font-semibold text-slate-700"
           >
-            Price (৳)
+            {courseAffiliateFields ? "Sale Price (৳, optional)" : "Price (৳)"}
           </label>
           <input
             id={`${idPrefix}-price`}
@@ -320,9 +320,9 @@ function ProductForm({
             className={inputClass}
           />
           <p className="mt-1 text-xs leading-5 text-slate-500">
-            Price is required for direct-sale products and optional for affiliate products. If provided,
-            it will be displayed on the site. Keep it aligned with the seller’s current price
-            and update it regularly.
+            {courseAffiliateFields
+              ? "Discounted course price. Leave blank if the provider does not show a sale price; otherwise enter the current discounted amount."
+              : "Price is required for direct-sale products and optional for affiliate products. If provided, it will be displayed on the site. Keep it aligned with the seller’s current price and update it regularly."}
           </p>
         </div>
       <div className="grid gap-4 md:grid-cols-3">
@@ -351,7 +351,7 @@ function ProductForm({
             htmlFor={`${idPrefix}-list-price`}
             className="mb-2 block text-sm font-semibold text-slate-700"
           >
-            List Price (৳, optional)
+            {courseAffiliateFields ? "Regular Price (৳, optional)" : "List Price (৳, optional)"}
           </label>
           <input
             id={`${idPrefix}-list-price`}
@@ -364,7 +364,9 @@ function ProductForm({
             className={inputClass}
           />
           <p className="mt-1 text-xs leading-5 text-slate-500">
-            If provided, the crossed-out price and discount will be shown. It cannot be lower than the selling price.
+            {courseAffiliateFields
+              ? "Original course price before discount. When both prices are entered, this must be equal to or higher than the Sale Price."
+              : "If provided, the crossed-out price and discount will be shown. It cannot be lower than the selling price."}
           </p>
         </div>
       </div>
