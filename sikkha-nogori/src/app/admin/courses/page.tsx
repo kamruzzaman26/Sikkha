@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { connection } from "next/server";
 import { AdminBookImport } from "@/components/admin-book-import";
 import { requireAdmin } from "@/lib/supabase/admin";
 
@@ -9,6 +10,7 @@ export const metadata: Metadata = {
 };
 
 export default async function AdminCoursesPage() {
+  await connection();
   await requireAdmin("admin");
 
   return (

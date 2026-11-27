@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
+import { connection } from "next/server";
 import { placeOrder } from "../actions";
 import { AddressFields } from "@/components/address-fields";
 import { SubmitButton } from "@/components/submit-button";
@@ -43,6 +44,7 @@ const couponFailure: Record<string, string> = {
 const first = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v);
 
 async function DeliveryContent({ searchParams }: Pick<PageProps<"/checkout/delivery">, "searchParams">) {
+  await connection();
   const supabase = await createSupabaseServerClient();
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   if (userError && !isNoActiveSessionError(userError)) {

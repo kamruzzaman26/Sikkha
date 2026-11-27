@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
+import { connection } from "next/server";
 import { formatBDT } from "@/lib/money";
 import { getCheckoutOptions } from "@/lib/supabase/checkout";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -41,6 +42,7 @@ function getSelectedProductId(value: string | string[] | undefined): string | nu
 async function CheckoutContent({
   searchParams,
 }: Pick<PageProps<"/checkout">, "searchParams">) {
+  await connection();
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },
