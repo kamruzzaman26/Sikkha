@@ -57,8 +57,12 @@ async function getSiteIdentity(): Promise<SiteIdentity> {
   if (adminError) {
     throw new Error("Unable to load the account's admin membership.", { cause: adminError });
   }
+  // Order-count lookup is a navigation enhancement, not a page prerequisite.
+  // If the role temporarily lacks SELECT (or the orders service is unavailable),
+  // keep the rest of the signed-in site usable; the dedicated Orders page still
+  // reports its own actionable error until the database permission is repaired.
   if (ordersError) {
-    throw new Error("Unable to load the account's order status.", { cause: ordersError });
+    console.error("Unable to load the account's order status for navigation.", ordersError);
   }
 
   return {
@@ -67,7 +71,7 @@ async function getSiteIdentity(): Promise<SiteIdentity> {
       emailName ||
       "গ্রাহক",
     email: user.email ?? "",
-    hasOrders: (orderCount ?? 0) > 0,
+    hasOrders: !ordersError && (orderCount ?? 0) > 0,
     isAdmin: adminMembership?.role === "admin",
   };
 }
