@@ -70,13 +70,13 @@ async function CheckoutContent({
   const selectedQuantities = new Map((Array.isArray(params.quantities) ? params.quantities[0] : params.quantities ?? "").split(",").map((entry) => { const [id, quantity] = entry.split(":"); return [id, /^[1-9]\d?$/.test(quantity ?? "") ? Number(quantity) : 1] as const; }));
 
   return (
-    <main className="min-h-screen bg-[#f7faf8] px-5 py-10 text-slate-900 sm:px-8 sm:py-14">
+    <main className="min-h-screen bg-[#f2f7f5] px-5 py-10 text-slate-900 sm:px-8 sm:py-14">
       <div className="mx-auto max-w-4xl">
-        <Link href="/" className="font-semibold text-emerald-700">
+        <Link href="/" className="font-semibold text-emerald-800">
           ← শিক্ষা নগরী
         </Link>
         <header className="mt-8">
-          <p className="text-sm font-bold text-emerald-700">ধাপ ১ / ২</p>
+          <p className="text-sm font-bold text-emerald-800">ধাপ ১ / ২</p>
           <h1 className="mt-2 text-3xl font-extrabold sm:text-4xl">
             পণ্য ও কুপন
           </h1>
@@ -115,18 +115,18 @@ async function CheckoutContent({
             পরিচালকের সঙ্গে যোগাযোগ করুন।
           </p>
         ) : options.products.length === 0 ? (
-          <p className="mt-7 rounded-xl border border-slate-200 bg-white px-4 py-5 leading-7 text-slate-600">
+          <p className="mt-7 rounded-xl border border-emerald-100 bg-white px-4 py-5 leading-7 text-slate-600">
             অর্ডারের জন্য কোনো প্রকাশিত পণ্য এখন উপলভ্য নেই।
           </p>
         ) : (
           <form action="/checkout/delivery" method="get" className="mt-7 grid gap-6">
-            <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
+            <section className="rounded-2xl border border-emerald-100 bg-white p-5 shadow-sm sm:p-7">
               <h2 className="text-xl font-bold">পণ্য নির্বাচন</h2>
               <ul className="mt-4 grid gap-3">
                 {options.products.map((product) => (
                   <li
                     key={product.id}
-                    className="grid gap-3 rounded-xl border border-slate-200 p-4 sm:grid-cols-[minmax(0,1fr)_7rem]"
+                    className="grid gap-3 rounded-xl border border-emerald-100 p-4 sm:grid-cols-[minmax(0,1fr)_7rem]"
                   >
                     <label className="flex min-w-0 items-start gap-3">
                       <input
@@ -134,7 +134,7 @@ async function CheckoutContent({
                         name="productId"
                         value={product.id}
                         defaultChecked={selectedProductIds.has(product.id) || product.id === selectedProductId}
-                        className="mt-1 size-4 shrink-0 rounded border-slate-300 text-emerald-700"
+                        className="mt-1 size-4 shrink-0 rounded border-emerald-200 text-emerald-800"
                       />
                       <span className="min-w-0">
                         <span className="block font-bold">{product.title}</span>
@@ -206,10 +206,10 @@ export default function CheckoutPage({
   return (
     <Suspense
       fallback={
-        <main className="min-h-screen bg-[#f7faf8] px-5 py-10 sm:px-8 sm:py-14">
+        <main className="min-h-screen bg-[#f2f7f5] px-5 py-10 sm:px-8 sm:py-14">
           <div className="mx-auto max-w-4xl animate-pulse rounded-2xl bg-white p-8">
-            <div className="h-8 w-64 rounded bg-slate-100" />
-            <div className="mt-8 h-64 rounded-xl bg-slate-100" />
+            <div className="h-8 w-64 rounded bg-emerald-50" />
+            <div className="mt-8 h-64 rounded-xl bg-emerald-50" />
           </div>
         </main>
       }
