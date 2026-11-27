@@ -17,10 +17,10 @@ export function AdminNavLink({ href, label, icon }: { href: string; label: strin
   return (
     <Link href={href} aria-current={active ? "page" : undefined} aria-busy={pending || undefined}
       onClick={() => { if (!active) setPending(true); }}
-      className={`group flex min-h-11 items-center gap-3 rounded-xl px-3 text-[13px] font-semibold transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-300 ${active ? "bg-blue-400 text-slate-950 shadow-lg shadow-black/10" : "text-slate-100/80 hover:bg-white/[0.09] hover:text-white"}`}>
-      <AdminIcon name={icon} className={`size-[18px] shrink-0 ${active ? "text-slate-950" : "text-blue-100/70 group-hover:text-blue-200"}`} />
+      className={`group flex min-h-11 items-center gap-3 rounded-xl px-3 text-[13px] font-semibold transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300 ${active ? "bg-emerald-400 text-emerald-950 shadow-lg shadow-black/15" : "text-emerald-50/80 hover:bg-white/[0.09] hover:text-white"}`}>
+      <AdminIcon name={icon} className={`size-[18px] shrink-0 ${active ? "text-emerald-950" : "text-emerald-200/70 group-hover:text-emerald-200"}`} />
       <span className="flex-1">{label}</span>
-      {pending ? <span aria-label="Loading" className="size-4 animate-spin rounded-full border-2 border-current border-r-transparent" /> : active && <span className="size-1.5 rounded-full bg-slate-950" />}
+      {pending ? <span aria-label="Loading" className="size-4 animate-spin rounded-full border-2 border-current border-r-transparent" /> : active && <span className="size-1.5 rounded-full bg-emerald-950" />}
     </Link>
   );
 }

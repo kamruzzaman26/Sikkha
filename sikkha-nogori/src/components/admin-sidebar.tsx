@@ -14,18 +14,18 @@ function NavList({ onNavigate }: { onNavigate?: () => void }) {
     <nav aria-label="Admin navigation" className="space-y-7">
       {adminNav.map((group) => (
         <section key={group.title}>
-          <p className="px-3 text-[10px] font-extrabold uppercase tracking-[0.18em] text-blue-200/80">{group.title}</p>
+          <p className="px-3 text-[10px] font-extrabold uppercase tracking-[0.18em] text-emerald-300/75">{group.title}</p>
           <ul className="mt-3 space-y-1">
             {group.items.map((item) => (
               <li key={item.label}>
                 {item.children ? (
                   <details className="group/partner">
-                    <summary className="flex min-h-11 cursor-pointer list-none items-center gap-3 rounded-xl px-3 text-sm font-semibold text-slate-100 transition hover:bg-white/10">
+                    <summary className="flex min-h-11 cursor-pointer list-none items-center gap-3 rounded-xl px-3 text-sm font-semibold text-emerald-50 transition hover:bg-emerald-400/15">
                       <AdminIcon name={item.icon} className="size-[18px] shrink-0" />
                       <span className="flex-1">{item.label}</span>
                       <AdminIcon name="chevron" className="size-4 transition group-open/partner:rotate-180" />
                     </summary>
-                    <ul className="ml-5 mt-1 space-y-1 border-l border-white/15 pl-3">
+                    <ul className="ml-5 mt-1 space-y-1 border-l border-emerald-400/20 pl-3">
                       {item.children.map((child) => (
                         <li key={child.href}>
                           <div onClick={onNavigate}><AdminNavLink href={child.href} label={child.label} icon="chevron" /></div>
@@ -39,7 +39,7 @@ function NavList({ onNavigate }: { onNavigate?: () => void }) {
                   <span aria-disabled="true" className="flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm text-slate-300/65">
                     <AdminIcon name={item.icon} className="size-[18px] shrink-0" />
                     <span className="flex-1">{item.label}</span>
-                    <span className="rounded-md border border-white/10 bg-white/5 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-slate-300/60">Soon</span>
+                    <span className="rounded-md border border-emerald-900/40 bg-white/5 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-slate-300/60">Soon</span>
                   </span>
                 )}
               </li>
@@ -54,10 +54,10 @@ function NavList({ onNavigate }: { onNavigate?: () => void }) {
 function Brand() {
   return (
     <Link href="/admin/dashboard" className="flex items-center gap-3 rounded-2xl px-2 py-3">
-      <span className="flex size-11 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-300 to-blue-600 text-lg font-black text-white shadow-lg shadow-black/10">SN</span>
+      <span className="flex size-11 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-600 text-lg font-black text-white shadow-lg shadow-black/10">SN</span>
       <span className="min-w-0">
         <span className="block truncate text-sm font-extrabold tracking-wide text-white">SIKKHA NOGORI</span>
-        <span className="mt-0.5 block text-[10px] font-semibold uppercase tracking-[0.16em] text-blue-200/70">Admin workspace</span>
+        <span className="mt-0.5 block text-[10px] font-semibold uppercase tracking-[0.16em] text-emerald-300/80">Admin workspace</span>
       </span>
     </Link>
   );
@@ -93,10 +93,10 @@ function AdminTopbar({ identity, onMenuClick }: { identity: AdminIdentity; onMen
     return () => { document.removeEventListener("pointerdown", onDown); document.removeEventListener("keydown", onKey); };
   }, [open]);
 
-  const iconBtn = "flex size-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 transition hover:bg-blue-50 hover:text-blue-800";
+  const iconBtn = "flex size-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 transition hover:bg-emerald-50 hover:text-emerald-800";
   return (
     <header className="sticky top-0 z-40 flex min-h-[64px] items-center gap-2 border-b border-slate-200/80 bg-white/95 px-3 shadow-sm backdrop-blur sm:min-h-[72px] sm:px-7">
-      <button type="button" onClick={onMenuClick} aria-label="Open navigation menu" className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[#1d376b] text-white lg:hidden"><AdminIcon name="menu" /></button>
+      <button type="button" onClick={onMenuClick} aria-label="Open navigation menu" className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[#062c22] text-white lg:hidden"><AdminIcon name="menu" /></button>
       <div className="ml-auto flex items-center gap-2">
         <Dropdown id="bell" open={open} setOpen={setOpen} label="Notifications" triggerClass={iconBtn} trigger={<AdminIcon name="bell" className="size-[19px]" />}>
           <p className="text-sm font-bold text-slate-900">Notifications</p>
@@ -108,7 +108,7 @@ function AdminTopbar({ identity, onMenuClick }: { identity: AdminIdentity; onMen
               // eslint-disable-next-line @next/next/no-img-element
               <img src={identity.avatarUrl} alt="" className="size-8 rounded-lg object-cover" />
             ) : (
-              <span className="flex size-8 items-center justify-center rounded-lg bg-[#1d376b] text-xs font-extrabold text-white">{initials}</span>
+              <span className="flex size-8 items-center justify-center rounded-lg bg-[#062c22] text-xs font-extrabold text-white">{initials}</span>
             )}
             <span className="hidden min-w-0 sm:block">
               <span className="block max-w-36 truncate text-xs font-bold text-slate-900">{displayName}</span>
@@ -118,7 +118,7 @@ function AdminTopbar({ identity, onMenuClick }: { identity: AdminIdentity; onMen
           </>}>
           <p className="text-sm font-bold text-slate-900">{displayName}</p>
           <p className="mt-1 break-all text-xs text-slate-500">{identity.email || "Administrator account"}</p>
-          <Link href="/" className="mt-3 block rounded-lg bg-slate-50 px-3 py-2 text-xs font-bold text-blue-800 hover:bg-blue-50">View storefront</Link>
+          <Link href="/" className="mt-3 block rounded-lg bg-slate-50 px-3 py-2 text-xs font-bold text-emerald-800 hover:bg-emerald-50">View storefront</Link>
         </Dropdown>
       </div>
     </header>
@@ -136,29 +136,29 @@ export function AdminShell({ children, identity }: { children: React.ReactNode; 
   }, [mobileOpen]);
 
   return (
-    <div lang="en" className="min-h-screen bg-[#f4f6fb] lg:flex">
-      <aside className="sticky top-0 hidden h-screen w-[276px] shrink-0 flex-col overflow-y-auto border-r border-white/10 bg-[#0d1933] px-4 py-5 text-white lg:flex">
+    <div lang="en" className="flex h-screen overflow-hidden bg-[#f2f7f5]">
+      <aside className="hidden h-full w-[276px] shrink-0 flex-col overflow-y-auto border-r border-emerald-900/40 bg-[#062c22] px-4 py-5 text-white lg:flex">
         <Brand />
-        <div className="my-5 h-px bg-white/10" />
+        <div className="my-5 h-px bg-emerald-400/15" />
         <NavList />
         <div className="mt-auto pt-8">
-          <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+          <div className="rounded-2xl border border-emerald-900/40 bg-white/[0.04] p-4">
             <p className="text-xs font-bold text-white">Sikkha Nogori</p>
             <p className="mt-1 text-[11px] leading-5 text-blue-100/75">Manage your store, catalog, customers, and partners from one place.</p>
           </div>
         </div>
       </aside>
-      <div className="min-w-0 flex-1">
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <AdminTopbar key={pathname} identity={identity} onMenuClick={() => setMobileOpen(true)} />
-        <main className="min-w-0">{children}</main>
+        <div className="min-w-0 flex-1 overflow-y-auto">{children}</div>
       </div>
       {mobileOpen && (
         <div className="fixed inset-0 z-[100] lg:hidden" role="dialog" aria-modal="true" aria-label="Admin navigation">
           <button type="button" aria-label="Close navigation menu" onClick={() => setMobileOpen(false)} className="absolute inset-0 size-full bg-slate-950/60 backdrop-blur-sm" />
-          <aside className="absolute bottom-0 left-0 top-0 w-[min(86vw,340px)] overflow-y-auto overscroll-contain border-r border-white/10 bg-[#0d1933] px-4 py-5 text-white shadow-2xl">
+          <aside className="absolute bottom-0 left-0 top-0 w-[min(86vw,340px)] overflow-y-auto overscroll-contain border-r border-emerald-900/40 bg-[#062c22] px-4 py-5 text-white shadow-2xl">
             <div className="mb-5 flex items-center justify-between">
               <Brand />
-              <button type="button" onClick={() => setMobileOpen(false)} aria-label="Close menu" className="flex size-9 shrink-0 items-center justify-center rounded-lg text-slate-200 hover:bg-white/10"><AdminIcon name="x" /></button>
+              <button type="button" onClick={() => setMobileOpen(false)} aria-label="Close menu" className="flex size-9 shrink-0 items-center justify-center rounded-lg text-slate-200 hover:bg-emerald-400/15"><AdminIcon name="x" /></button>
             </div>
             <NavList onNavigate={() => setMobileOpen(false)} />
           </aside>

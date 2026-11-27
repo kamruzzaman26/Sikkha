@@ -35,9 +35,9 @@ const orderStatusLabels: Record<string, string> = {
 
 const statusStyles: Record<string, string> = {
   pending: "bg-amber-100 text-amber-900",
-  confirmed: "bg-sky-100 text-sky-900",
-  processing: "bg-sky-100 text-sky-900",
-  shipped: "bg-indigo-100 text-indigo-900",
+  confirmed: "bg-teal-100 text-teal-900",
+  processing: "bg-teal-100 text-teal-900",
+  shipped: "bg-emerald-100 text-emerald-900",
   delivered: "bg-emerald-100 text-emerald-900",
   cancelled: "bg-rose-100 text-rose-900",
 };
@@ -154,13 +154,13 @@ function Card({
   tone?: "green" | "amber" | "rose" | "slate";
 }) {
   const tones = {
-    green: "bg-blue-50 text-blue-800",
+    green: "bg-emerald-50 text-emerald-800",
     amber: "bg-amber-50 text-amber-900",
     rose: "bg-rose-50 text-rose-900",
     slate: "bg-slate-100 text-slate-700",
   };
   return (
-    <div className="rounded-2xl border border-blue-100 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+    <div className="rounded-2xl border border-emerald-100 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
       <div className="flex items-center justify-between gap-3">
         <p className="text-sm font-semibold text-slate-600">{label}</p>
         <span className={`flex h-10 w-10 items-center justify-center rounded-xl ${tones[tone]}`}>
@@ -237,13 +237,13 @@ async function DashboardContent() {
   const todayKey = dhakaDateKey(new Date().toISOString());
 
   return (
-    <main lang="en" className="min-h-screen bg-[#f4f7ff] px-4 py-6 text-slate-900 sm:px-7 sm:py-8 xl:px-10">
+    <main lang="en" className="min-h-screen bg-[#f2f7f5] px-4 py-6 text-slate-900 sm:px-7 sm:py-8 xl:px-10">
       <div className="mx-auto max-w-[1500px]">
-        <header className="relative flex flex-wrap items-end justify-between gap-4 overflow-hidden rounded-[26px] bg-[#101b35] px-6 py-7 text-white shadow-xl sm:px-8 sm:py-8">
+        <header className="relative flex flex-wrap items-end justify-between gap-4 overflow-hidden rounded-[26px] bg-gradient-to-br from-[#062c22] via-[#0b4636] to-[#0f5c47] px-6 py-7 text-white shadow-xl sm:px-8 sm:py-8">
           <div className="min-w-0">
             <p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-800">Overview</p>
             <h1 className="mt-1 text-3xl font-extrabold tracking-tight text-white">Welcome back, Admin!</h1>
-            <p className="mt-1.5 max-w-2xl text-[15px] leading-6 text-blue-100/85">
+            <p className="mt-1.5 max-w-2xl text-[15px] leading-6 text-emerald-100/85">
               Here’s what is happening with your website today. Sales include only payment-verified orders (today and month are based on Dhaka time).
             </p>
           </div>
@@ -257,7 +257,7 @@ async function DashboardContent() {
             </Link>
             <Link
               href="/admin"
-              className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-blue-600 px-4 text-sm font-semibold text-white transition hover:bg-blue-800"
+              className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-emerald-700 px-4 text-sm font-semibold text-white transition hover:bg-emerald-800"
             >
               <Icon name="box" className="h-[18px] w-[18px]" />
               Open product catalog
@@ -275,7 +275,7 @@ async function DashboardContent() {
             <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
               <h2 className="text-lg font-bold tracking-tight text-slate-900">Quick Actions</h2>
               <div className="mt-4 grid gap-2">
-                {[{label:"Add Product",href:"/admin#products"},{label:"Manage Affiliate Links",href:"/admin#affiliate-links"},{label:"Manage Orders",href:"/admin/orders"},{label:"Manage Payments",href:"/admin/payments"},{label:"Manage Users",href:"/admin/users"}].map((action) => <Link key={action.label} href={action.href} className="flex min-h-12 items-center justify-between rounded-xl bg-slate-50 px-4 text-sm font-semibold text-slate-700 transition hover:bg-blue-50 hover:text-blue-800"><span>{action.label}</span><span aria-hidden="true">→</span></Link>)}
+                {[{label:"Add Product",href:"/admin#products"},{label:"Manage Affiliate Links",href:"/admin#affiliate-links"},{label:"Manage Orders",href:"/admin/orders"},{label:"Manage Payments",href:"/admin/payments"},{label:"Manage Users",href:"/admin/users"}].map((action) => <Link key={action.label} href={action.href} className="flex min-h-12 items-center justify-between rounded-xl bg-slate-50 px-4 text-sm font-semibold text-slate-700 transition hover:bg-emerald-50 hover:text-emerald-800"><span>{action.label}</span><span aria-hidden="true">→</span></Link>)}
               </div>
             </section>
           </div>
@@ -341,7 +341,7 @@ async function DashboardContent() {
         </div>
 
         <div className="mt-8 grid gap-6 lg:grid-cols-2">
-          <section className="rounded-2xl border border-blue-100 bg-white p-5 shadow-sm sm:p-6">
+          <section className="rounded-2xl border border-emerald-100 bg-white p-5 shadow-sm sm:p-6">
             <div className="flex items-center justify-between gap-3">
               <h2 className="text-lg font-bold tracking-tight">Recent orders</h2>
               <Link
@@ -405,7 +405,7 @@ async function DashboardContent() {
                       </div>
                       <div className="mt-1.5 h-2 rounded-full bg-slate-100">
                         <div
-                          className="h-2 rounded-full bg-blue-600"
+                          className="h-2 rounded-full bg-emerald-700"
                           style={{ width: `${Math.max(4, ((Number(item.quantity) || 0) / topMax) * 100)}%` }}
                         />
                       </div>
@@ -430,7 +430,7 @@ export default function AdminDashboardPage() {
   return (
     <Suspense
       fallback={
-        <main className="min-h-screen bg-[#f3f6f5] px-5 py-8">
+        <main className="min-h-screen bg-[#f2f7f5] px-5 py-8">
           <div className="mx-auto h-64 max-w-6xl animate-pulse rounded-2xl bg-white" />
         </main>
       }

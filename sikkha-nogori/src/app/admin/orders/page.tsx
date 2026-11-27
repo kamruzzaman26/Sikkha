@@ -145,18 +145,18 @@ async function AdminOrdersContent({
   const typedOrders = orders as AdminOrder[];
 
   return (
-    <main lang="en" className="min-h-screen bg-[#f4f6fa] px-4 py-6 text-slate-900 sm:px-7 sm:py-8 xl:px-10">
+    <main lang="en" className="min-h-screen bg-[#f2f7f5] px-4 py-6 text-slate-900 sm:px-7 sm:py-8 xl:px-10">
       <div className="mx-auto max-w-[1500px]">
-        <header className="flex flex-wrap items-end justify-between gap-4">
+        <header className="flex flex-wrap items-end justify-between gap-4 rounded-2xl bg-gradient-to-br from-[#062c22] via-[#0b4636] to-[#0f5c47] px-6 py-7 text-white shadow-lg sm:px-8">
           <div className="min-w-0">
-            <p className="text-xs font-bold uppercase tracking-[0.14em] text-brand-800">Daily operations</p>
-            <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900">Order Management</h1>
-            <p className="mt-1.5 max-w-3xl text-[15px] leading-6 text-slate-600">Showing the latest 100 orders. Orders are not marked Paid without manual payment verification. Do not mark Paid until COD delivery is completed and cash is collected.</p>
+            <p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-800">Daily operations</p>
+            <h1 className="mt-1 text-3xl font-extrabold tracking-tight text-white">Order Management</h1>
+            <p className="mt-1.5 max-w-3xl text-[15px] leading-6 text-emerald-100/85">Showing the latest 100 orders. Orders are not marked Paid without manual payment verification. Do not mark Paid until COD delivery is completed and cash is collected.</p>
           </div>
           <div className="flex flex-wrap gap-2.5">
-            <Link href="/admin/dashboard" className="inline-flex min-h-11 items-center rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-800 transition hover:bg-slate-50">Dashboard</Link>
+            <Link href="/admin/dashboard" className="inline-flex min-h-11 items-center rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-800 transition hover:bg-emerald-50/40">Dashboard</Link>
             <form action={logoutAdmin}>
-              <button type="submit" className="inline-flex min-h-11 items-center rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-800 transition hover:bg-slate-50">Sign out</button>
+              <button type="submit" className="inline-flex min-h-11 items-center rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-800 transition hover:bg-emerald-50/40">Sign out</button>
             </form>
           </div>
         </header>
@@ -164,7 +164,7 @@ async function AdminOrdersContent({
         {message && (
           <p
             role="status"
-            className="mt-6 rounded-xl border border-brand-200 bg-brand-50 px-4 py-3 text-brand-950"
+            className="mt-6 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-emerald-950"
           >
             {message}
           </p>
@@ -201,7 +201,7 @@ async function AdminOrdersContent({
               return (
                 <li
                   key={order.id}
-                  className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7"
+                  className="rounded-2xl border border-emerald-100 bg-white p-5 shadow-sm transition hover:border-emerald-200 sm:p-7"
                 >
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div>
@@ -216,13 +216,13 @@ async function AdminOrdersContent({
                       </p>
                     </div>
                     <div className="flex flex-wrap gap-2">
-                      <span className="rounded-full bg-sky-50 px-3 py-1 text-sm font-bold text-sky-800">
+                      <span className="rounded-full bg-teal-50 px-3 py-1 text-sm font-bold text-teal-800">
                         {orderStatusLabels[order.status]}
                       </span>
                       <span
                         className={`rounded-full px-3 py-1 text-sm font-bold ${
                           order.payment_status === "verified"
-                            ? "bg-brand-100 text-brand-800"
+                            ? "bg-emerald-100 text-emerald-800"
                             : order.payment_status === "refunded"
                               ? "bg-rose-100 text-rose-800"
                               : "bg-amber-50 text-amber-900"
@@ -277,7 +277,7 @@ async function AdminOrdersContent({
                     </div>
                     <div>
                       <dt className="font-semibold text-slate-600">Grand Total</dt>
-                      <dd className="mt-1 text-lg font-extrabold text-brand-800">
+                      <dd className="mt-1 text-lg font-extrabold text-emerald-800">
                         {formatBDT(order.total_amount)}{" "}
                         <span className="text-sm">({order.currency})</span>
                       </dd>
@@ -285,7 +285,7 @@ async function AdminOrdersContent({
                   </dl>
 
                   {latestSubmission && (
-                    <p className="mt-4 break-all rounded-xl bg-slate-50 p-4 text-sm leading-6 text-slate-700">
+                    <p className="mt-4 break-all rounded-xl bg-emerald-50/40 p-4 text-sm leading-6 text-slate-700">
                       Transaction reference:{" "}
                       <span className="font-semibold">
                         {latestSubmission.transaction_reference}
@@ -355,7 +355,7 @@ async function AdminOrdersContent({
                           />
                           <button
                             type="submit"
-                            className="min-h-10 rounded-lg bg-brand-700 px-4 py-2 font-bold text-white hover:bg-brand-800"
+                            className="min-h-10 rounded-lg bg-emerald-700 px-4 py-2 font-bold text-white hover:bg-emerald-800"
                           >
                             Verify Payment & Mark Paid
                           </button>
@@ -417,7 +417,7 @@ async function AdminOrdersContent({
                             className={`min-h-10 rounded-lg border px-3 py-2 text-sm font-semibold ${
                               nextStatus === "cancelled"
                                 ? "border-rose-300 text-rose-800 hover:bg-rose-50"
-                                : "border-slate-300 text-slate-700 hover:bg-slate-50"
+                                : "border-slate-300 text-slate-700 hover:bg-emerald-50/40"
                             }`}
                           >
                             {orderStatusLabels[nextStatus]}
@@ -442,7 +442,7 @@ export default function AdminOrdersPage({
   return (
     <Suspense
       fallback={
-        <main lang="en" className="min-h-screen bg-[#f4f6fa] px-5 py-10 sm:px-8 sm:py-14">
+        <main lang="en" className="min-h-screen bg-[#f2f7f5] px-5 py-10 sm:px-8 sm:py-14">
           <div className="mx-auto max-w-5xl animate-pulse rounded-2xl bg-white p-8">
             <div className="h-8 w-64 rounded bg-slate-100" />
             <div className="mt-8 h-56 rounded-xl bg-slate-100" />
